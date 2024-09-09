@@ -1,0 +1,12 @@
+{
+    "product": [
+      { "id": "1", "name": "Holcim Excel", "category": "cement", "price": 200 },
+      { "id": "2", "name": "Nihon Bond 1.5", "category": "bond", "price": 200 },
+      { "id": "3", "name": "Nihon Bond 1.5", "category": "bond", "price": 200 },
+      { "id": "4", "name": "Nihon Bond 1.5", "category": "bond", "price": 200 },
+      { "id": "5", "name": "Nihon Bond 1.5", "category": "bond", "price": 200 },
+      { "id": "6", "name": "Nihon Bond 1.5", "category": "bond", "price": 200 },
+      { "id": "7", "name": "Nihon Bond 1.5", "category": "bond", "price": 200 },
+      { "id": "8", "name": "Nihon Bond 1.5", "category": "bond", "price": 200 }
+    ]
+  }
