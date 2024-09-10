@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { ComponentToPrint } from '../components/ComponentToPrint';
 import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
+import '../components/Scrollbar.css';
 
 function POSPage() {
 
@@ -12,9 +13,10 @@ function POSPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [cart, setCart] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const toastOptions = {
-        autoClose: 300,
+        autoClose: 500,
         pauseOnHover: true
     }
 
@@ -86,64 +88,111 @@ function POSPage() {
             newTotalAmount = newTotalAmount + parseInt(icart.totalAmount);
         })
         setTotalAmount(newTotalAmount);
-    },[cart])
+    },[cart]);
+
+    const filteredProducts = product.filter((prod) =>
+        prod.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   return (
     <MainLayout>
         <div className='row'>
-            <div className='col-lg-8'>
-                {isLoading ? 'Loading' : <div className='row'>
-                    {product.map((product, key) => 
-                    <div className='col-lg-3 mb-3'>
-                        <div key={key} className='card d-flex align-items-center justify-content-center text-center' style={{ height: '100%' }} onClick={()=> addProductToCart(product)}>
-                            <h5 className='card-title text-truncate' style={{maxWidth: '150px'}}>{product.name}</h5>
-                            <p>{product.category}</p>
-                            <p><strong>₱{product.price}</strong></p>
-                        </div>
-                    </div>
-                    )}
-                </div>}
-            </div>
-            <div className='col-lg-4'>
-                    <div style={{display: "none"}}>
-                        <ComponentToPrint cart={cart} totalAmount={totalAmount} ref={componentRef}/>
-                    </div>
-                    <div className='table-responsive bg-dark'>
-                        <table className='table table-responsive table-dark table-hover'>
-                            <thead>
-                                <tr>
-                                    <td>#</td>
-                                    <td>Name</td>
-                                    <td>Price</td>
-                                    <td>Quantity</td>
-                                    <td>Total</td>
-                                    <td>Action</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {cart ? cart.map((cartProduct, key) => <tr key={key}>
-                                    <td>{cartProduct.id}</td>
-                                    <td>{cartProduct.name}</td>
-                                    <td>{cartProduct.price}</td>
-                                    <td>{cartProduct.quantity}</td>
-                                    <td>{cartProduct.totalAmount}</td>
-                                    <td>
-                                        <button className='btn btn-danger btn-small' onClick={() => removeProduct(cartProduct)}>Remove</button>
-                                    </td>
-                                </tr>)
+        <div className="col-lg-8">
+                <input
+                    type="text"
+                    className="form-control mb-3"
+                    placeholder="Search for a product..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
 
-                                : 'No Item in Cart'
-                                }
+                <div className='scrollable-container-items'>
+                    {isLoading ? (
+                        'Loading'
+                    ) : (
+                        <div className="row">
+                            {filteredProducts.map((product, key) => (
+                                <div className="col-lg-3 mb-3" key={key}>
+                                    <div
+                                        className="card d-flex align-items-center justify-content-center text-center"
+                                        style={{ height: '100%' }}
+                                        onClick={() => addProductToCart(product)}
+                                    >
+                                        <h5
+                                            className="card-title text-truncate"
+                                            style={{ maxWidth: '150px' }}
+                                        >
+                                            {product.name}
+                                        </h5>
+                                        <p>{product.category}</p>
+                                        <p>
+                                            <strong>₱{product.price}</strong>
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+            <div className="col-lg-4">
+                <div style={{ display: 'none' }}>
+                    <ComponentToPrint cart={cart} totalAmount={totalAmount} ref={componentRef} />
+                </div>
+
+                <div className="table-responsive bg-dark">
+                    <table className="table table-dark table-hover mb-1">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+
+                    <div className='scrollable-container-order'>
+                        <table className="table table-dark table-hover mb-0">
+                            <tbody>
+                                {cart.length > 0 ? (
+                                    cart.map((cartProduct, key) => (
+                                        <tr key={key}>
+                                            <td>{cartProduct.id}</td>
+                                            <td>{cartProduct.name}</td>
+                                            <td>{cartProduct.price}</td>
+                                            <td>{cartProduct.quantity}</td>
+                                            <td>{cartProduct.totalAmount}</td>
+                                            <td>
+                                                <button
+                                                    className="btn btn-danger btn-small"
+                                                    onClick={() => removeProduct(cartProduct)}
+                                                >
+                                                    Remove
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="6">No Item in Cart</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
-                        <h2 className='px-2 text-white'>Total Amount: ₱{totalAmount}</h2>
                     </div>
-                    <div className='mt-3'>
-                        { totalAmount !== 0 ? <div>
-                            <button className='btn btn-primary' onClick={handlePrint}>Proceed</button>
-                        </div> : 'Please add a product to the cart'
-                        }
+
+                    <h4 className="px-2 text-white mt-2">Total Amount: ₱{totalAmount}</h4>
+                    <div className="mt-3">
+                        {totalAmount !== 0 && (
+                            <button className="btn btn-primary" onClick={handlePrint}>
+                                Proceed
+                            </button>
+                        )}
                     </div>
+                </div>
             </div>
         </div>
     </MainLayout>
