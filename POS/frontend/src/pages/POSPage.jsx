@@ -94,11 +94,11 @@ function POSPage() {
             <div className='col-lg-8'>
                 {isLoading ? 'Loading' : <div className='row'>
                     {product.map((product, key) => 
-                    <div className='col-lg-4'>
-                        <div key={key} className='card' onClick={()=> addProductToCart(product)}>
-                            <p>{product.name}</p>
+                    <div className='col-lg-3 mb-3'>
+                        <div key={key} className='card d-flex align-items-center justify-content-center text-center' style={{ height: '100%' }} onClick={()=> addProductToCart(product)}>
+                            <h5 className='card-title text-truncate' style={{maxWidth: '150px'}}>{product.name}</h5>
                             <p>{product.category}</p>
-                            <p>₱{product.price}</p>
+                            <p><strong>₱{product.price}</strong></p>
                         </div>
                     </div>
                     )}
