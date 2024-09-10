@@ -1,0 +1,61 @@
+.scrollable-container-items {
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+    overflow-x: hidden;
+
+    /* Hide scrollbar arrows and buttons for Webkit browsers */
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    ::-webkit-scrollbar-button {
+        display: none;
+    }
+
+    /* Hide scrollbar for Firefox and Edge */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.scrollable-container-order {
+    overflow-y: auto;
+    max-height: calc(100vh - 250px);
+    overflow-x: hidden;
+
+    /* Hide scrollbar arrows and buttons for Webkit browsers */
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    ::-webkit-scrollbar-button {
+        display: none;
+    }
+
+    /* Hide scrollbar for Firefox and Edge */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
