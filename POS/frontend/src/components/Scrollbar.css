@@ -1,6 +1,6 @@
 .scrollable-container-items {
     overflow-y: auto;
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 180px);
     overflow-x: hidden;
 
     /* Hide scrollbar arrows and buttons for Webkit browsers */
