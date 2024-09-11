@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './InventoryTable.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const InventoryTable = () => {
     const initialInventory = [
@@ -9,8 +10,9 @@ const InventoryTable = () => {
     ];
 
     const [inventoryData, setInventoryData] = useState(initialInventory);
-    const [formData, setFormData] = useState({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '', totalCost: '' });
+    const [formData, setFormData] = useState({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
     const [editId, setEditId] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -21,6 +23,11 @@ const InventoryTable = () => {
     };
 
     const handleAddItem = () => {
+        if (!formData.itemDescription || !formData.unitPrice || !formData.qualityStocks || !formData.unitMeasurement) {
+            alert('Please fill in all fields.');
+            return;
+        }
+
         const calculatedTotalCost = (formData.unitPrice * formData.qualityStocks).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
 
         if (editId) {
@@ -31,11 +38,16 @@ const InventoryTable = () => {
             setInventoryData([...inventoryData, newItem]);
         }
 
-        setFormData({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '', totalCost: '' });
+        setFormData({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
     };
 
     const handleEditItem = (item) => {
-        setFormData(item);
+        setFormData({
+            itemDescription: item.itemDescription,
+            unitPrice: item.unitPrice,
+            qualityStocks: item.qualityStocks,
+            unitMeasurement: item.unitMeasurement,
+        });
         setEditId(item.id);
     };
 
@@ -43,43 +55,81 @@ const InventoryTable = () => {
         setInventoryData(inventoryData.filter(item => item.id !== id));
     };
 
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const handleSearch = () => {
+        alert(`Search for: ${searchTerm}`);
+    };
+
     return (
         <div className="content">
-            <div className="inventory-header">
+            {/* Left-aligned Inventory header */}
+            <div className="d-flex justify-content-between align-items-center my-4">
                 <h1>Inventory</h1>
-                <div className="controls">
+
+                {/* Search bar aligned right */}
+                <div className="d-flex">
                     <input
                         type="text"
-                        name="itemDescription"
-                        placeholder="Item Description"
-                        value={formData.itemDescription}
-                        onChange={handleInputChange}
+                        placeholder="Search items"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        className="form-control mx-2"
+                        style={{ width: '250px' }}
                     />
-                    <input
-                        type="number"
-                        name="unitPrice"
-                        placeholder="Unit Price"
-                        value={formData.unitPrice}
-                        onChange={handleInputChange}
-                    />
-                    <input
-                        type="number"
-                        name="qualityStocks"
-                        placeholder="Quality in Stocks"
-                        value={formData.qualityStocks}
-                        onChange={handleInputChange}
-                    />
-                    <input
-                        type="text"
-                        name="unitMeasurement"
-                        placeholder="Unit of Measurement"
-                        value={formData.unitMeasurement}
-                        onChange={handleInputChange}
-                    />
-                    <button onClick={handleAddItem}>{editId ? 'Update' : 'Add'}</button>
+                    <button onClick={handleSearch} className="btn btn-primary mx-2">Search</button>
                 </div>
             </div>
-            <table>
+
+            {/* Input form under the header */}
+            <div className="inventory-form my-4">
+                <input
+                    type="text"
+                    name="itemDescription"
+                    placeholder="Item Description"
+                    value={formData.itemDescription}
+                    onChange={handleInputChange}
+                    className="form-control d-inline-block mx-2"
+                    style={{ width: '200px' }}
+                />
+                <input
+                    type="number"
+                    name="unitPrice"
+                    placeholder="Unit Price"
+                    value={formData.unitPrice}
+                    onChange={handleInputChange}
+                    className="form-control d-inline-block mx-2"
+                    style={{ width: '150px' }}
+                />
+                <input
+                    type="number"
+                    name="qualityStocks"
+                    placeholder="Quality in Stocks"
+                    value={formData.qualityStocks}
+                    onChange={handleInputChange}
+                    className="form-control d-inline-block mx-2"
+                    style={{ width: '150px' }}
+                />
+                <input
+                    type="text"
+                    name="unitMeasurement"
+                    placeholder="Unit of Measurement"
+                    value={formData.unitMeasurement}
+                    onChange={handleInputChange}
+                    className="form-control d-inline-block mx-2"
+                    style={{ width: '150px' }}
+                />
+                <button 
+                    onClick={handleAddItem} 
+                    className="btn btn-primary d-inline-block mx-2"
+                >
+                    {editId ? 'Update' : 'Add'}
+                </button>
+            </div>
+
+            <table className="table table-bordered">
                 <thead>
                     <tr>
                         <th>Item Description</th>
@@ -99,8 +149,8 @@ const InventoryTable = () => {
                             <td>{item.unitMeasurement}</td>
                             <td>{item.totalCost}</td>
                             <td>
-                                <button onClick={() => handleEditItem(item)}>Edit</button>
-                                <button onClick={() => handleDeleteItem(item.id)}>Delete</button>
+                                <button className="btn btn-warning btn-sm mx-1" onClick={() => handleEditItem(item)}>Edit</button>
+                                <button className="btn btn-danger btn-sm mx-1" onClick={() => handleDeleteItem(item.id)}>Delete</button>
                             </td>
                         </tr>
                     ))}
