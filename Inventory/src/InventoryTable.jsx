@@ -65,11 +65,8 @@ const InventoryTable = () => {
 
     return (
         <div className="content">
-            {/* Left-aligned Inventory header */}
             <div className="d-flex justify-content-between align-items-center my-4">
                 <h1>Inventory</h1>
-
-                {/* Search bar aligned right */}
                 <div className="d-flex">
                     <input
                         type="text"
@@ -83,7 +80,6 @@ const InventoryTable = () => {
                 </div>
             </div>
 
-            {/* Input form under the header */}
             <div className="inventory-form my-4">
                 <input
                     type="text"
