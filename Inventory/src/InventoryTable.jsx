@@ -4,9 +4,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const InventoryTable = () => {
     const initialInventory = [
-        { id: 1, itemDescription: 'Holcim Excel', unitPrice: 186, qualityStocks: 860, unitMeasurement: 'bags', totalCost: '₱159,960.00' },
-        { id: 2, itemDescription: 'G.I. Pipe 2 1/2 LS II', unitPrice: 3, qualityStocks: 120, unitMeasurement: 'pcs', totalCost: '₱360.00' },
-        { id: 3, itemDescription: 'G.I. Pipe 2 LS II', unitPrice: 1215, qualityStocks: 200, unitMeasurement: 'pcs', totalCost: '₱243,000.00' },
+        {itemDescription: 'Holcim Excel', unitPrice: 186, qualityStocks: 860, unitMeasurement: 'bags', totalCost: '₱159,960.00' },
+        {itemDescription: 'G.I. Pipe 2 1/2 LS II', unitPrice: 3, qualityStocks: 120, unitMeasurement: 'pcs', totalCost: '₱360.00' },
+        {itemDescription: 'G.I. Pipe 2 LS II', unitPrice: 1215, qualityStocks: 200, unitMeasurement: 'pcs', totalCost: '₱243,000.00' },
     ];
 
     const [inventoryData, setInventoryData] = useState(initialInventory);
