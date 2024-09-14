@@ -4,9 +4,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const InventoryTable = () => {
     const initialInventory = [
-        { id: 1, itemDescription: 'Holcim Excel', unitPrice: 186, qualityStocks: 860, unitMeasurement: 'bags', totalCost: '₱159,960.00' },
-        { id: 2, itemDescription: 'G.I. Pipe 2 1/2 LS II', unitPrice: 3, qualityStocks: 120, unitMeasurement: 'pcs', totalCost: '₱360.00' },
-        { id: 3, itemDescription: 'G.I. Pipe 2 LS II', unitPrice: 1215, qualityStocks: 200, unitMeasurement: 'pcs', totalCost: '₱243,000.00' },
+        {itemDescription: 'Holcim Excel', unitPrice: 186, qualityStocks: 860, unitMeasurement: 'bags', totalCost: '₱159,960.00' },
+        {itemDescription: 'G.I. Pipe 2 1/2 LS II', unitPrice: 3, qualityStocks: 120, unitMeasurement: 'pcs', totalCost: '₱360.00' },
+        {itemDescription: 'G.I. Pipe 2 LS II', unitPrice: 1215, qualityStocks: 200, unitMeasurement: 'pcs', totalCost: '₱243,000.00' },
     ];
 
     const [inventoryData, setInventoryData] = useState(initialInventory);
@@ -65,11 +65,8 @@ const InventoryTable = () => {
 
     return (
         <div className="content">
-            {/* Left-aligned Inventory header */}
             <div className="d-flex justify-content-between align-items-center my-4">
                 <h1>Inventory</h1>
-
-                {/* Search bar aligned right */}
                 <div className="d-flex">
                     <input
                         type="text"
@@ -83,7 +80,6 @@ const InventoryTable = () => {
                 </div>
             </div>
 
-            {/* Input form under the header */}
             <div className="inventory-form my-4">
                 <input
                     type="text"
