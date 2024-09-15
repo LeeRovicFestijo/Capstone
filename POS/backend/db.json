@@ -1,7 +1,7 @@
 {
     "product": [
-      { "id": "1", "name": "Holcim Excel", "category": "Cement", "price": 200, "stock": 100 },
-      { "id": "2", "name": "Nihon Bond 1.5", "category": "Bond", "price": 200, "stock": 100 },
+      { "id": "1", "name": "Holcim Excel", "category": "Cement", "price": 200.10, "stock": 100 },
+      { "id": "2", "name": "Nihon Bond 1.5", "category": "Bond", "price": 200.12, "stock": 100 },
       { "id": "3", "name": "Nihon Bond 1.5", "category": "Steel", "price": 200, "stock": 100 },
       { "id": "4", "name": "Nihon Bond 1.5", "category": "wire", "price": 200, "stock": 100 },
       { "id": "5", "name": "Nihon Bond 1.5", "category": "Tape", "price": 200, "stock": 100 },

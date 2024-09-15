@@ -3,7 +3,7 @@ import axios from "axios"
 import { toast, Flip } from 'react-toastify';
 import { ComponentToPrint } from '../components/ComponentToPrint';
 import { useReactToPrint } from 'react-to-print';
-import '../components/style.css';
+import '../components/pos-style.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 import SidebarPOS from '../components/SidebarPOS';
@@ -116,9 +116,9 @@ function POSPage() {
     useEffect(()=> {
         let newTotalAmount = 0;
         cart.forEach(icart =>{
-            newTotalAmount = newTotalAmount + parseInt(icart.totalAmount);
+            newTotalAmount = newTotalAmount + parseFloat(icart.totalAmount);
         })
-        setTotalAmount(newTotalAmount);
+        setTotalAmount(parseFloat(newTotalAmount.toFixed(2)));
     },[cart]);
 
     useEffect(() => {
@@ -135,6 +135,14 @@ function POSPage() {
         }, 10);
     };
 
+    const handleRemoveChange = (cartProduct) => {
+        setLastScrollPosition(scrollableRef.current.scrollTop); 
+        removeProduct(cartProduct);
+        setTimeout(() => {
+            scrollableRef.current.scrollTo({ top: lastScrollPosition, behavior: 'smooth' });
+        }, 10);
+    };
+
     const filteredProducts = product.filter((prod) =>
         prod.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
         (selectedCategory === '' || prod.category === selectedCategory)
@@ -142,7 +150,7 @@ function POSPage() {
 
     const scrollCategories = (direction) => {
         const container = document.querySelector('.category-scroll-container');
-        const scrollAmount = 100; // Adjust the scroll amount as needed
+        const scrollAmount = 100; 
     
         if (direction === 'left') {
             container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
@@ -154,8 +162,8 @@ function POSPage() {
 
     return (
         <SidebarPOS>
-            <div className='row'>
-                <div className="col-lg-8 bg-light p-2">
+            <div className='row' style={{ height: '91vh' }}>
+                <div className="col-lg-8 bg-light p-3 border border-gray">
                     <input
                         type="text"
                         className="form-control mb-3"
@@ -246,7 +254,7 @@ function POSPage() {
                         )}
                     </div>
                 </div>
-                <div className="col-lg-4 border border-gray rounded p-3 d-flex flex-column">
+                <div className="col-lg-4 border border-gray rounded-right p-3 d-flex flex-column">
                     <div style={{ display: 'none' }}>
                         <ComponentToPrint cart={cart} totalAmount={totalAmount} ref={componentRef} />
                     </div>
@@ -296,7 +304,7 @@ function POSPage() {
                                             onMouseEnter={() => setHoveredIndex(key)}
                                             onMouseLeave={() => setHoveredIndex(null)}
                                             style={{ color: 'red', cursor: 'pointer' }}
-                                            onClick={() => removeProduct(cartProduct)}
+                                            onClick={() => handleRemoveChange(cartProduct)}
                                             ></i>
 
                                         </div>
@@ -336,16 +344,19 @@ function POSPage() {
                                 </React.Fragment>
                                 ))
                             ) : (
-                                <div>No Item in Cart</div>
+                                <div></div>
                             )}
                         </div>
                     </div>
                     
                     <div className="mt-0">
                         <hr />
-                        <h4 className="px-2 text-primary mt-2">Total Amount ₱{totalAmount}</h4>
+                        <div className="d-flex justify-content-between align-items-center px-2 text-primary mt-2">
+                            <h4 className="mb-0 text-black">Total Amount</h4>
+                            <h4 className="mb-0 text-black">₱{totalAmount.toFixed(2)}</h4>
+                        </div>
                         <button className="btn custom-btn-proceed mt-2" onClick={handlePrint}>
-                            <i className='bi bi-arrow-right-circle'/>Checkout
+                            <i className='bi bi-arrow-right-circle'/> Checkout
                         </button>
                     </div>
                 </div>

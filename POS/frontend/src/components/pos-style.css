@@ -1,9 +1,8 @@
 .scrollable-container-items {
     overflow-y: auto;
-    max-height: calc(100vh - 225px);
+    max-height: calc(100vh - 250px);
     overflow-x: hidden;
 
-    /* Hide scrollbar arrows and buttons for Webkit browsers */
     ::-webkit-scrollbar {
         width: 12px;
     }
@@ -24,20 +23,18 @@
         display: none;
     }
 
-    /* Hide scrollbar for Firefox and Edge */
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
 }
 
 .scrollable-container-order {
     overflow-y: auto;
-    max-height: calc(100vh - 320px);
+    max-height: calc(100vh - 330px);
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
 
-    /* Hide scrollbar arrows and buttons for Webkit browsers */
     ::-webkit-scrollbar {
         width: 12px;
     }
@@ -58,9 +55,8 @@
         display: none;
     }
 
-    /* Hide scrollbar for Firefox and Edge */
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
 }
 
 input[type='number']::-webkit-outer-spin-button,
@@ -74,8 +70,8 @@ input[type='number'] {
 }
 
 .custom-btn-reset {
-    border: 2px solid red;
-    color: red;
+    border: 2px solid rgb(245, 46, 46);
+    color: rgb(245, 46, 46);
     background-color: transparent;
     font-weight: bold;
     display: inline-flex;
@@ -83,7 +79,7 @@ input[type='number'] {
 }
 
 .custom-btn-reset:hover {
-    background-color: red;
+    background-color: rgb(245, 46, 46);
     color: white;
 }
 
@@ -92,8 +88,8 @@ input[type='number'] {
 }
 
 .custom-btn-proceed {
-    border: 2px solid green;
-    color: green;
+    border: 2px solid #007bff;
+    color: #007bff;
     background-color: transparent;
     font-weight: bold;
     display: inline-flex;
@@ -104,7 +100,7 @@ input[type='number'] {
 }
 
 .custom-btn-proceed:hover {
-    background-color: green;
+    background-color: #007bff;
     color: white;
 }
 
@@ -113,8 +109,8 @@ input[type='number'] {
 }
 
 .custom-btn-add-customer {
-    border: 2px solid blue;
-    color: blue;
+    border: 2px solid #007bff;
+    color: #007bff;
     background-color: transparent;
     font-weight: bold;
     display: inline-flex;
@@ -122,7 +118,7 @@ input[type='number'] {
 }
 
 .custom-btn-add-customer:hover {
-    background-color: blue;
+    background-color: #007bff;
     color: white;
 }
 
@@ -131,8 +127,13 @@ input[type='number'] {
 }
 
 .rounded-left {
-    border-top-left-radius: 0.50rem; /* Adjust size as needed */
-    border-bottom-left-radius: 0.50rem; /* Adjust size as needed */
+    border-top-left-radius: 0.50rem; 
+    border-bottom-left-radius: 0.50rem; 
+}
+
+.rounded-right {
+    border-top-right-radius: 0.50rem; 
+    border-bottom-right-radius: 0.50rem; 
 }
 
 .category-scroll-container {
@@ -175,6 +176,78 @@ input[type='number'] {
     flex: 0 0 auto;
     margin-right: 0.5rem; 
 }
+
+.nav-link {
+    color: #000;
+    text-decoration: none;
+    padding: 10px;
+    transition: background-color 0.3s ease;
+}
+  
+.nav-link:hover {
+    background-color: #f0f0f0;
+    color: #007bff;
+}
+  
+.nav-link.active {
+    background-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+}
+
+.nav-link-side {
+    text-decoration: none;
+    font-size: small;
+    color: #6c757d;
+    text-align: center;
+    padding: 10px 10px;
+    margin-bottom: 15px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.nav-link-logout {
+    text-decoration: none;
+    font-size: small;
+    color: #6c757d;
+    text-align: center;
+    padding: 5px 0;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.nav-link-logout svg {
+    font-size: 25px;
+    margin-bottom: 5px;
+}
+
+.nav-link-side svg {
+    font-size: 25px;
+    margin-bottom: 10px;
+}
+
+.nav-link-side:hover {
+    background-color: white;
+    color: #007bff;
+}
+
+.nav-link-logout:hover {
+    background-color: white;
+    color: rgb(245, 46, 46);
+}
+
+.nav-link-side.active {
+    background-color: #007bff; 
+    color: white;
+    border-radius: 15px;
+}
+  
 
 
 
