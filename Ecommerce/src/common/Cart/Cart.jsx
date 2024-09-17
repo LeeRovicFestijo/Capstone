@@ -22,8 +22,8 @@ const Cart = ({ CartItem, addToCart, decreaseQty, handleBuy }) => {
                   <div className='cart-details'>
                     <h3>{item.name}</h3>
                     <h4>
-                    ₱{item.price}.00 * {item.qty}
-                      <span>${productQty}.00</span>
+                    ₱{item.price} X  {item.qty}
+                      <span>${productQty}</span>
                     </h4>
                   </div>
                   <div className='cart-items-function'>
@@ -34,7 +34,7 @@ const Cart = ({ CartItem, addToCart, decreaseQty, handleBuy }) => {
                     </div>
                     <div className='cartControl d_flex'>
                       <button className='incCart' onClick={() => addToCart(item)}>
-                        <i className='fa-solid fa-plus'></i>
+                      <i className='fa fa-add'></i>
                       </button>
                       <button className='desCart' onClick={() => decreaseQty(item)}>
                         <i className='fa-solid fa-minus'></i>
@@ -51,7 +51,7 @@ const Cart = ({ CartItem, addToCart, decreaseQty, handleBuy }) => {
             <h2>Cart Summary</h2>
             <div className='d_flex'>
               <h4>Total Price :</h4>
-              <h3>₱{totalPrice}.00</h3>
+              <h3>₱{totalPrice}</h3>
               <button className='buy-button' onClick={handleBuy}>Buy</button>
             </div>
            

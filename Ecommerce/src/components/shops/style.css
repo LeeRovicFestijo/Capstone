@@ -75,13 +75,44 @@
   max-width: 100%;
   height: auto;   
 }
-
-
-
 .shop .product:hover {
   box-shadow: rgb(43 52 69 / 10%) 0px 4px 16px;
 }
 
+
+.price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
+  margin-top: auto; 
+}
+
+.cart-button {
+  padding: 2px;
+  font-size: 16px;
+}
+
+.product-like {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5px;
+}
+
+.product-like i {
+  font-size: 12 px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.product-like i:hover {
+  color: #ff4757; 
+}
+
+.product-like label {
+  margin-right: 8px;
+  font-size: 10px;
+}
 
 .shop {
   padding: 30px;
