@@ -1,0 +1,253 @@
+.scrollable-container-items {
+    overflow-y: auto;
+    max-height: calc(100vh - 250px);
+    overflow-x: hidden;
+
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    ::-webkit-scrollbar-button {
+        display: none;
+    }
+
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+}
+
+.scrollable-container-order {
+    overflow-y: auto;
+    max-height: calc(100vh - 330px);
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    ::-webkit-scrollbar-button {
+        display: none;
+    }
+
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.custom-btn-reset {
+    border: 2px solid rgb(245, 46, 46);
+    color: rgb(245, 46, 46);
+    background-color: transparent;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+}
+
+.custom-btn-reset:hover {
+    background-color: rgb(245, 46, 46);
+    color: white;
+}
+
+.custom-btn-reset .svg-inline--fa {
+    margin-right: 5px;
+}
+
+.custom-btn-proceed {
+    border: 2px solid #007bff;
+    color: #007bff;
+    background-color: transparent;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    width: 100%;
+}
+
+.custom-btn-proceed:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.custom-btn-proceed .bi {
+    margin-right: 10px;
+}
+
+.custom-btn-add-customer {
+    border: 2px solid #007bff;
+    color: #007bff;
+    background-color: transparent;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+}
+
+.custom-btn-add-customer:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.custom-btn-add-customer .bi {
+    margin-right: 5px;
+}
+
+.rounded-left {
+    border-top-left-radius: 0.50rem; 
+    border-bottom-left-radius: 0.50rem; 
+}
+
+.rounded-right {
+    border-top-right-radius: 0.50rem; 
+    border-bottom-right-radius: 0.50rem; 
+}
+
+.category-scroll-container {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none; 
+    scrollbar-width: none;  
+}
+
+.category-scroll-container .nav-pills {
+    display: flex;
+    flex-wrap: nowrap;
+    margin: 0;
+    padding: 0;
+}
+
+.category-scroll-container .nav-item {
+    flex: 0 0 auto;
+    margin-right: 0.5rem;
+}
+
+.btn-outline-secondary {
+    border: none;
+}
+
+.category-scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+.nav-pills {
+    display: flex;
+    flex-wrap: nowrap;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    flex: 0 0 auto;
+    margin-right: 0.5rem; 
+}
+
+.nav-link {
+    color: #000;
+    text-decoration: none;
+    padding: 10px;
+    transition: background-color 0.3s ease;
+}
+  
+.nav-link:hover {
+    background-color: #f0f0f0;
+    color: #007bff;
+}
+  
+.nav-link.active {
+    background-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+}
+
+.nav-link-side {
+    text-decoration: none;
+    font-size: small;
+    color: #6c757d;
+    text-align: center;
+    padding: 10px 10px;
+    margin-bottom: 15px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.nav-link-logout {
+    text-decoration: none;
+    font-size: small;
+    color: #6c757d;
+    text-align: center;
+    padding: 5px 0;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.nav-link-logout svg {
+    font-size: 25px;
+    margin-bottom: 5px;
+}
+
+.nav-link-side svg {
+    font-size: 25px;
+    margin-bottom: 10px;
+}
+
+.nav-link-side:hover {
+    background-color: white;
+    color: #007bff;
+}
+
+.nav-link-logout:hover {
+    background-color: white;
+    color: rgb(245, 46, 46);
+}
+
+.nav-link-side.active {
+    background-color: #007bff; 
+    color: white;
+    border-radius: 15px;
+}
+  
+
+
+
