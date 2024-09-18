@@ -1,15 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './InventoryTable.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const InventoryTable = () => {
-    const initialInventory = [
-    ];
-
-    const [inventoryData, setInventoryData] = useState(initialInventory);
+    const [inventoryData, setInventoryData] = useState([]);
     const [formData, setFormData] = useState({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
     const [editId, setEditId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+
+    // Fetch inventory data from the server
+    useEffect(() => {
+        fetch('/api/inventory')
+            .then(response => response.json())
+            .then(data => setInventoryData(data))
+            .catch(err => console.error('Error fetching inventory:', err));
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -20,36 +25,82 @@ const InventoryTable = () => {
     };
 
     const handleAddItem = () => {
+        // Check if form inputs are valid
         if (!formData.itemDescription || !formData.unitPrice || !formData.qualityStocks || !formData.unitMeasurement) {
             alert('Please fill in all fields.');
             return;
         }
-
+    
+        // Calculate the total cost
         const calculatedTotalCost = (formData.unitPrice * formData.qualityStocks).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
-
+    
+        const itemData = { 
+            itemDescription: formData.itemDescription, 
+            unitPrice: Number(formData.unitPrice), 
+            qualityStocks: Number(formData.qualityStocks), 
+            unitMeasurement: formData.unitMeasurement, 
+            totalCost: calculatedTotalCost 
+        };
+    
+        console.log('Item data to be sent:', itemData); // For debugging
+    
+        // Check if we're editing or adding a new item
         if (editId) {
-            setInventoryData(inventoryData.map(item => (item.id === editId ? { ...item, ...formData, totalCost: calculatedTotalCost } : item)));
-            setEditId(null);
+            // Update item in the database
+            fetch(`/api/inventory/${editId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(itemData),
+            })
+            .then(response => response.json())
+            .then(updatedItem => {
+                setInventoryData(inventoryData.map(item => (item.id === editId ? updatedItem : item)));
+                setEditId(null);
+                setFormData({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
+            })
+            .catch(err => console.error('Error updating item:', err));
         } else {
-            const newItem = { id: Date.now(), ...formData, totalCost: calculatedTotalCost };
-            setInventoryData([...inventoryData, newItem]);
+            // Add new item to the database
+            fetch('/api/inventory', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(itemData),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to add item');
+                }
+                return response.json();
+            })
+            .then(newItem => {
+                setInventoryData([...inventoryData, newItem]);
+                setFormData({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
+                console.log('Item added successfully:', newItem); // Debugging log
+            })
+            .catch(err => console.error('Error adding item:', err));
         }
-
-        setFormData({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
     };
+    
 
     const handleEditItem = (item) => {
         setFormData({
-            itemDescription: item.itemDescription,
-            unitPrice: item.unitPrice,
-            qualityStocks: item.qualityStocks,
-            unitMeasurement: item.unitMeasurement,
+            itemDescription: item.item_description,
+            unitPrice: item.unit_price,
+            qualityStocks: item.quality_stocks,
+            unitMeasurement: item.unit_measurement,
         });
         setEditId(item.id);
     };
 
     const handleDeleteItem = (id) => {
-        setInventoryData(inventoryData.filter(item => item.id !== id));
+        // Delete item from the database
+        fetch(`/api/inventory/${id}`, {
+            method: 'DELETE',
+        })
+            .then(() => {
+                setInventoryData(inventoryData.filter(item => item.id !== id));
+            })
+            .catch(err => console.error('Error deleting item:', err));
     };
 
     const handleSearchChange = (e) => {
@@ -57,6 +108,7 @@ const InventoryTable = () => {
     };
 
     const handleSearch = () => {
+        // Implement search functionality (optional)
         alert(`Search for: ${searchTerm}`);
     };
 
@@ -136,11 +188,11 @@ const InventoryTable = () => {
                 <tbody>
                     {inventoryData.map(item => (
                         <tr key={item.id}>
-                            <td>{item.itemDescription}</td>
-                            <td>{item.unitPrice}</td>
-                            <td>{item.qualityStocks}</td>
-                            <td>{item.unitMeasurement}</td>
-                            <td>{item.totalCost}</td>
+                            <td>{item.item_description}</td>
+                            <td>{item.unit_price}</td>
+                            <td>{item.quality_stocks}</td>
+                            <td>{item.unit_measurement}</td>
+                            <td>{item.total_cost}</td>
                             <td>
                                 <button className="btn btn-warning btn-sm mx-1" onClick={() => handleEditItem(item)}>Edit</button>
                                 <button className="btn btn-danger btn-sm mx-1" onClick={() => handleDeleteItem(item.id)}>Delete</button>
