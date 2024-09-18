@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Modal from 'react-modal';
 import axios from 'axios';
 
@@ -11,38 +11,9 @@ const CustomerModal = ({ isOpen, onClose, onSave }) => {
         emailAddress: '',
         address: '',
     });
-    const [existingCustomers, setExistingCustomers] = useState([]);
-
-    useEffect(() => {
-        // Fetch existing customers if modal is open
-        if (isOpen) {
-            axios.get('customer').then(response => {
-                setExistingCustomers(response.data);
-            });
-        }
-    }, [isOpen]);
 
     const handleChange = (e) => {
         setCustomerData({ ...customerData, [e.target.name]: e.target.value });
-    };
-
-    const handleSearch = (e) => {
-        // Filter existing customers based on search
-        const query = e.target.value.toLowerCase();
-        if (query) {
-            setExistingCustomers(existingCustomers.filter(customer =>
-                customer.fullName.toLowerCase().includes(query)
-            ));
-        } else {
-            // Fetch all customers again if search query is empty
-            axios.get('customer').then(response => {
-                setExistingCustomers(response.data);
-            });
-        }
-    };
-
-    const handleSelectCustomer = (customer) => {
-        setCustomerData(customer);
     };
 
     const handleSave = () => {
@@ -54,21 +25,22 @@ const CustomerModal = ({ isOpen, onClose, onSave }) => {
     };
 
     return (
-        <Modal isOpen={isOpen} onRequestClose={onClose}>
+        <Modal 
+        isOpen={isOpen} 
+        onRequestClose={onClose}
+        style={{
+            content: {
+                width: '50%', 
+                height: '60%',  
+                margin: 'auto', 
+                padding: '20px', 
+            },
+            overlay: {
+                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            }
+        }}
+        >
             <h2>Add Customer</h2>
-            <input
-                type="text"
-                name="search"
-                placeholder="Search existing customers"
-                onChange={handleSearch}
-            />
-            <ul>
-                {existingCustomers.map(customer => (
-                    <li key={customer.id} onClick={() => handleSelectCustomer(customer)}>
-                        {customer.fullName}
-                    </li>
-                ))}
-            </ul>
             <input
                 type="text"
                 name="fullName"

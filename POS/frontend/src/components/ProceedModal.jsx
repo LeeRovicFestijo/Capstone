@@ -28,7 +28,21 @@ const ProceedModal = ({ isOpen, onClose, cart, totalAmount, customerName, custom
     }, [shippingMethod]);
 
     return (
-        <Modal isOpen={isOpen} onRequestClose={onClose}>
+        <Modal 
+        isOpen={isOpen} 
+        onRequestClose={onClose}
+        style={{
+            content: {
+                width: '50%', 
+                height: '60%',  
+                margin: 'auto', 
+                padding: '20px', 
+            },
+            overlay: {
+                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            }
+        }}
+        >
             <h2>Proceed to Payment</h2>
             <div>
                 {customer && customer.length > 0 && (
@@ -46,10 +60,10 @@ const ProceedModal = ({ isOpen, onClose, cart, totalAmount, customerName, custom
                     </select>
                 </div>
                 <div>
-                    <label>Shipping Method:</label>
+                    <label>To Ship:</label>
                     <select value={shippingMethod} onChange={(e) => setShippingMethod(e.target.value)}>
-                        <option value="OnSite">On Site</option>
-                        <option value="Ship">Ship</option>
+                        <option value="OnSite">No</option>
+                        <option value="Ship">Yes</option>
                     </select>
                 </div>
                 {shippingMethod === "Ship" && (

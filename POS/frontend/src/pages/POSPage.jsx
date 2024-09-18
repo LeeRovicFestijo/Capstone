@@ -11,7 +11,7 @@ import ProceedModal from '../components/ProceedModal';
 
 function POSPage() {
 
-    const { cart, setCart, totalAmount, setTotalAmount, selectedCustomer, setSelectedCustomer, isCustomerAdded, setIsCustomerAdded } = usePOS();
+    const { cart, setCart, totalAmount, setTotalAmount, selectedCustomer, setSelectedCustomer, selectedCustomerLocal, setSelectedCustomerLocal, isCustomerAdded, setIsCustomerAdded } = usePOS();
     const [product, setProduct] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -112,7 +112,6 @@ function POSPage() {
 
     const handleAddCustomer = () => {
         if (selectedCustomer) {
-            console.log("tit")
           navigate('/customers', { state: { newCustomer: selectedCustomer } });
         } else {
             navigate('/customers');
@@ -146,13 +145,34 @@ function POSPage() {
             console.log('Selected customer:3', selectedCustomer);
         }
     }, [selectedCustomer]);
+
+    // useEffect(() => {
+    //     if (location.state?.newCustomer) {
+    //         const newCustomer = location.state.newCustomer;
+            
+    //         if (selectedCustomer?.id === newCustomer.id) {
+    //             setIsCustomerAdded(true);
+    //         } else {
+    //             setSelectedCustomer(newCustomer);
+    //             setIsCustomerAdded(true);
+    //         }
+    //     }
+    // }, [location.state?.newCustomer]);
     
     const handleRemoveCustomer = () => {
         if (selectedCustomer) {
-            console.log(selectedCustomer)
-            navigate('/customers', { state: { newCustomer: selectedCustomer } });
-            setSelectedCustomer(null);
-            setIsCustomerAdded(false);
+            console.log("titi")
+            if (selectedCustomer.id === selectedCustomerLocal.id) {
+                console.log(selectedCustomer)
+                navigate('/customers', { state: { newCustomer: selectedCustomer } });
+                setSelectedCustomer(null);
+                setIsCustomerAdded(false);
+            } else {
+                console.log(selectedCustomer)
+                navigate('/customers', { state: { newCustomer: selectedCustomer } });
+                setSelectedCustomer(null);
+                setIsCustomerAdded(true);
+            }
         }
     };
 
@@ -314,7 +334,7 @@ function POSPage() {
                                         <div
                                         className="list-item"
                                         style={{
-                                            backgroundColor: key % 2 === 0 ? 'white' : '#f8f9fa',
+                                            backgroundColor: key % 2 === 0 ? '#f8f9fa' : 'white',
                                             borderRadius: '10px',
                                         }}
                                         >

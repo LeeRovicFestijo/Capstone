@@ -7,11 +7,12 @@ import '../components/customer-style.css';
 import CustomerModal from '../components/CustomerModal';
 
 function CustomerPage() {
-  const { selectedCustomer, setSelectedCustomer, isCustomerAdded, setIsCustomerAdded } = usePOS();
+  const { selectedCustomer, setSelectedCustomer, isCustomerAdded, setIsCustomerAdded, selectedCustomerLocal, setSelectedCustomerLocal } = usePOS();
   const [recentCustomers, setRecentCustomers] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
   const [isCustomerModalOpen, setCustomerModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchCustomers = async () => {
     try {
@@ -25,9 +26,13 @@ function CustomerPage() {
   };
 
   const handleSelectCustomer = (customer) => {
-    setSelectedCustomer(customer);
-    setIsCustomerAdded(false);
-    console.log("Selected Customer2:", selectedCustomer);
+    setSelectedCustomerLocal(customer);
+    if (selectedCustomer && selectedCustomer.id === customer.id) {
+      setIsCustomerAdded(true);
+    } else {
+      setIsCustomerAdded(false);
+    }
+    console.log("Selected Customer2:", selectedCustomerLocal);
   };
 
   const handleRemoveCustomer = () => {
@@ -37,7 +42,8 @@ function CustomerPage() {
   };
 
   const handleAddCustomer = () => {
-    if (selectedCustomer) {
+    setSelectedCustomer(selectedCustomerLocal)
+    if (selectedCustomerLocal) {
       console.log("Selected Customer1:", selectedCustomer);
       setIsCustomerAdded(true);
       navigate('/pos');
@@ -54,12 +60,19 @@ function CustomerPage() {
   };
 
   const handleSaveCustomer = (customer) => {
-    // Save the new customer and add them to the recent customers list
     setRecentCustomers((prevCustomers) => [customer, ...prevCustomers]);
     setSelectedCustomer(customer);
     setIsCustomerAdded(true);
-    navigate('/pos'); // Optionally navigate back to POS after saving
+    navigate('/pos'); 
   };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredCustomers = recentCustomers.filter((customer) =>
+    customer.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   useEffect(() => {
     fetchCustomers();
@@ -70,6 +83,7 @@ function CustomerPage() {
       const newCustomer = location.state.newCustomer;
       setRecentCustomers((prevCustomers) => [newCustomer, ...prevCustomers]);
       setSelectedCustomer(newCustomer);
+      setSelectedCustomerLocal(newCustomer);
       setIsCustomerAdded(true);
     }
   }, [location.state?.newCustomer]);
@@ -83,7 +97,9 @@ function CustomerPage() {
             <input 
               type="text" 
               className="search-bar" 
-              placeholder="Search Customers..." 
+              placeholder="Search Customers..."
+              value={searchTerm}
+              onChange={handleSearch}
             />
             <button className="add-customer-btn" onClick={handleOpenCustomerModal}>+ Add New Customer</button>
           </header>
@@ -91,27 +107,31 @@ function CustomerPage() {
           <hr />
 
           <div className="customer-details">
-            {selectedCustomer ? (
+            {selectedCustomerLocal ? (
               <div className="customer-info">
                 <img 
-                  src={selectedCustomer.profilePicture || "https://via.placeholder.com/150"} 
+                  src={selectedCustomerLocal.profilePicture || "https://via.placeholder.com/150"} 
                   alt="Customer" 
                   className="customer-image"
                 />
                 <div className="customer-meta">
-                  <h2>{selectedCustomer.fullName}</h2>
-                  <p>{selectedCustomer.id}</p>
-                  <p>{selectedCustomer.emailAddress}</p>
-                  <p>{selectedCustomer.phoneNumber}</p>
-                </div>
-                <div className="customer-actions">
-                  {isCustomerAdded ? (
-                    <button className="remove-btn" onClick={handleRemoveCustomer}>Remove</button>
-                  ) : (
-                    <button className="add-btn" onClick={handleAddCustomer}>Add</button>
-                  )}
-                  <button className="edit-btn">Edit</button>
-                  <button className="delete-btn">Delete</button>
+                  <div className="customer-header">
+                    <h2>{selectedCustomerLocal.fullName}</h2>
+                    <h2 className="customer-id">#{selectedCustomerLocal.id}</h2>
+                  </div>
+                  <p>{selectedCustomerLocal.emailAddress}</p>
+                  <p>{selectedCustomerLocal.phoneNumber}</p>
+                  <div className="customer-actions">
+                    {isCustomerAdded ? (
+                      <button className="remove-btn" onClick={handleRemoveCustomer}>Remove</button>
+                    ) : (
+                      <button className="add-btn" onClick={handleAddCustomer}>Add</button>
+                    )}
+                    <div className="edit-delete-buttons">
+                      <button className="edit-btn"><i className='bi bi-pencil-square'/> Edit</button>
+                      <button className="delete-btn"><i className='bi bi-trash'/> Delete</button>
+                    </div>                   
+                  </div>
                 </div>
               </div>
             ) : (
@@ -122,7 +142,7 @@ function CustomerPage() {
           </div>
           <h3>Recent Customers</h3>
           <div className="recent-customers-scrollable">
-            {recentCustomers.map((customer, index) => (
+            {filteredCustomers.map((customer, index) => (
               <div 
                 key={index} 
                 className="recent-customer-item"
