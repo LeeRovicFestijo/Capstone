@@ -10,6 +10,7 @@ const Sidebar = () => {
                 <li><a href="#">Dashboard</a></li>
                 <li><a href="#" className="active">Inventory</a></li>
                 <li><a href="#">Reports</a></li>
+                <li><a href="#">Site Management</a></li> {/* New "Site Management" button */}
             </ul>
         </div>
     );
