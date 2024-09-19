@@ -7,12 +7,16 @@ const InventoryTable = () => {
     const [formData, setFormData] = useState({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
     const [editId, setEditId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [filteredData, setFilteredData] = useState([]);
 
-    // Fetch inventory data from the server
+    // Fetch inventory data from the server on component mount
     useEffect(() => {
         fetch('/api/inventory')
             .then(response => response.json())
-            .then(data => setInventoryData(data))
+            .then(data => {
+                setInventoryData(data);
+                setFilteredData(data); // Initialize filtered data
+            })
             .catch(err => console.error('Error fetching inventory:', err));
     }, []);
 
@@ -30,61 +34,54 @@ const InventoryTable = () => {
             alert('Please fill in all fields.');
             return;
         }
-    
-        // Calculate the total cost
-        const calculatedTotalCost = (formData.unitPrice * formData.qualityStocks).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
-    
+
+        // Ensure that numeric values are properly converted
+        const unitPrice = parseFloat(formData.unitPrice);
+        const qualityStocks = parseInt(formData.qualityStocks, 10);
+
         const itemData = { 
-            itemDescription: formData.itemDescription, 
-            unitPrice: Number(formData.unitPrice), 
-            qualityStocks: Number(formData.qualityStocks), 
-            unitMeasurement: formData.unitMeasurement, 
-            totalCost: calculatedTotalCost 
+            item_description: formData.itemDescription, // Update the key to match the server side
+            unit_price: unitPrice, 
+            quality_stocks: qualityStocks, 
+            unit_measurement: formData.unitMeasurement
         };
-    
-        console.log('Item data to be sent:', itemData); // For debugging
-    
-        // Check if we're editing or adding a new item
-        if (editId) {
-            // Update item in the database
-            fetch(`/api/inventory/${editId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(itemData),
-            })
-            .then(response => response.json())
-            .then(updatedItem => {
-                setInventoryData(inventoryData.map(item => (item.id === editId ? updatedItem : item)));
-                setEditId(null);
-                setFormData({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
-            })
-            .catch(err => console.error('Error updating item:', err));
-        } else {
-            // Add new item to the database
-            fetch('/api/inventory', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(itemData),
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to add item');
-                }
-                return response.json();
-            })
-            .then(newItem => {
-                setInventoryData([...inventoryData, newItem]);
-                setFormData({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
-                console.log('Item added successfully:', newItem); // Debugging log
-            })
-            .catch(err => console.error('Error adding item:', err));
-        }
+
+        const requestUrl = editId ? `http://localhost:5000/api/inventory/${editId}` : 'http://localhost:5000/api/inventory';
+        const method = editId ? 'PUT' : 'POST';
+
+        // Send data to the server (either create or update)
+        fetch(requestUrl, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(itemData),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to save item');
+            }
+            return response.json();
+        })
+        .then(savedItem => {
+            if (editId) {
+                setInventoryData(inventoryData.map(item => item.id === savedItem.id ? savedItem : item));
+            } else {
+                setInventoryData([...inventoryData, savedItem]);
+            }
+            // Reset form after success
+            setFormData({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
+            setEditId(null);
+            alert('Item added successfully!');
+            setFilteredData([...inventoryData, savedItem]); // Update filtered data after adding
+        })
+        .catch(err => {
+            console.error('Error saving item:', err);
+            alert('There was an error saving the item. Please try again.');
+        });
     };
-    
 
     const handleEditItem = (item) => {
         setFormData({
-            itemDescription: item.item_description,
+            itemDescription: item.item_description, // Match the key from the server
             unitPrice: item.unit_price,
             qualityStocks: item.quality_stocks,
             unitMeasurement: item.unit_measurement,
@@ -93,14 +90,12 @@ const InventoryTable = () => {
     };
 
     const handleDeleteItem = (id) => {
-        // Delete item from the database
-        fetch(`/api/inventory/${id}`, {
-            method: 'DELETE',
+        fetch(`/api/inventory/${id}`, { method: 'DELETE' })
+        .then(() => {
+            setInventoryData(inventoryData.filter(item => item.id !== id));
+            setFilteredData(filteredData.filter(item => item.id !== id)); // Also update filtered data
         })
-            .then(() => {
-                setInventoryData(inventoryData.filter(item => item.id !== id));
-            })
-            .catch(err => console.error('Error deleting item:', err));
+        .catch(err => console.error('Error deleting item:', err));
     };
 
     const handleSearchChange = (e) => {
@@ -108,8 +103,12 @@ const InventoryTable = () => {
     };
 
     const handleSearch = () => {
-        // Implement search functionality (optional)
-        alert(`Search for: ${searchTerm}`);
+        // Filter the inventory based on the search term
+        const lowercasedFilter = searchTerm.toLowerCase();
+        const filtered = inventoryData.filter(item => 
+            item.item_description.toLowerCase().includes(lowercasedFilter) // Match the key from the server
+        );
+        setFilteredData(filtered);
     };
 
     return (
@@ -181,18 +180,16 @@ const InventoryTable = () => {
                         <th>Unit Price</th>
                         <th>Quality in Stocks</th>
                         <th>Unit of Measurement</th>
-                        <th>Total Cost</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {inventoryData.map(item => (
+                    {filteredData.map(item => (
                         <tr key={item.id}>
-                            <td>{item.item_description}</td>
+                            <td>{item.item_description}</td> {/* Update to match key */}
                             <td>{item.unit_price}</td>
                             <td>{item.quality_stocks}</td>
                             <td>{item.unit_measurement}</td>
-                            <td>{item.total_cost}</td>
                             <td>
                                 <button className="btn btn-warning btn-sm mx-1" onClick={() => handleEditItem(item)}>Edit</button>
                                 <button className="btn btn-danger btn-sm mx-1" onClick={() => handleDeleteItem(item.id)}>Delete</button>
