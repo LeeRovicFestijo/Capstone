@@ -11,7 +11,7 @@ import ProceedModal from '../components/ProceedModal';
 
 function POSPage() {
 
-    const { cart, setCart, totalAmount, setTotalAmount, selectedCustomer, setSelectedCustomer, selectedCustomerLocal, setSelectedCustomerLocal, isCustomerAdded, setIsCustomerAdded } = usePOS();
+    const { cart, setCart, totalAmount, setTotalAmount, selectedCustomer, setSelectedCustomer, selectedCustomerLocal, setIsCustomerAdded } = usePOS();
     const [product, setProduct] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -103,6 +103,14 @@ function POSPage() {
     }
 
     const handleOpenProceedModal = () => {
+        if (!selectedCustomer) {
+            toast.error('A customer must be selected before proceeding.', toastOptions);
+            return;
+        }
+        if (cart.length === 0) {
+            toast.error('Your cart is empty. Please add items to the cart before proceeding.', toastOptions);
+            return;
+        }
         setProceedModalOpen(true);
     };
 
@@ -146,19 +154,6 @@ function POSPage() {
         }
     }, [selectedCustomer]);
 
-    // useEffect(() => {
-    //     if (location.state?.newCustomer) {
-    //         const newCustomer = location.state.newCustomer;
-            
-    //         if (selectedCustomer?.id === newCustomer.id) {
-    //             setIsCustomerAdded(true);
-    //         } else {
-    //             setSelectedCustomer(newCustomer);
-    //             setIsCustomerAdded(true);
-    //         }
-    //     }
-    // }, [location.state?.newCustomer]);
-    
     const handleRemoveCustomer = () => {
         if (selectedCustomer) {
             console.log("titi")
@@ -309,10 +304,18 @@ function POSPage() {
                         <div className='col-lg-12'>
                             <div className="d-flex justify-content-between">
                                 {selectedCustomer ? (
-                                        <div className="customer-profile" onClick={handleRemoveCustomer}>
-                                            <img src={selectedCustomer.profilePicture || "https://via.placeholder.com/50"} alt="Customer" />
-                                            <span>{selectedCustomer.fullName}</span>
-                                        </div>
+                                        <div className="customer-profile d-flex align-items-center" onClick={handleRemoveCustomer}>
+                                        {selectedCustomer.profilePicture ? (
+                                            <img 
+                                                src={selectedCustomer.profilePicture} 
+                                                alt="Customer" 
+                                                style={{ width: '35px', height: '35px', borderRadius: '50%', objectFit: 'cover' }}
+                                            />
+                                        ) : (
+                                            <i className="bi bi-person-circle" style={{ fontSize: '35px' }}></i>
+                                        )}
+                                        <span style={{ marginLeft: '10px' }}>{selectedCustomer.fullName}</span>
+                                    </div>
                                     ) : (
                                         <button className="btn custom-btn-add-customer" onClick={handleAddCustomer}>
                                             <i className='bi bi-plus-square'/> Add Customer

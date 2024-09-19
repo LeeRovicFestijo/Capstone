@@ -28,12 +28,7 @@ function SidebarPOS({children}) {
                     </Link>
                 </nav>
                 <div className="mt-auto d-flex flex-column align-items-center">
-                    <img
-                        src="https://via.placeholder.com/80"
-                        alt="Profile"
-                        className="img-fluid rounded-circle mb-2"
-                        style={{ width: '70px', height: '70px' }}
-                    />
+                <i className="bi bi-person-circle" style={{ fontSize: '50px', color: 'gray' }}></i>
                     <Link to="/" className="nav-link-logout logout">
                         <FontAwesomeIcon icon={faSignOutAlt} /> Logout
                     </Link>
