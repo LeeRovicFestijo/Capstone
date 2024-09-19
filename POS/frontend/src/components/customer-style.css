@@ -1,11 +1,7 @@
-.customer-page-container {
-    padding: 20px;
-}
-  
 .customer-page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
   
 .search-bar {
@@ -61,6 +57,10 @@
   flex-direction: column;
 }
 
+.bi-person-circle {
+  font-size: 150px;
+}
+
 .customer-actions {
   margin-top: 10px; /* Adjust this to control spacing */
   display: flex;
@@ -87,7 +87,7 @@
 
 .recent-customers-scrollable {
   overflow-y: auto;
-  max-height: calc(100vh - 480px);
+  max-height: calc(100vh - 547px);
   overflow-x: hidden;
 
   ::-webkit-scrollbar {
@@ -112,6 +112,56 @@
 
   -ms-overflow-style: none; 
   scrollbar-width: none; 
+}
+
+@media (max-width: 768px) {
+  .customer-page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .customer-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .add-customer-btn {
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+
+  .customer-info {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .customer-meta {
+    text-align: center;
+  }
+
+  .edit-delete-buttons {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    margin: 0.5rem 0;
+    width: 100%;
+  }
+
+  .search-bar {
+    width: 100%;
+  }
+
+  .bi-person-circle {
+    font-size: 100px;
+  }
+}
+
+.rounded-right {
+  border-top-right-radius: 0.50rem; 
+  border-bottom-right-radius: 0.50rem; 
 }
 
 .customer-meta {
@@ -170,4 +220,8 @@
   color: white;
   border-radius: 4px;
   width: 140px;
+}
+
+.bi-envelope, .bi-telephone {
+  padding-right: 3px;
 }
