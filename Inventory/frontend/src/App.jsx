@@ -1,7 +1,9 @@
 import React from 'react';
 import './App.css';
-import Sidebar from './Sidebar';
-import InventoryTable from './InventoryTable';
+import Sidebar from './Sidebar'; // Assuming Sidebar.jsx is in the same directory
+import InventoryTable from './InventoryTable'; // Assuming InventoryTable.jsx is in the same directory
+
+
 
 function App() {
     return (
