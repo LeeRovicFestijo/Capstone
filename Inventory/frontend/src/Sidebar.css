@@ -32,6 +32,12 @@
     border-radius: 5px;
 }
 
+.sidebar ul li a.active-site-management {
+    background-color: #3498DB; /* Example color for the active state */
+    border-radius: 5px;
+}
+
+
 @media (min-width: 768px) {
     .sidebar {
         width: 20%;

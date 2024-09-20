@@ -19,6 +19,140 @@ body {
   max-width: 90%;
   margin: auto;
 }
+/* Popup Styles */
+.product-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.product-popup.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+  transform: translateY(-50px);
+  transition: transform 0.3s ease;
+}
+
+.product-popup.show .popup-content {
+  transform: translateY(0);
+}
+
+.close-popup {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.popup-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.popup-content h3 {
+  margin: 10px 0;
+}
+
+.popup-content p {
+  margin: 10px 0;
+}
+
+.popup-content h4 {
+  margin: 10px 0;
+}
+
+.popup-content label {
+  margin-right: 10px;
+}
+
+.popup-content select,
+.popup-content input {
+  margin-bottom: 10px;
+}
+.profile-popup {
+  position: fixed;
+  top: 20%;
+  right: 10%;
+  width: 300px;
+  padding: 20px;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.profile-content {
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.profile-content h3 {
+  margin-bottom: 10px;
+}
+
+.profile-content label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.profile-content span {
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+.profile-content input {
+  margin-left: 10px;
+}
+
+.profile-actions button {
+  margin-top: 10px;
+  padding: 5px 10px;
+}
+
+
+.add-to-cart-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-to-cart-button:hover {
+  background-color: #0056b3;
+}
+
+
 .d_flex {
   display: flex;
   justify-content: space-between;
@@ -44,9 +178,7 @@ li {
 .capitalize {
   text-transform: capitalize;
 }
-.RText {
-  text-align-last: right;
-}
+
 input,
 button {
   border: none;
