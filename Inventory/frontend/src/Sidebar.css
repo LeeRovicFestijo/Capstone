@@ -1,0 +1,45 @@
+.sidebar {
+    width: 100%;
+    background-color: #2C3E50;
+    color: white;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.sidebar h2 {
+    text-align: center;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    margin: 10px 0;
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+}
+
+.sidebar ul li a.active {
+    background-color: #1ABC9C;
+    border-radius: 5px;
+}
+
+.sidebar ul li a.active-site-management {
+    background-color: #3498DB; /* Example color for the active state */
+    border-radius: 5px;
+}
+
+
+@media (min-width: 768px) {
+    .sidebar {
+        width: 20%;
+    }
+}

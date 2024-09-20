@@ -1,0 +1,227 @@
+.customer-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+  
+.search-bar {
+  padding: 8px;
+  font-size: 16px;
+  width: 400px;
+  border-radius: 5px;
+  border: 1px solid #888;
+}
+
+.search-bar:focus {
+  box-shadow: 0 0 0 0.2rem #b4d8ff;
+  outline: none;
+}
+
+  
+.add-customer-btn {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+  
+.customer-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 20px;
+}
+
+.customer-date {
+  text-align: right;
+}
+
+.customer-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.customer-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-right: 20px;
+}
+
+.customer-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.bi-person-circle {
+  font-size: 150px;
+}
+
+.customer-actions {
+  margin-top: 10px; /* Adjust this to control spacing */
+  display: flex;
+  justify-content: flex-start;
+  gap: 30px;
+}
+
+.recent-customers {
+  margin-top: 30px;
+}
+
+.recent-customer-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.recent-customer-item p {
+  margin: 0;
+}
+
+.recent-customers-scrollable {
+  overflow-y: auto;
+  max-height: calc(100vh - 547px);
+  overflow-x: hidden;
+
+  ::-webkit-scrollbar {
+      width: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+  }
+
+  ::-webkit-scrollbar-thumb {
+      background: #888;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+  }
+
+  ::-webkit-scrollbar-button {
+      display: none;
+  }
+
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
+}
+
+@media (max-width: 768px) {
+  .customer-page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .customer-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .add-customer-btn {
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+
+  .customer-info {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .customer-meta {
+    text-align: center;
+  }
+
+  .edit-delete-buttons {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    margin: 0.5rem 0;
+    width: 100%;
+  }
+
+  .search-bar {
+    width: 100%;
+  }
+
+  .bi-person-circle {
+    font-size: 100px;
+  }
+}
+
+.rounded-right {
+  border-top-right-radius: 0.50rem; 
+  border-bottom-right-radius: 0.50rem; 
+}
+
+.customer-meta {
+  margin-top: 10px;
+}
+
+.customer-header {
+  display: flex;
+  align-items: center;
+}
+
+.customer-id {
+  font-size: 20px;
+  margin-left: 5px;
+  color: #888;
+}
+
+.edit-delete-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-btn,
+.delete-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 120px;
+}
+
+.edit-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.add-btn, .remove-btn {
+  border: 2px solid #007bff;
+  color: #007bff;
+  background-color: transparent;
+  font-weight: bold;
+  display: inline-flex;
+  border-radius: 4px;
+  width: 140px;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-btn:hover, .remove-btn:hover {
+  background-color: #007bff;
+  color: white;
+  border-radius: 4px;
+  width: 140px;
+}
+
+.bi-envelope, .bi-telephone {
+  padding-right: 3px;
+}
