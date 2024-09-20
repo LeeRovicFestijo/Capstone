@@ -3,7 +3,7 @@ import {
   Routes,
   Route
 } from 'react-router-dom';
-import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
 import POSPage from './pages/POSPage';
 import CustomerPage from './pages/CustomerPage';
 import TransactionPage from './pages/TransactionPage';
@@ -14,7 +14,7 @@ function App() {
     <POSProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<HomePage/>} />
+          <Route path="/" element={<LoginPage/>} />
           <Route path="/pos" element={<POSPage/>} />
           <Route path="/customers" element={<CustomerPage/>} />
           <Route path="/transactions" element={<TransactionPage/>} />

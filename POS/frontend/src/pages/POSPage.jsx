@@ -18,8 +18,6 @@ function POSPage() {
     const [collapsedItemIndex, setCollapsedItemIndex] = useState(null);
     const [hoveredIndex, setHoveredIndex] = useState(null);
     const scrollableRef = useRef(null);
-    const [selectedCategory, setSelectedCategory] = useState(''); 
-    const [categories, setCategories] = useState([]);
     const [lastScrollPosition, setLastScrollPosition] = useState(0);
     const [isProceedModalOpen, setProceedModalOpen] = useState(false);
     const [customerName, setCustomerName] = useState(selectedCustomer?.fullName || '');
@@ -43,8 +41,6 @@ function POSPage() {
         const result = await axios.get('product');
         const products = await result.data
         setProduct(products);
-        const uniqueCategories = [...new Set(products.map(p => p.category))];
-        setCategories(uniqueCategories);
         setIsLoading(false);
     }
 
@@ -188,20 +184,8 @@ function POSPage() {
     };
 
     const filteredProducts = product.filter((prod) =>
-        prod.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        (selectedCategory === '' || prod.category === selectedCategory)
+        prod.name.toLowerCase().includes(searchQuery.toLowerCase()) 
     );
-
-    const scrollCategories = (direction) => {
-        const container = document.querySelector('.category-scroll-container');
-        const scrollAmount = 100; 
-    
-        if (direction === 'left') {
-            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-        } else if (direction === 'right') {
-            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-        }
-    };
     
 
     return (
@@ -211,13 +195,15 @@ function POSPage() {
                     <div className="col-lg-8 bg-light p-3 border border-gray">
                         <input
                             type="text"
-                            className="form-control mb-3"
+                            className="form-control mb-3" style={{ height: '48px' }}
                             placeholder="Search for a product..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
 
-                    <div className='col-lg-12'>
+                        <hr />
+
+                    {/* <div className='col-lg-12'>
                         <div className="position-relative">
 
                             <nav className="mb-3 bg-white p-2" style={{ borderRadius: '0.5rem', overflow: 'hidden' }}>
@@ -263,7 +249,7 @@ function POSPage() {
                                 </div>
                             </nav>
                         </div>
-                    </div>
+                    </div> */}
 
                         <div className='scrollable-container-items'>
                             {isLoading ? (
@@ -283,12 +269,12 @@ function POSPage() {
                                                 onClick={() => addProductToCart(product)}
                                             >
                                                 <h6
-                                                    className="card-title text-truncate"
+                                                    className="card-title text-truncate mt-2"
                                                     style={{ maxWidth: '120px' }}
                                                 >
                                                     {product.name}
                                                 </h6>
-                                                <p>cat: {product.category} stk: {product.stock}</p>
+                                                <p>Qty: {product.stock}</p>
                                                 <p>
                                                     <strong>₱{product.price}</strong>
                                                 </p>
@@ -312,7 +298,7 @@ function POSPage() {
                                                 style={{ width: '35px', height: '35px', borderRadius: '50%', objectFit: 'cover' }}
                                             />
                                         ) : (
-                                            <i className="bi bi-person-circle" style={{ fontSize: '35px' }}></i>
+                                            <i className="bi bi-person-circle" style={{ fontSize: '30px' }}></i>
                                         )}
                                         <span style={{ marginLeft: '10px' }}>{selectedCustomer.fullName}</span>
                                     </div>
