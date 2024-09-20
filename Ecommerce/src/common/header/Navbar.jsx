@@ -15,9 +15,6 @@ const Navbar = () => {
               <Link to='/pages'>About Us</Link>
             </li>
             <li>
-              <Link to='/track'>Track my order</Link>
-            </li>
-            <li>
               <Link to='/contact'>Contact</Link>
             </li>
           </ul>
@@ -31,4 +28,4 @@ const Navbar = () => {
   );
 }
 
-export default Navbar;
+export default Navbar
