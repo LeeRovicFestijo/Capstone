@@ -247,6 +247,14 @@ input[type='number'] {
     color: white;
     border-radius: 15px;
 }
+
+.user-name {
+    text-align: center;
+    color: #888;
+    font-size: 12px;
+    margin-bottom: -10px;
+    font-weight: bold;
+}
   
 
 

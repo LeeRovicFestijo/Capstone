@@ -412,5 +412,21 @@
       "address": "Tinga Itaas",
       "date": "2024-09-19"
     }
+  ],
+  "employee_account": [
+    {
+      "id": "065b",
+      "employeeId": "013d",
+      "username": "Gaia the Great",
+      "password": "1234",
+      "role": "Cashier"
+    },
+    {
+      "id": "065h",
+      "employeeId": "013d",
+      "username": "Godrick the Mog",
+      "password": "1234",
+      "role": "Cashier"
+    }
   ]
 }

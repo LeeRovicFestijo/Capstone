@@ -1,6 +1,7 @@
-import React from 'react'
-import MainLayout from '../layout/MainLayout'
-import { Link, useLocation } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import MainLayout from '../layout/MainLayout';
+import { Link, useLocation } from 'react-router-dom';
+import { usePOS } from '../api/POSProvider';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faUsers, faReceipt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import './pos-style.css';
@@ -8,8 +9,14 @@ import './pos-style.css';
 function SidebarPOS({children}) {
 
     const location = useLocation();
-
+    // const [userName, setUserName] = useState('');
+    const { user } = usePOS();
     const isActive = (path) => location.pathname === path;
+
+    useEffect(() => {
+        if (user) {
+        }
+    }, [user]); 
 
 
   return (
@@ -28,7 +35,8 @@ function SidebarPOS({children}) {
                     </Link>
                 </nav>
                 <div className="mt-auto d-flex flex-column align-items-center">
-                <i className="bi bi-person-circle" style={{ fontSize: '50px', color: 'gray' }}></i>
+                    {user && <p className='user-name'>{user.username}</p>}
+                    <i className="bi bi-person-circle" style={{ fontSize: '50px', color: 'gray' }}></i>
                     <Link to="/" className="nav-link-logout logout">
                         <FontAwesomeIcon icon={faSignOutAlt} /> Logout
                     </Link>
