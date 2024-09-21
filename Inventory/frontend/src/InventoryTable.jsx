@@ -46,8 +46,19 @@ const InventoryTable = () => {
             unit_measurement: formData.unitMeasurement
         };
 
+        console.log(itemData);
+        console.log(editId);
+
         const requestUrl = editId ? `http://localhost:5000/api/inventory/${editId}` : 'http://localhost:5000/api/inventory';
         const method = editId ? 'PUT' : 'POST';
+
+        if (!editId) {
+            // Generate a new unique primary key for the new item
+            const newId = inventoryData.length > 0 ? Math.max(...inventoryData.map(item => item.id)) + 1 : 1;
+            itemData.id = newId; // Assuming 'id' is your primary key
+        }
+
+        console.log(requestUrl);
 
         // Send data to the server (either create or update)
         fetch(requestUrl, {
@@ -63,9 +74,14 @@ const InventoryTable = () => {
         })
         .then(savedItem => {
             if (editId) {
-                setInventoryData(inventoryData.map(item => item.id === savedItem.id ? savedItem : item));
+                // Update the existing item in both inventoryData and filteredData
+                const updatedInventory = inventoryData.map(item => item.id === savedItem.id ? savedItem : item);
+                setInventoryData(updatedInventory);
+                setFilteredData(updatedInventory); // Update filtered data as well
             } else {
+                // For new item, append to both inventoryData and filteredData
                 setInventoryData([...inventoryData, savedItem]);
+                setFilteredData([...inventoryData, savedItem]); // Update filtered data after adding
             }
             // Reset form after success
             setFormData({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
@@ -79,7 +95,59 @@ const InventoryTable = () => {
         });
     };
 
+    const handleUpdateItem = () => {
+        // Check if form inputs are valid
+        if (!formData.itemDescription || !formData.unitPrice || !formData.qualityStocks || !formData.unitMeasurement) {
+            alert('Please fill in all fields.');
+            return;
+        }
+    
+        // Ensure that numeric values are properly converted
+        const unitPrice = parseFloat(formData.unitPrice);
+        const qualityStocks = parseInt(formData.qualityStocks, 10);
+    
+        const itemData = { 
+            item_description: formData.itemDescription,
+            unit_price: unitPrice, 
+            quality_stocks: qualityStocks, 
+            unit_measurement: formData.unitMeasurement
+        };
+    
+        // Update the item in the backend
+        const requestUrl = `http://localhost:5000/api/inventory/${editId}`;
+        fetch(requestUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(itemData),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to update item');
+            }
+            return response.json();
+        })
+        .then(updatedItem => {
+            // Update the item in inventoryData and filteredData
+            const updatedInventory = inventoryData.map(item =>
+                item.id === updatedItem.id ? updatedItem : item
+            );
+            setInventoryData(updatedInventory);
+            setFilteredData(updatedInventory); // Also update filtered data
+    
+            // Reset the form
+            setFormData({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
+            setEditId(null);
+            alert('Item updated successfully!');
+        })
+        .catch(err => {
+            console.error('Error updating item:', err);
+            alert('There was an error updating the item. Please try again.');
+        });
+    };
+    
+
     const handleEditItem = (item) => {
+        console.log(item);
         setFormData({
             itemDescription: item.item_description, // Match the key from the server
             unitPrice: item.unit_price,
@@ -90,7 +158,7 @@ const InventoryTable = () => {
     };
 
     const handleDeleteItem = (id) => {
-        fetch(`/api/inventory/${id}`, { method: 'DELETE' })
+        fetch(`http://localhost:5000/api/inventory/${id}`, { method: 'DELETE' })
         .then(() => {
             setInventoryData(inventoryData.filter(item => item.id !== id));
             setFilteredData(filteredData.filter(item => item.id !== id)); // Also update filtered data
@@ -159,18 +227,20 @@ const InventoryTable = () => {
                 <input
                     type="text"
                     name="unitMeasurement"
-                    placeholder="Unit of Measurement"
+                    placeholder="Measurement"
                     value={formData.unitMeasurement}
                     onChange={handleInputChange}
                     className="form-control d-inline-block mx-2"
                     style={{ width: '150px' }}
                 />
-                <button 
-                    onClick={handleAddItem} 
-                    className="btn btn-primary d-inline-block mx-2"
-                >
-                    {editId ? 'Update' : 'Add'}
-                </button>
+                {editId ? ( 
+                    <button onClick={handleUpdateItem} className="btn btn-primary d-inline-block mx-2">
+                        Update
+                    </button>
+                ) : (
+                    <button onClick={handleAddItem} className="btn btn-primary d-inline-block mx-2">
+                        Add
+                    </button>)}
             </div>
 
             <table className="table table-bordered">
