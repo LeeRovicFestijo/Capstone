@@ -21,16 +21,27 @@ const pool = new Pool({
 app.use(bodyParser.json());
 
 // Fetch all inventory items
-app.get('/api/inventory', (req, res) => {
-    pool.query('SELECT * FROM inventory', (err, result) => {
-        console.log(result)
-        if (err) {
-            console.error('Error fetching inventory:', err);
-            return res.status(500).json({ error: 'Failed to fetch inventory.' });
-        }
-        res.json(result.rows);
-    });
-});
+// app.get('/api/inventory', (req, res) => {
+//     pool.query('SELECT * FROM inventory', (err, result) => {
+//         console.log(result)
+//         if (err) {
+//             console.error('Error fetching inventory:', err);
+//             return res.status(500).json({ error: 'Failed to fetch inventory.' });
+//         }
+//         res.json(result.rows);
+//     });
+// });
+
+app.get('/api/inventory', async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM inventory'); // Adjust the table name
+      res.json(result.rows);
+      console.log(result.rows);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      res.status(500).send('Error fetching products');
+    }
+  });
 
 // Add a new inventory item
 app.post('/api/inventory', (req, res) => {
