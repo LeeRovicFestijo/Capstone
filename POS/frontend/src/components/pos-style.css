@@ -1,6 +1,6 @@
 .scrollable-container-items {
     overflow-y: auto;
-    max-height: calc(100vh - 250px);
+    max-height: calc(100vh - 201px);
     overflow-x: hidden;
 
     ::-webkit-scrollbar {
@@ -246,6 +246,14 @@ input[type='number'] {
     background-color: #007bff; 
     color: white;
     border-radius: 15px;
+}
+
+.user-name {
+    text-align: center;
+    color: #888;
+    font-size: 12px;
+    margin-bottom: -10px;
+    font-weight: bold;
 }
   
 

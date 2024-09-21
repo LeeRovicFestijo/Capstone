@@ -50,6 +50,7 @@ const ProceedModal = ({ isOpen, onClose, cart, totalAmount, customerName, custom
                             <option value="Cash">Cash</option>
                             <option value="Gcash">Gcash</option>
                             <option value="PayMaya">PayMaya</option>
+                            <option value="PayMaya">Card</option>
                         </select>
                         <i className="bi bi-chevron-down"></i>
                     </div>

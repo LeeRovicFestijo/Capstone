@@ -90,7 +90,7 @@
   height: 130px;
 }
 .buy-button {
-  background-color: #007bff; /* Adjust color as needed */
+  background-color: #1b305b; 
   color: white;
   border: none;
   padding: 10px 20px;
@@ -101,10 +101,10 @@
 }
 
 .buy-button:hover {
-  background-color: #1b305b; /* Adjust color as needed */
+  background-color: #1b305b; 
 }
 .buy-button {
-  background-color: #1b305b; /* Adjust color as needed */
+  background-color: #1b305b; 
   color: white;
   border: none;
   padding: 10px 20px;
@@ -115,7 +115,7 @@
 }
 
 .buy-button:hover {
-  background-color: #1b305b; /* Adjust color as needed */
+  background-color: #1b305b; 
 }
 
 .cart-total {
@@ -124,7 +124,7 @@
   margin-top: 20px;
   position: relative;
 }
-/* Base styles for the cart-summary */
+
 .cart-total {
   padding: 20px;
   border: 1px solid #ddd;
@@ -159,7 +159,6 @@
   background-color: #1b305b;
 }
 
-/* Responsive styles */
 @media (max-width: 768px) {
   .cart-total .d_flex {
     flex-direction: column;

@@ -8,9 +8,10 @@ export function POSProvider({ children }) {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [selectedCustomerLocal, setSelectedCustomerLocal] = useState(null);
   const [isCustomerAdded, setIsCustomerAdded] = useState(false);
+  const [user, setUser] = useState(null);
 
   return (
-    <POSContext.Provider value={{ cart, setCart, totalAmount, setTotalAmount, selectedCustomer, setSelectedCustomer, selectedCustomerLocal, setSelectedCustomerLocal, isCustomerAdded, setIsCustomerAdded }}>
+    <POSContext.Provider value={{ cart, setCart, totalAmount, setTotalAmount, selectedCustomer, setSelectedCustomer, selectedCustomerLocal, setSelectedCustomerLocal, isCustomerAdded, setIsCustomerAdded, user, setUser }}>
       {children}
     </POSContext.Provider>
   );

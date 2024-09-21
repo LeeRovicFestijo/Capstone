@@ -31,7 +31,7 @@ const SlideCard = () => {
                   <img src={value.cover} alt='' />
                 </div>
               </div>
-            </>
+            </> 
           )
         })}
       </Slider>

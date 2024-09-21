@@ -142,7 +142,8 @@ function CustomerPage() {
             </div>
             <hr />
             <h3>Recent Customers</h3>
-            <div className="recent-customers-scrollable">
+            <div className={`${ selectedCustomerLocal ? 'recent-customers-scrollable' : 'recent-customers-scrollable-selected'
+            }`}>
               {filteredCustomers.map((customer, index) => (
                 <div 
                   key={index} 
