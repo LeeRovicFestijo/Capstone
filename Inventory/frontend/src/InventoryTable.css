@@ -4,6 +4,13 @@
     box-sizing: border-box;
 }
 
+.content h1 {
+    margin-left: 15px; /* Adjust this value to align with the sidebar heading */
+    margin-top: 10px;
+    font-size: 30px; /* Ensure it's larger or same size as the sidebar title */
+}
+
+
 .inventory-header {
     display: flex;
     flex-direction: column;

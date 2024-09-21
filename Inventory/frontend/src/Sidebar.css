@@ -8,16 +8,18 @@
 }
 
 .sidebar h2 {
-    margin-bottom: 20px;
+    margin: 40px 0 40px ;
+    font-size: 30px; /* Adjust font size for the heading */
 }
 
 .sidebar ul {
     list-style: none;
     padding: 0;
+    margin-top: 40px;
 }
 
 .sidebar ul li {
-    margin-bottom: 15px;
+    margin-bottom: 20px; /* Increase spacing between the list items */
 }
 
 .sidebar ul li a {
@@ -25,10 +27,17 @@
     text-decoration: none;
     display: flex;
     align-items: center;
+    font-size: 20px; /* Adjust font size for buttons */
+    padding: 10px 0;  /* Add padding to increase clickable area */
 }
 
 .sidebar ul li a .icon {
-    margin-right: 10px; /* Adds space between icon and text */
+    margin-right: 12px; /* Adjust space between icon and text */
+    font-size: 20px; /* Adjust size of the icons */
+}
+
+.sidebar ul li a:hover {
+    font-size: 18px; /* Increase font size on hover */
 }
 
 .sidebar ul li a.active {
@@ -46,10 +55,12 @@
     text-decoration: none;
     display: flex;
     align-items: center;
+    font-size: 20px; /* Adjust font size for logout */
 }
 
 .logout-button a .icon {
     margin-right: 8px;
+    font-size: 20px; /* Adjust icon size for logout */
 }
 
 .logout-button a:hover {
