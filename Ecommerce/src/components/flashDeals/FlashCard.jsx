@@ -76,7 +76,6 @@ const FlashCard = ({ productItems, addToCart }) => {
           <div className='box' key={item.id}>
             <div className='product mtop'>
               <div className='img' onClick={() => openPopup(item)}>
-                <span className='discount'>{item.discount}% Off</span>
                 <img src={item.cover} alt={item.name} />
                 <div className='product-like'>
                   <label>{likes[item.id] || 0}</label> <br />
