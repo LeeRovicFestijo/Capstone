@@ -170,38 +170,40 @@ const InventoryTable = () => {
             </div>
 
             {isLoading ? (
-                <p>Loading inventory...</p>
-            ) : (
-                <table className="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Item Description</th>
-                            <th>Unit Price</th>
-                            <th>Quality in Stocks</th>
-                            <th>Unit of Measurement</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {filteredData.map(inventory => (
-                        <tr key={inventory.id}>
-                            <td>{inventory.item_description}</td>
-                            <td>{inventory.unit_price}</td>
-                            <td>{inventory.quality_stocks}</td>
-                            <td>{inventory.unit_measurement}</td>
-                            <td>
-                                <button className="btn btn-warning btn-sm mx-1" onClick={() => handleEditInventory(inventory)}>
-                                    <FontAwesomeIcon icon={faEdit} /> Edit {/* Add the edit icon */}
-                                </button>
-                                <button className="btn btn-danger btn-sm mx-1" onClick={() => handleDeleteInventory(inventory.id)}>
-                                    <FontAwesomeIcon icon={faTrash} /> Delete
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            )}
+    <p>Loading inventory...</p>
+) : filteredData.length === 0 ? (
+    <p>No results found</p>
+) : (
+    <table className="table table-bordered">
+        <thead>
+            <tr>
+                <th>Item Description</th>
+                <th>Unit Price</th>
+                <th>Quality in Stocks</th>
+                <th>Unit of Measurement</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {filteredData.map(inventory => (
+            <tr key={inventory.id}>
+                <td>{inventory.item_description}</td>
+                <td>{inventory.unit_price}</td>
+                <td>{inventory.quality_stocks}</td>
+                <td>{inventory.unit_measurement}</td>
+                <td>
+                    <button className="btn btn-warning btn-sm mx-1" onClick={() => handleEditInventory(inventory)}>
+                        <FontAwesomeIcon icon={faEdit} /> Edit
+                    </button>
+                    <button className="btn btn-danger btn-sm mx-1" onClick={() => handleDeleteInventory(inventory.id)}>
+                        <FontAwesomeIcon icon={faTrash} /> Delete
+                    </button>
+                </td>
+            </tr>
+        ))}
+        </tbody>
+    </table>
+)}
         </div>
     );
 };
