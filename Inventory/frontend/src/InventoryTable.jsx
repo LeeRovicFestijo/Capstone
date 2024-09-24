@@ -3,7 +3,8 @@ import './InventoryTable.css';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrash, faSearch, faEdit } from '@fortawesome/free-solid-svg-icons'; // Import the edit icon
+import { faPlus, faTrash, faSearch, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { Modal, Button } from 'react-bootstrap'; // Import Modal and Button
 
 const InventoryTable = () => {
     const [inventoryData, setInventoryData] = useState([]);
@@ -12,6 +13,7 @@ const InventoryTable = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredData, setFilteredData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false); // State for modal visibility
 
     const fetchInventory = async () => {
         setIsLoading(true);
@@ -68,6 +70,7 @@ const InventoryTable = () => {
             setFilteredData(updatedInventory);
             resetForm();
             alert('Inventory saved successfully!');
+            setShowModal(false); // Close modal after saving
         })
         .catch(err => {
             console.error('Error saving inventory:', err);
@@ -83,6 +86,7 @@ const InventoryTable = () => {
             unitMeasurement: inventory.unit_measurement,
         });
         setEditId(inventory.id);
+        setShowModal(true); // Open modal for editing
     };
 
     const handleDeleteInventory = (id) => {
@@ -127,83 +131,94 @@ const InventoryTable = () => {
                 </div>
             </div>
 
-            <div className="inventory-form my-4">
-                <input
-                    type="text"
-                    name="itemDescription"
-                    placeholder="Item Description"
-                    value={formData.itemDescription}
-                    onChange={handleInputChange}
-                    className="form-control d-inline-block mx-2"
-                    style={{ width: '200px' }}
-                />
-                <input
-                    type="number"
-                    name="unitPrice"
-                    placeholder="Unit Price"
-                    value={formData.unitPrice}
-                    onChange={handleInputChange}
-                    className="form-control d-inline-block mx-2"
-                    style={{ width: '150px' }}
-                />
-                <input
-                    type="number"
-                    name="qualityStocks"
-                    placeholder="Quality in Stocks"
-                    value={formData.qualityStocks}
-                    onChange={handleInputChange}
-                    className="form-control d-inline-block mx-2"
-                    style={{ width: '150px' }}
-                />
-                <input
-                    type="text"
-                    name="unitMeasurement"
-                    placeholder="Measurement"
-                    value={formData.unitMeasurement}
-                    onChange={handleInputChange}
-                    className="form-control d-inline-block mx-2"
-                    style={{ width: '150px' }}
-                />
-                <button onClick={handleAddInventory} className="btn btn-primary d-inline-block mx-2">
-                    <FontAwesomeIcon icon={faPlus} /> Add
-                </button>
-            </div>
+            <button onClick={() => { resetForm(); setShowModal(true); }} className="btn btn-primary my-2">
+                <FontAwesomeIcon icon={faPlus} /> Add Inventory
+            </button>
 
             {isLoading ? (
-    <p>Loading inventory...</p>
-) : filteredData.length === 0 ? (
-    <p>No results found</p>
-) : (
-    <table className="table table-bordered">
-        <thead>
-            <tr>
-                <th>Item Description</th>
-                <th>Unit Price</th>
-                <th>Quality in Stocks</th>
-                <th>Unit of Measurement</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {filteredData.map(inventory => (
-            <tr key={inventory.id}>
-                <td>{inventory.item_description}</td>
-                <td>{inventory.unit_price}</td>
-                <td>{inventory.quality_stocks}</td>
-                <td>{inventory.unit_measurement}</td>
-                <td>
-                    <button className="btn btn-warning btn-sm mx-1" onClick={() => handleEditInventory(inventory)}>
-                        <FontAwesomeIcon icon={faEdit} /> Edit
-                    </button>
-                    <button className="btn btn-danger btn-sm mx-1" onClick={() => handleDeleteInventory(inventory.id)}>
-                        <FontAwesomeIcon icon={faTrash} /> Delete
-                    </button>
-                </td>
-            </tr>
-        ))}
-        </tbody>
-    </table>
-)}
+                <p>Loading inventory...</p>
+            ) : filteredData.length === 0 ? (
+                <p>No results found</p>
+            ) : (
+                <table className="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Item Description</th>
+                            <th>Unit Price</th>
+                            <th>Quality in Stocks</th>
+                            <th>Unit of Measurement</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {filteredData.map(inventory => (
+                        <tr key={inventory.id}>
+                            <td>{inventory.item_description}</td>
+                            <td>{inventory.unit_price}</td>
+                            <td>{inventory.quality_stocks}</td>
+                            <td>{inventory.unit_measurement}</td>
+                            <td>
+                                <button className="btn btn-warning btn-sm mx-1" onClick={() => handleEditInventory(inventory)}>
+                                    <FontAwesomeIcon icon={faEdit} /> Edit
+                                </button>
+                                <button className="btn btn-danger btn-sm mx-1" onClick={() => handleDeleteInventory(inventory.id)}>
+                                    <FontAwesomeIcon icon={faTrash} /> Delete
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            )}
+
+            {/* Modal for Add/Edit Inventory */}
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{editId ? 'Edit Inventory' : 'Add Inventory'}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <input
+                        type="text"
+                        name="itemDescription"
+                        placeholder="Item Description"
+                        value={formData.itemDescription}
+                        onChange={handleInputChange}
+                        className="form-control my-2"
+                    />
+                    <input
+                        type="number"
+                        name="unitPrice"
+                        placeholder="Unit Price"
+                        value={formData.unitPrice}
+                        onChange={handleInputChange}
+                        className="form-control my-2"
+                    />
+                    <input
+                        type="number"
+                        name="qualityStocks"
+                        placeholder="Quality in Stocks"
+                        value={formData.qualityStocks}
+                        onChange={handleInputChange}
+                        className="form-control my-2"
+                    />
+                    <input
+                        type="text"
+                        name="unitMeasurement"
+                        placeholder="Measurement"
+                        value={formData.unitMeasurement}
+                        onChange={handleInputChange}
+                        className="form-control my-2"
+                    />
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={handleAddInventory}>
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };
