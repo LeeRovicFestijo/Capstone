@@ -3,7 +3,8 @@ import './InventoryTable.css';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrash, faSearch, faEdit } from '@fortawesome/free-solid-svg-icons'; // Import the edit icon
+import { faPlus, faTrash, faSearch, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { Modal, Button } from 'react-bootstrap';
 
 const InventoryTable = () => {
     const [inventoryData, setInventoryData] = useState([]);
@@ -12,12 +13,18 @@ const InventoryTable = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredData, setFilteredData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedItems, setSelectedItems] = useState([]);
+    
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10; // Limit items per page to 10
 
     const fetchInventory = async () => {
         setIsLoading(true);
         try {
-            const result = await axios.get('http://localhost:5000/api/inventory'); 
-            setInventoryData(result.data); 
+            const result = await axios.get('http://localhost:5000/api/inventory');
+            setInventoryData(result.data);
             setFilteredData(result.data);
         } catch (error) {
             console.error('Error fetching inventory:', error);
@@ -41,10 +48,10 @@ const InventoryTable = () => {
             return;
         }
 
-        const newInventoryData = { 
+        const newInventoryData = {
             item_description: formData.itemDescription,
-            unit_price: parseFloat(formData.unitPrice), 
-            quality_stocks: parseInt(formData.qualityStocks, 10), 
+            unit_price: parseFloat(formData.unitPrice),
+            quality_stocks: parseInt(formData.qualityStocks, 10),
             unit_measurement: formData.unitMeasurement
         };
 
@@ -56,23 +63,24 @@ const InventoryTable = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newInventoryData),
         })
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to save inventory');
-            return response.json();
-        })
-        .then(savedInventory => {
-            const updatedInventory = editId 
-                ? inventoryData.map(item => (item.id === savedInventory.id ? savedInventory : item))
-                : [...inventoryData, savedInventory];
-            setInventoryData(updatedInventory);
-            setFilteredData(updatedInventory);
-            resetForm();
-            alert('Inventory saved successfully!');
-        })
-        .catch(err => {
-            console.error('Error saving inventory:', err);
-            alert('Error saving inventory. Please try again.');
-        });
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to save inventory');
+                return response.json();
+            })
+            .then(savedInventory => {
+                const updatedInventory = editId
+                    ? inventoryData.map(item => (item.id === savedInventory.id ? savedInventory : item))
+                    : [...inventoryData, savedInventory];
+                setInventoryData(updatedInventory);
+                setFilteredData(updatedInventory);
+                resetForm();
+                alert('Inventory saved successfully!');
+                setShowModal(false);
+            })
+            .catch(err => {
+                console.error('Error saving inventory:', err);
+                alert('Error saving inventory. Please try again.');
+            });
     };
 
     const handleEditInventory = (inventory) => {
@@ -83,15 +91,52 @@ const InventoryTable = () => {
             unitMeasurement: inventory.unit_measurement,
         });
         setEditId(inventory.id);
+        setShowModal(true);
     };
 
     const handleDeleteInventory = (id) => {
         fetch(`http://localhost:5000/api/inventory/${id}`, { method: 'DELETE' })
-        .then(() => {
-            setInventoryData(inventoryData.filter(item => item.id !== id));
-            setFilteredData(filteredData.filter(item => item.id !== id));
-        })
-        .catch(err => console.error('Error deleting inventory:', err));
+            .then(() => {
+                setInventoryData(inventoryData.filter(item => item.id !== id));
+                setFilteredData(filteredData.filter(item => item.id !== id));
+            })
+            .catch(err => console.error('Error deleting inventory:', err));
+    };
+
+    const handleDeleteSelected = async () => {
+        // Create an array of promises for the deletion requests
+        const deletePromises = selectedItems.map(id =>
+            fetch(`http://localhost:5000/api/inventory/${id}`, { method: 'DELETE' })
+                .then(() => id) // Return the id of the deleted item
+                .catch(err => {
+                    console.error(`Error deleting inventory with id ${id}:`, err);
+                    return null; // Return null for failed deletions
+                })
+        );
+
+        // Wait for all delete requests to complete
+        const deletedIds = await Promise.all(deletePromises);
+
+        // Update state to reflect deleted items
+        setInventoryData(inventoryData.filter(item => !deletedIds.includes(item.id)));
+        setFilteredData(filteredData.filter(item => !deletedIds.includes(item.id)));
+        setSelectedItems([]); // Reset selected items after deletion
+    };
+
+    const handleSelectItem = (id) => {
+        setSelectedItems(prevSelectedItems =>
+            prevSelectedItems.includes(id)
+                ? prevSelectedItems.filter(item => item !== id)
+                : [...prevSelectedItems, id]
+        );
+    };
+
+    const handleSelectAll = () => {
+        if (selectedItems.length === filteredData.length) {
+            setSelectedItems([]); // Deselect all
+        } else {
+            setSelectedItems(filteredData.map(item => item.id)); // Select all
+        }
     };
 
     const resetForm = () => {
@@ -103,10 +148,25 @@ const InventoryTable = () => {
         const value = e.target.value;
         setSearchTerm(value);
         const lowercasedFilter = value.toLowerCase();
-        const filtered = inventoryData.filter(inventory => 
+        const filtered = inventoryData.filter(inventory =>
             inventory.item_description.toLowerCase().includes(lowercasedFilter)
         );
         setFilteredData(filtered);
+        setCurrentPage(1); // Reset to first page when searching
+    };
+
+    // Pagination logic
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    };
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
     };
 
     return (
@@ -127,54 +187,35 @@ const InventoryTable = () => {
                 </div>
             </div>
 
-            <div className="inventory-form my-4">
-                <input
-                    type="text"
-                    name="itemDescription"
-                    placeholder="Item Description"
-                    value={formData.itemDescription}
-                    onChange={handleInputChange}
-                    className="form-control d-inline-block mx-2"
-                    style={{ width: '200px' }}
-                />
-                <input
-                    type="number"
-                    name="unitPrice"
-                    placeholder="Unit Price"
-                    value={formData.unitPrice}
-                    onChange={handleInputChange}
-                    className="form-control d-inline-block mx-2"
-                    style={{ width: '150px' }}
-                />
-                <input
-                    type="number"
-                    name="qualityStocks"
-                    placeholder="Quality in Stocks"
-                    value={formData.qualityStocks}
-                    onChange={handleInputChange}
-                    className="form-control d-inline-block mx-2"
-                    style={{ width: '150px' }}
-                />
-                <input
-                    type="text"
-                    name="unitMeasurement"
-                    placeholder="Measurement"
-                    value={formData.unitMeasurement}
-                    onChange={handleInputChange}
-                    className="form-control d-inline-block mx-2"
-                    style={{ width: '150px' }}
-                />
-                <button onClick={handleAddInventory} className="btn btn-primary d-inline-block mx-2">
-                    <FontAwesomeIcon icon={faPlus} /> Add
+            <div className="d-flex my-2">
+                <button onClick={() => { resetForm(); setShowModal(true); }} className="btn btn-primary">
+                    <FontAwesomeIcon icon={faPlus} /> Add Inventory
+                </button>
+
+                <button
+                    onClick={handleDeleteSelected}
+                    className="btn btn-danger ms-2"
+                    disabled={selectedItems.length === 0}
+                >
+                    <FontAwesomeIcon icon={faTrash} /> Delete Selected
                 </button>
             </div>
 
             {isLoading ? (
                 <p>Loading inventory...</p>
+            ) : currentItems.length === 0 ? (
+                <p>No results found</p>
             ) : (
                 <table className="table table-bordered">
                     <thead>
                         <tr>
+                            <th>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedItems.length === filteredData.length && filteredData.length > 0}
+                                    onChange={handleSelectAll}
+                                />
+                            </th>
                             <th>Item Description</th>
                             <th>Unit Price</th>
                             <th>Quality in Stocks</th>
@@ -183,25 +224,91 @@ const InventoryTable = () => {
                         </tr>
                     </thead>
                     <tbody>
-                    {filteredData.map(inventory => (
-                        <tr key={inventory.id}>
-                            <td>{inventory.item_description}</td>
-                            <td>{inventory.unit_price}</td>
-                            <td>{inventory.quality_stocks}</td>
-                            <td>{inventory.unit_measurement}</td>
-                            <td>
-                                <button className="btn btn-warning btn-sm mx-1" onClick={() => handleEditInventory(inventory)}>
-                                    <FontAwesomeIcon icon={faEdit} /> Edit {/* Add the edit icon */}
-                                </button>
-                                <button className="btn btn-danger btn-sm mx-1" onClick={() => handleDeleteInventory(inventory.id)}>
-                                    <FontAwesomeIcon icon={faTrash} /> Delete
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
+                        {currentItems.map(inventory => (
+                            <tr key={inventory.id}>
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedItems.includes(inventory.id)}
+                                        onChange={() => handleSelectItem(inventory.id)}
+                                    />
+                                </td>
+                                <td>{inventory.item_description}</td>
+                                <td>{inventory.unit_price}</td>
+                                <td>{inventory.quality_stocks}</td>
+                                <td>{inventory.unit_measurement}</td>
+                                <td>
+                                    <button className="btn btn-warning btn-sm mx-1" onClick={() => handleEditInventory(inventory)}>
+                                        <FontAwesomeIcon icon={faEdit} /> Edit
+                                    </button>
+                                    <button className="btn btn-danger btn-sm mx-1" onClick={() => handleDeleteInventory(inventory.id)}>
+                                        <FontAwesomeIcon icon={faTrash} /> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             )}
+
+            {/* Pagination Controls */}
+            <div className="d-flex justify-content-between my-3">
+                <button onClick={handlePrevPage} className="btn btn-secondary" disabled={currentPage === 1}>
+                    Previous
+                </button>
+                <span>Page {currentPage} of {totalPages}</span>
+                <button onClick={handleNextPage} className="btn btn-secondary" disabled={currentPage === totalPages}>
+                    Next
+                </button>
+            </div>
+
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{editId ? 'Edit Inventory' : 'Add Inventory'}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <input
+                        type="text"
+                        name="itemDescription"
+                        placeholder="Item Description"
+                        value={formData.itemDescription}
+                        onChange={handleInputChange}
+                        className="form-control my-2"
+                    />
+                    <input
+                        type="number"
+                        name="unitPrice"
+                        placeholder="Unit Price"
+                        value={formData.unitPrice}
+                        onChange={handleInputChange}
+                        className="form-control my-2"
+                    />
+                    <input
+                        type="number"
+                        name="qualityStocks"
+                        placeholder="Quality in Stocks"
+                        value={formData.qualityStocks}
+                        onChange={handleInputChange}
+                        className="form-control my-2"
+                    />
+                    <input
+                        type="text"
+                        name="unitMeasurement"
+                        placeholder="Measurement"
+                        value={formData.unitMeasurement}
+                        onChange={handleInputChange}
+                        className="form-control my-2"
+                    />
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={handleAddInventory}>
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };
