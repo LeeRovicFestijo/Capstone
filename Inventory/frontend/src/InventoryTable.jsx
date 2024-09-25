@@ -14,7 +14,11 @@ const InventoryTable = () => {
     const [filteredData, setFilteredData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
-    const [selectedItems, setSelectedItems] = useState([]); // State for selected items
+    const [selectedItems, setSelectedItems] = useState([]);
+    
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10; // Limit items per page to 10
 
     const fetchInventory = async () => {
         setIsLoading(true);
@@ -99,8 +103,23 @@ const InventoryTable = () => {
             .catch(err => console.error('Error deleting inventory:', err));
     };
 
-    const handleDeleteSelected = () => {
-        selectedItems.forEach(id => handleDeleteInventory(id));
+    const handleDeleteSelected = async () => {
+        // Create an array of promises for the deletion requests
+        const deletePromises = selectedItems.map(id =>
+            fetch(`http://localhost:5000/api/inventory/${id}`, { method: 'DELETE' })
+                .then(() => id) // Return the id of the deleted item
+                .catch(err => {
+                    console.error(`Error deleting inventory with id ${id}:`, err);
+                    return null; // Return null for failed deletions
+                })
+        );
+
+        // Wait for all delete requests to complete
+        const deletedIds = await Promise.all(deletePromises);
+
+        // Update state to reflect deleted items
+        setInventoryData(inventoryData.filter(item => !deletedIds.includes(item.id)));
+        setFilteredData(filteredData.filter(item => !deletedIds.includes(item.id)));
         setSelectedItems([]); // Reset selected items after deletion
     };
 
@@ -133,6 +152,21 @@ const InventoryTable = () => {
             inventory.item_description.toLowerCase().includes(lowercasedFilter)
         );
         setFilteredData(filtered);
+        setCurrentPage(1); // Reset to first page when searching
+    };
+
+    // Pagination logic
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    };
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
     };
 
     return (
@@ -169,7 +203,7 @@ const InventoryTable = () => {
 
             {isLoading ? (
                 <p>Loading inventory...</p>
-            ) : filteredData.length === 0 ? (
+            ) : currentItems.length === 0 ? (
                 <p>No results found</p>
             ) : (
                 <table className="table table-bordered">
@@ -190,7 +224,7 @@ const InventoryTable = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredData.map(inventory => (
+                        {currentItems.map(inventory => (
                             <tr key={inventory.id}>
                                 <td>
                                     <input
@@ -216,6 +250,17 @@ const InventoryTable = () => {
                     </tbody>
                 </table>
             )}
+
+            {/* Pagination Controls */}
+            <div className="d-flex justify-content-between my-3">
+                <button onClick={handlePrevPage} className="btn btn-secondary" disabled={currentPage === 1}>
+                    Previous
+                </button>
+                <span>Page {currentPage} of {totalPages}</span>
+                <button onClick={handleNextPage} className="btn btn-secondary" disabled={currentPage === totalPages}>
+                    Next
+                </button>
+            </div>
 
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
