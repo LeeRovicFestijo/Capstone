@@ -3,7 +3,7 @@ import './InventoryTable.css';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrash, faSearch, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash, faSearch, faEdit, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { Modal, Button } from 'react-bootstrap';
 
 const InventoryTable = () => {
@@ -15,7 +15,7 @@ const InventoryTable = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
-    
+
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; // Limit items per page to 10
@@ -104,23 +104,20 @@ const InventoryTable = () => {
     };
 
     const handleDeleteSelected = async () => {
-        // Create an array of promises for the deletion requests
         const deletePromises = selectedItems.map(id =>
             fetch(`http://localhost:5000/api/inventory/${id}`, { method: 'DELETE' })
-                .then(() => id) // Return the id of the deleted item
+                .then(() => id)
                 .catch(err => {
                     console.error(`Error deleting inventory with id ${id}:`, err);
-                    return null; // Return null for failed deletions
+                    return null;
                 })
         );
 
-        // Wait for all delete requests to complete
         const deletedIds = await Promise.all(deletePromises);
 
-        // Update state to reflect deleted items
         setInventoryData(inventoryData.filter(item => !deletedIds.includes(item.id)));
         setFilteredData(filteredData.filter(item => !deletedIds.includes(item.id)));
-        setSelectedItems([]); // Reset selected items after deletion
+        setSelectedItems([]);
     };
 
     const handleSelectItem = (id) => {
@@ -133,9 +130,9 @@ const InventoryTable = () => {
 
     const handleSelectAll = () => {
         if (selectedItems.length === filteredData.length) {
-            setSelectedItems([]); // Deselect all
+            setSelectedItems([]);
         } else {
-            setSelectedItems(filteredData.map(item => item.id)); // Select all
+            setSelectedItems(filteredData.map(item => item.id));
         }
     };
 
@@ -152,7 +149,7 @@ const InventoryTable = () => {
             inventory.item_description.toLowerCase().includes(lowercasedFilter)
         );
         setFilteredData(filtered);
-        setCurrentPage(1); // Reset to first page when searching
+        setCurrentPage(1);
     };
 
     // Pagination logic
@@ -262,43 +259,65 @@ const InventoryTable = () => {
                 </button>
             </div>
 
+            {/* Modal */}
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>{editId ? 'Edit Inventory' : 'Add Inventory'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <input
-                        type="text"
-                        name="itemDescription"
-                        placeholder="Item Description"
-                        value={formData.itemDescription}
-                        onChange={handleInputChange}
-                        className="form-control my-2"
-                    />
-                    <input
-                        type="number"
-                        name="unitPrice"
-                        placeholder="Unit Price"
-                        value={formData.unitPrice}
-                        onChange={handleInputChange}
-                        className="form-control my-2"
-                    />
-                    <input
-                        type="number"
-                        name="qualityStocks"
-                        placeholder="Quality in Stocks"
-                        value={formData.qualityStocks}
-                        onChange={handleInputChange}
-                        className="form-control my-2"
-                    />
-                    <input
-                        type="text"
-                        name="unitMeasurement"
-                        placeholder="Measurement"
-                        value={formData.unitMeasurement}
-                        onChange={handleInputChange}
-                        className="form-control my-2"
-                    />
+                    <form>
+                        <div className="form-group">
+                            <label htmlFor="itemDescription">Item Description</label>
+                            <input
+                                type="text"
+                                name="itemDescription"
+                                value={formData.itemDescription}
+                                onChange={handleInputChange}
+                                className="form-control my-2"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="unitPrice">Unit Price</label>
+                            <input
+                                type="number"
+                                name="unitPrice"
+                                value={formData.unitPrice}
+                                onChange={handleInputChange}
+                                className="form-control my-2"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="qualityStocks">Quality in Stocks</label>
+                            <input
+                                type="number"
+                                name="qualityStocks"
+                                value={formData.qualityStocks}
+                                onChange={handleInputChange}
+                                className="form-control my-2"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="unitMeasurement">Unit of Measurement</label>
+                            <div className="custom-select-wrapper">
+                                <select
+                                    name="unitMeasurement"
+                                    value={formData.unitMeasurement}
+                                    onChange={handleInputChange}
+                                    className="form-control my-2 custom-select-dropdown"
+                                >
+                                    <option value="">Select Unit of Measurement</option> {/* Placeholder */}
+                                    <option value="bags">Bags</option>
+                                    <option value="pcs">Pcs</option>
+                                    <option value="boxes">Boxes</option>
+                                    <option value="pairs">Pairs</option>
+                                    <option value="roll">Roll</option>
+                                    <option value="pd">Pd</option>
+                                    <option value="gals">Gals</option>
+                                </select>
+                                <FontAwesomeIcon icon={faChevronDown} className="dropdown-icon" />
+                            </div>
+                        </div>
+                    </form>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowModal(false)}>

@@ -1,15 +1,18 @@
+/* Overall container for the content */
 .content {
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
 }
 
+/* Heading */
 .content h1 {
     margin-left: 15px;
     margin-top: 10px;
     font-size: 30px;
 }
 
+/* Inventory form styles */
 .inventory-form {
     display: flex;
     flex-wrap: wrap;
@@ -24,6 +27,7 @@
     border-radius: 4px;
 }
 
+/* Button in the inventory form */
 .inventory-form button {
     padding: 8px;
     font-size: 16px;
@@ -39,6 +43,7 @@
     background-color: #16a085;
 }
 
+/* Table styles */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -91,6 +96,36 @@ table td button:last-child:hover {
     background-color: #c0392b;
 }
 
+/* Custom select dropdown styles */
+.custom-select-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.custom-select-dropdown {
+    appearance: none; /* Remove default arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 2.5rem; /* Space for the icon */
+    padding: 8px; /* Match other input fields */
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dropdown-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Allow clicks through the icon */
+    color: #999; /* Color of the icon */
+}
+
+/* Responsive design for larger screens */
 @media (min-width: 768px) {
     .content {
         width: 80%;
