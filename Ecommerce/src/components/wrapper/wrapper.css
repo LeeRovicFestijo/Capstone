@@ -1,0 +1,54 @@
+.wrapper {
+  text-align: center;
+}
+
+.wrapper .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px; /* Add gap between items */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.wrapper .product {
+  flex: 1 1 calc(25% - 20px); /* Make all products the same size and subtract gap */
+  box-sizing: border-box;
+  padding: 30px;
+  text-align: center;
+  background: #f9f9f9; /* Optional: Add background to see the space */
+  border-radius: 10px; /* Optional: Rounded corners */
+}
+
+.wrapper .img {
+  margin: auto;
+  width: 70px;
+  height: 70px;
+  line-height: 70px;
+  margin-bottom: 20px;
+}
+
+.wrapper .img i {
+  font-size: 40px;
+}
+
+.wrapper .product h3 {
+  font-weight: 500;
+}
+
+.wrapper p {
+  font-size: 15px;
+  margin-top: 20px;
+  color: grey;
+}
+
+@media (max-width: 768px) {
+  .wrapper .product {
+    flex: 1 1 calc(45% - 20px); /* On smaller screens, display two per row */
+  }
+}
+
+@media (max-width: 480px) {
+  .wrapper .product {
+    flex: 1 1 calc(100% - 20px); /* On mobile, display one per row */
+  }
+}

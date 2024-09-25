@@ -148,3 +148,133 @@ p {
 .popup-content {
   animation: fadeIn 0.3s ease, slideUp 0.3s ease;
 }
+/* FlashCard Component Styles */
+.flash-card-container {
+  padding: 20px; /* Padding around the card container */
+}
+
+/* Slider Settings */
+.slick-slider {
+  margin: 0 auto; /* Center the slider */
+}
+.box {
+  margin: 10px; /* Adjusts spacing between products */
+}
+
+.product {
+  border: 1px solid #ddd; /* Optional: add a border around each product */
+  border-radius: 5px; /* Optional: rounded corners */
+  overflow: hidden; /* Ensures the image stays within the box */
+}
+
+.img {
+  height: 500px; /* Set a fixed height for the image */
+  display: flex;
+  justify-content: center; /* Center the image horizontally */
+  align-items: center; /* Center the image vertically */
+
+}
+
+.img img {
+  height:  500px; /* Make the image fill the container's height */
+  width: 500px; /* Maintain aspect ratio */
+  max-width: none; /* Prevent image from exceeding its container */
+}
+
+
+/* Product Details */
+.product-details {
+  padding: 15px; /* Padding inside product details */
+  text-align: center; /* Center text alignment */
+}
+
+.product-details h3 {
+  font-size: 1.25rem; /* Adjust font size for the product name */
+  color: #333; /* Dark color for text */
+  margin: 10px 0; /* Margin for spacing */
+}
+
+.price {
+  color: #e63946; /* Color for the price */
+  font-weight: bold; /* Bold text for emphasis */
+}
+
+/* Popup Styles */
+.product-popup {
+  position: fixed; /* Fixed position to overlay */
+  top: 0; /* Align to the top */
+  left: 0; /* Align to the left */
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  background-color: rgba(0, 0, 0, 0.7); /* Dark background with opacity */
+  display: flex; /* Use flexbox for centering */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  z-index: 1000; /* Ensure it is on top */
+  opacity: 0; /* Initially hidden */
+  transition: opacity 0.3s ease; /* Fade effect */
+}
+
+.product-popup.show {
+  opacity: 1; /* Show when active */
+}
+
+.popup-content {
+  background: #fff; /* White background for popup */
+  border-radius: 8px; /* Rounded corners */
+  width: 90%; /* Responsive width */
+  max-width: 600px; /* Maximum width */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+  padding: 20px; /* Padding for popup content */
+  position: relative; /* For positioning close button */
+}
+
+.close-popup {
+  position: absolute; /* Positioning for the close button */
+  top: 10px; /* Distance from the top */
+  right: 10px; /* Distance from the right */
+  font-size: 1.5rem; /* Larger font size */
+  cursor: pointer; /* Pointer cursor on hover */
+  color: #333; /* Dark color for close button */
+}
+
+/* Popup Inner */
+.popup-inner {
+  display: flex; /* Flexbox for layout */
+  flex-direction: row; /* Horizontal alignment */
+}
+
+.left-side {
+  flex: 1; /* Take available space */
+  margin-right: 20px; /* Space between sides */
+}
+
+.left-side img {
+  width: 100%; /* Full width for the image */
+  border-radius: 8px; /* Rounded corners */
+}
+
+.right-side {
+  flex: 1; /* Take available space */
+}
+
+/* Size and Quantity Selection */
+.size-selection, .quantity-selection {
+  margin: 15px 0; /* Margin for spacing */
+}
+
+/* Add to Cart Button */
+.add-to-cart-btn {
+  background-color: #2a9d8f; /* Main button color */
+  color: white; /* Text color */
+  padding: 10px 15px; /* Padding */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-size: 1rem; /* Font size */
+  transition: background-color 0.3s; /* Transition for background color */
+}
+
+.add-to-cart-btn:hover {
+  background-color: #21867a; /* Darker shade on hover */
+}
