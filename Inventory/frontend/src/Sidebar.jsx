@@ -34,12 +34,12 @@ const Sidebar = () => {
                 </li>
                 <li>
                     <a href="#">
-                        <FaUserCircle className="icon" /> Accounts
+                        <FaTruck className="icon" /> Shipment
                     </a>
                 </li>
                 <li>
                     <a href="#">
-                        <FaTruck className="icon" /> Shipment
+                        <FaUserCircle className="icon" /> Accounts
                     </a>
                 </li>
             </ul>
