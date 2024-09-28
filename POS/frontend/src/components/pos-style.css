@@ -1,6 +1,6 @@
 .scrollable-container-items {
     overflow-y: auto;
-    max-height: calc(100vh - 201px);
+    max-height: calc(100vh - 145px);
     overflow-x: hidden;
 
     ::-webkit-scrollbar {

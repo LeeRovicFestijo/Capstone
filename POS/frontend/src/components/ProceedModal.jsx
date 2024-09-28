@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Modal from 'react-modal';
+import axios from "axios"
 import { useReactToPrint } from 'react-to-print';
 import { ComponentToPrint } from '../components/ComponentToPrint';
 import './modal-style.css';
 
 Modal.setAppElement('#root');
 
-const ProceedModal = ({ isOpen, onClose, cart, totalAmount, customerName, customer }) => {
+const ProceedModal = ({ isOpen, onClose, cart, fetchProducts, totalAmount, customerName, customer, account, payment }) => {
     const [paymentMethod, setPaymentMethod] = useState('Cash');
     const [shippingMethod, setShippingMethod] = useState('OnSite');
     const [shippingAddress, setShippingAddress] = useState('');
@@ -16,9 +17,38 @@ const ProceedModal = ({ isOpen, onClose, cart, totalAmount, customerName, custom
         content: () => componentRef.current,
     });
 
-    const handlePayment = () => {
-        handlePrint();
-        onClose();
+    const handlePayment = async () => {
+        const orderData = {
+            customer_id: customer[0].customer_id,
+            cart: cart.map(item => ({
+                item_id: item.item_id,
+                item_description: item.item_description,
+                order_quantity: item.quantity,
+                unit_price: item.unit_price,
+            })),
+            total_amount: totalAmount,
+            order_delivery: shippingMethod === 'Ship' ? 'yes' : 'no',
+            payment_mode: paymentMethod,
+            account_id: account.account_id,
+            shipping_address: shippingAddress
+        };
+
+        console.log(orderData);
+
+        try {
+            const response = await axios.post('http://localhost:5001/api/orders', orderData);
+            if (response.status === 200) {
+                handlePrint(); // Print the receipt after successful order creation
+                payment();
+                fetchProducts();
+                onClose(); // Close the modal
+            } else {
+                alert(response.data.message);
+            }
+        } catch (error) {
+            console.error('Error creating order:', error);
+            alert('Failed to create order. Please try again.');
+        }
     };
 
     useEffect(() => {
@@ -38,7 +68,7 @@ const ProceedModal = ({ isOpen, onClose, cart, totalAmount, customerName, custom
                 <h2 className="modal-title">Proceed to Payment</h2>
                 {customer && customer.length > 0 && (
                     <div className="customer-info">
-                        <h4>Customer Name: <span>{customer[0].fullName}</span></h4>
+                        <h4>Customer Name: <span>{customer[0].customer_name}</span></h4>
                     </div>
                 )}
                 <h4>Total Amount: <span>₱{totalAmount.toFixed(2)}</span></h4>
@@ -50,7 +80,7 @@ const ProceedModal = ({ isOpen, onClose, cart, totalAmount, customerName, custom
                             <option value="Cash">Cash</option>
                             <option value="Gcash">Gcash</option>
                             <option value="PayMaya">PayMaya</option>
-                            <option value="PayMaya">Card</option>
+                            <option value="Card">Card</option>
                         </select>
                         <i className="bi bi-chevron-down"></i>
                     </div>
@@ -94,7 +124,8 @@ const ProceedModal = ({ isOpen, onClose, cart, totalAmount, customerName, custom
                         ref={componentRef} 
                         cart={cart} 
                         totalAmount={totalAmount} 
-                        customerName={customerName} 
+                        customerName={customerName}
+                        customer={customer}
                         paymentMethod={paymentMethod}
                         shippingAddress={shippingAddress}
                     />

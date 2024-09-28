@@ -11,7 +11,7 @@ import ProceedModal from '../components/ProceedModal';
 
 function POSPage() {
 
-    const { cart, setCart, totalAmount, setTotalAmount, selectedCustomer, setSelectedCustomer, selectedCustomerLocal, setIsCustomerAdded } = usePOS();
+    const { cart, setCart, totalAmount, setTotalAmount, selectedCustomer, setSelectedCustomer, selectedCustomerLocal, setIsCustomerAdded, persistedUser, payment, customerName, setCustomerName } = usePOS();
     const [product, setProduct] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -20,7 +20,6 @@ function POSPage() {
     const scrollableRef = useRef(null);
     const [lastScrollPosition, setLastScrollPosition] = useState(0);
     const [isProceedModalOpen, setProceedModalOpen] = useState(false);
-    const [customerName, setCustomerName] = useState(selectedCustomer?.fullName || '');
     const navigate = useNavigate();
 
 
@@ -36,61 +35,60 @@ function POSPage() {
         transition: Flip,
     }
 
-    const fetchproducts = async() => {
+    const fetchProducts = async () => {
         setIsLoading(true);
-        const result = await axios.get('product');
-        const products = await result.data
-        setProduct(products);
-        setIsLoading(false);
-    }
+        try {
+            const result = await axios.get('http://localhost:5001/api/products'); 
+            setProduct(result.data);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            toast.error('Failed to load products', toastOptions);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-    const addProductToCart = async(product) => {
-        let findProductInCart = await cart.find(i=>{
-            return i.id === product.id
-        });
+    const addProductToCart = async (product) => {
+        let findProductInCart = cart.find(i => i.item_id === product.item_id);
 
-        if(findProductInCart){
-            let newCart = [];
-            let newItem = [];
-
-            cart.forEach(cartItem => {
-                if(cartItem.id === product.id) {
-                    newItem = {
+        if (findProductInCart) {
+            const newCart = cart.map(cartItem => {
+                if (cartItem.item_id === product.item_id) {
+                    return {
                         ...cartItem,
                         quantity: cartItem.quantity + 1,
-                        totalAmount: cartItem.price * (cartItem.quantity + 1)
-                    }
-                    newCart.push(newItem);
-                }else {
-                    newCart.push(cartItem);
+                        totalAmount: cartItem.unit_price * (cartItem.quantity + 1),
+                    };
                 }
+                return cartItem;
             });
-
             setCart(newCart);
-
-        }else{
-            let addingProduct = {
+        } else {
+            const addingProduct = {
                 ...product,
-                'quantity': 1,
-                'totalAmount': product.price,
-            }
+                quantity: 1,
+                totalAmount: parseFloat(product.unit_price),
+            };
+            console.log(addingProduct);
             setCart([...cart, addingProduct]);
-            toast.success(`Added ${product.name} to cart`, toastOptions);
+            toast.success(`Added ${product.item_description} to cart`, toastOptions);
         }
-    }
+    };
 
     const removeProduct = async(product) => {
-        const newCart = cart.filter(cartItem => cartItem.id !== product.id);
+        const newCart = cart.filter(cartItem => cartItem.item_id !== product.item_id);
         setCart(newCart);
     }
 
     const updateQuantity = (productId, newQuantity) => {
         const newCart = cart.map(cartItem => {
-            if (cartItem.id === productId) {
+            if (cartItem.item_id === productId) {
+                const newTotalAmount = cartItem.unit_price * newQuantity;
+                console.log(`Updated Total Amount: ${newTotalAmount}`);
                 return {
                     ...cartItem,
                     quantity: newQuantity,
-                    totalAmount: cartItem.price * newQuantity
+                    totalAmount: cartItem.unit_price * newQuantity
                 }
             }
             return cartItem;
@@ -106,6 +104,9 @@ function POSPage() {
         if (cart.length === 0) {
             toast.error('Your cart is empty. Please add items to the cart before proceeding.', toastOptions);
             return;
+        }
+        if (selectedCustomer) {
+            setCustomerName(selectedCustomer.customer_name);
         }
         setProceedModalOpen(true);
     };
@@ -127,7 +128,7 @@ function POSPage() {
     }, [selectedCustomer]);
 
     useEffect( ()=> {
-        fetchproducts();
+        fetchProducts();
     },[]);
 
     useEffect(()=> {
@@ -151,9 +152,9 @@ function POSPage() {
     }, [selectedCustomer]);
 
     const handleRemoveCustomer = () => {
+        console.log(selectedCustomer);
         if (selectedCustomer) {
-            console.log("titi")
-            if (selectedCustomer.id === selectedCustomerLocal.id) {
+            if (selectedCustomer.customer_id === selectedCustomerLocal.customer_id) {
                 console.log(selectedCustomer)
                 navigate('/customers', { state: { newCustomer: selectedCustomer } });
                 setSelectedCustomer(null);
@@ -176,6 +177,7 @@ function POSPage() {
     };
 
     const handleRemoveChange = (cartProduct) => {
+        console.log("titi")
         setLastScrollPosition(scrollableRef.current.scrollTop); 
         removeProduct(cartProduct);
         setTimeout(() => {
@@ -184,14 +186,14 @@ function POSPage() {
     };
 
     const filteredProducts = product.filter((prod) =>
-        prod.name.toLowerCase().includes(searchQuery.toLowerCase()) 
+        prod.item_description.toLowerCase().includes(searchQuery.toLowerCase()) 
     );
     
 
     return (
         <>
             <SidebarPOS>
-                <div className='row' style={{ height: '91vh' }}>
+                <div className='row' style={{ height: '97vh' }}>
                     <div className="col-lg-8 bg-light p-3 border border-gray">
                         <input
                             type="text"
@@ -202,54 +204,6 @@ function POSPage() {
                         />
 
                         <hr />
-
-                    {/* <div className='col-lg-12'>
-                        <div className="position-relative">
-
-                            <nav className="mb-3 bg-white p-2" style={{ borderRadius: '0.5rem', overflow: 'hidden' }}>
-                                <div className="d-flex align-items-center">
-                                    <button
-                                        className="btn btn-outline-secondary"
-                                        style={{ flexShrink: 0 }}
-                                        onClick={() => scrollCategories('left')}
-                                    >
-                                        <i className="bi bi-chevron-left"></i>
-                                    </button>
-
-                                    <div className="category-scroll-container d-flex flex-grow-1 overflow-auto">
-                                        <ul className="nav nav-pills m-0">
-                                            <li className="nav-item">
-                                                <button
-                                                    className={`nav-link ${selectedCategory === '' ? 'active' : ''}`}
-                                                    onClick={() => setSelectedCategory('')}
-                                                >
-                                                    All
-                                                </button>
-                                            </li>
-                                            {categories.map((category, index) => (
-                                                <li className="nav-item" key={index}>
-                                                    <button
-                                                        className={`nav-link ${selectedCategory === category ? 'active' : ''}`}
-                                                        onClick={() => setSelectedCategory(category)}
-                                                    >
-                                                        {category}
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-
-                                    <button
-                                        className="btn btn-outline-secondary"
-                                        style={{ flexShrink: 0 }}
-                                        onClick={() => scrollCategories('right')}
-                                    >
-                                        <i className="bi bi-chevron-right"></i>
-                                    </button>
-                                </div>
-                            </nav>
-                        </div>
-                    </div> */}
 
                         <div className='scrollable-container-items'>
                             {isLoading ? (
@@ -272,11 +226,11 @@ function POSPage() {
                                                     className="card-title text-truncate mt-2"
                                                     style={{ maxWidth: '120px' }}
                                                 >
-                                                    {product.name}
+                                                    {product.item_description}
                                                 </h6>
-                                                <p>Qty: {product.stock}</p>
+                                                <p>Qty: {product.quality_stocks}</p>
                                                 <p>
-                                                    <strong>₱{product.price}</strong>
+                                                    <strong>₱{product.unit_price}</strong>
                                                 </p>
                                             </div>
                                         </div>
@@ -300,7 +254,7 @@ function POSPage() {
                                         ) : (
                                             <i className="bi bi-person-circle" style={{ fontSize: '30px' }}></i>
                                         )}
-                                        <span style={{ marginLeft: '10px' }}>{selectedCustomer.fullName}</span>
+                                        <span style={{ marginLeft: '10px' }}>{selectedCustomer.customer_name}</span>
                                     </div>
                                     ) : (
                                         <button className="btn custom-btn-add-customer" onClick={handleAddCustomer}>
@@ -321,49 +275,52 @@ function POSPage() {
                                     cart.map((cartProduct, key) => (
                                     <React.Fragment key={key}>
                                         <div
-                                        className="list-item"
-                                        style={{
-                                            backgroundColor: key % 2 === 0 ? '#f8f9fa' : 'white',
-                                            borderRadius: '10px',
-                                        }}
+                                            className="list-item"
+                                            style={{
+                                                backgroundColor: key % 2 === 0 ? '#f8f9fa' : 'white',
+                                                borderRadius: '10px',
+                                            }}
                                         >
                                             <div className="d-flex align-items-center p-3">
                                                 <i
-                                                className={`bi ${collapsedItemIndex === key ? 'bi-chevron-down' : 'bi-chevron-right'}`}
+                                                className={`bi ${collapsedItemIndex === key ? 'bi-chevron-up' : 'bi-chevron-right'}`}
                                                 data-bs-toggle="collapse"
                                                 data-bs-target={`#collapse${key}`}
                                                 style={{ cursor: 'pointer' }}
+                                                onClick={() => setCollapsedItemIndex(collapsedItemIndex === key ? null : key)}
                                                 aria-expanded={collapsedItemIndex === key}
                                                 aria-controls={`collapse${key}`}
-                                                onClick={() => setCollapsedItemIndex(collapsedItemIndex === key ? null : key)}
-                                                ></i>
+                                                />
 
                                                 <div className="mx-2">{cartProduct.quantity}</div>
-                                                <div className="flex-grow-1 mx-2">{cartProduct.name}</div>
-                                                <div className="mx-2">₱{cartProduct.totalAmount.toFixed(2)}</div>
+                                                <div className="flex-grow-1 mx-2">{cartProduct.item_description}</div>
+                                                <div className="mx-2">₱{typeof cartProduct.totalAmount === 'number' ? cartProduct.totalAmount.toFixed(2) : '0.00'}</div>
 
                                                 <i
                                                 className={`bi ${hoveredIndex === key ? 'bi-x-circle-fill' : 'bi-x-circle'}`}
                                                 onMouseEnter={() => setHoveredIndex(key)}
                                                 onMouseLeave={() => setHoveredIndex(null)}
                                                 style={{ color: 'red', cursor: 'pointer' }}
-                                                onClick={() => handleRemoveChange(cartProduct)}
+                                                onClick={() => {
+                                                    handleRemoveChange(cartProduct);
+                                                    setHoveredIndex(null);
+                                                    setCollapsedItemIndex(null);
+                                                }}
                                                 ></i>
-
                                             </div>
 
                                             <div
                                                 className={`collapse ${collapsedItemIndex === key ? 'show' : ''}`}
                                                 id={`collapse${key}`}
                                                 style={{
-                                                    backgroundColor: key % 2 === 0 ? 'white' : '#f8f9fa',
+                                                    backgroundColor: key % 2 === 0 ? '#f8f9fa' : 'white',
                                                 }}
                                             >
                                                 <div className="d-flex align-items-center justify-content-center p-2">
                                                     <button
                                                         className="btn btn-outline-secondary btn-sm mx-2"
-                                                        onClick={() => handleQuantityChange(cartProduct.id, cartProduct.quantity - 1)}
-                                                        disabled={cartProduct.quantity <= 1}
+                                                        onClick={() => handleQuantityChange(cartProduct.item_id, cartProduct.quantity - 1)}
+                                                        disabled={cartProduct.quantity <= 1 || isNaN(cartProduct.quantity)}
                                                     >
                                                         <i className="bi bi-dash-circle"></i>
                                                     </button>
@@ -371,13 +328,16 @@ function POSPage() {
                                                         type="number"
                                                         min="1"
                                                         className="form-control text-center"
-                                                        style={{ width: '80px', MozAppearance: 'textfield', WebkitAppearance: 'none', margin: 0 }}
+                                                        style={{ width: '90px', MozAppearance: 'textfield', WebkitAppearance: 'none', margin: 0 }}
                                                         value={cartProduct.quantity}
-                                                        onChange={(e) => handleQuantityChange(cartProduct.id, parseInt(e.target.value))}
+                                                        onChange={(e) => handleQuantityChange(cartProduct.item_id, parseInt(e.target.value))}
                                                     />
                                                     <button
                                                         className="btn btn-outline-secondary btn-sm mx-2"
-                                                        onClick={() => handleQuantityChange(cartProduct.id, cartProduct.quantity + 1)}
+                                                        onClick={() => {
+                                                            const newQuantity = isNaN(cartProduct.quantity) ? 1 : cartProduct.quantity + 1;
+                                                            handleQuantityChange(cartProduct.item_id, newQuantity);
+                                                        }}
                                                     >
                                                         <i className="bi bi-plus-circle"></i>
                                                     </button>
@@ -396,7 +356,7 @@ function POSPage() {
                             <hr />
                             <div className="d-flex justify-content-between align-items-center px-2 text-primary mt-2">
                                 <h4 className="mb-0 text-black">Total Amount</h4>
-                                <h4 className="mb-0 text-black">₱{totalAmount.toFixed(2)}</h4>
+                                <h4 className="mb-0 text-black">₱{typeof totalAmount === 'number' ? totalAmount.toFixed(2) : '0.00'}</h4>
                             </div>
                             <button className="btn custom-btn-proceed mt-2" onClick={handleOpenProceedModal}>
                                 <i className='bi bi-arrow-right-circle'/> Checkout
@@ -410,9 +370,12 @@ function POSPage() {
                 isOpen={isProceedModalOpen}
                 onClose={handleCloseProceedModal}
                 cart={cart}
+                fetchProducts={fetchProducts}
                 totalAmount={totalAmount}
                 customerName={customerName}
                 customer={selectedCustomer ? [selectedCustomer] : []}
+                account={persistedUser}
+                payment={payment}
             />
         </>
     )

@@ -26,6 +26,10 @@
   border-radius: 5px;
   cursor: pointer;
 }
+
+.add-customer-btn:hover {
+  background-color: #0672e6;
+}
   
 .customer-details {
   display: flex;
@@ -87,7 +91,7 @@
 
 .recent-customers-scrollable {
   overflow-y: auto;
-  max-height: calc(100vh - 541px);
+  max-height: calc(100vh - 485px);
   overflow-x: hidden;
 
   ::-webkit-scrollbar {
@@ -116,7 +120,7 @@
 
 .recent-customers-scrollable-selected {
   overflow-y: auto;
-  max-height: calc(100vh - 357px);
+  max-height: calc(100vh - 300px);
   overflow-x: hidden;
 
   ::-webkit-scrollbar {
@@ -249,6 +253,14 @@
   color: white;
   border-radius: 4px;
   width: 140px;
+}
+
+.edit-btn:hover {
+  background-color: #0672e6;
+}
+
+.delete-btn:hover {
+  background-color: #bc2d3c;
 }
 
 .bi-envelope, .bi-telephone {
