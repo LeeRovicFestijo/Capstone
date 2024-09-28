@@ -15,6 +15,7 @@ const InventoryTable = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
+    const [totalItems, setTotalItems] = useState(0); // New state for total count of items
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -26,6 +27,7 @@ const InventoryTable = () => {
             const result = await axios.get('http://localhost:5000/api/inventory');
             setInventoryData(result.data);
             setFilteredData(result.data);
+            setTotalItems(result.data.length); // Set the total number of items
         } catch (error) {
             console.error('Error fetching inventory:', error);
         } finally {
@@ -73,6 +75,7 @@ const InventoryTable = () => {
                     : [...inventoryData, savedInventory];
                 setInventoryData(updatedInventory);
                 setFilteredData(updatedInventory);
+                setTotalItems(updatedInventory.length); // Update the total count of items
                 resetForm();
                 alert('Inventory saved successfully!');
                 setShowModal(false);
@@ -97,8 +100,10 @@ const InventoryTable = () => {
     const handleDeleteInventory = (id) => {
         fetch(`http://localhost:5000/api/inventory/${id}`, { method: 'DELETE' })
             .then(() => {
-                setInventoryData(inventoryData.filter(item => item.id !== id));
-                setFilteredData(filteredData.filter(item => item.id !== id));
+                const updatedInventory = inventoryData.filter(item => item.id !== id);
+                setInventoryData(updatedInventory);
+                setFilteredData(updatedInventory);
+                setTotalItems(updatedInventory.length); // Update the total count of items
             })
             .catch(err => console.error('Error deleting inventory:', err));
     };
@@ -114,9 +119,11 @@ const InventoryTable = () => {
         );
 
         const deletedIds = await Promise.all(deletePromises);
-
-        setInventoryData(inventoryData.filter(item => !deletedIds.includes(item.id)));
-        setFilteredData(filteredData.filter(item => !deletedIds.includes(item.id)));
+        const updatedInventory = inventoryData.filter(item => !deletedIds.includes(item.id));
+        
+        setInventoryData(updatedInventory);
+        setFilteredData(updatedInventory);
+        setTotalItems(updatedInventory.length); // Update the total count of items
         setSelectedItems([]);
     };
 
@@ -196,6 +203,10 @@ const InventoryTable = () => {
                 >
                     <FontAwesomeIcon icon={faTrash} /> Delete Selected
                 </button>
+            </div>
+
+            <div className="d-flex justify-content-end my-2">
+                <p>Total Items: {totalItems}</p> {/* Display total number of items */}
             </div>
 
             {isLoading ? (
