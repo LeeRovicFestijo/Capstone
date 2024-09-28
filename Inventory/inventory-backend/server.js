@@ -2,10 +2,12 @@ const express = require('express');
 const { Pool } = require('pg');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-app.use(cors({ origin: 'http://localhost:3001' })); // Allow requests from React
-
 
 const app = express();
+
+app.use(cors({ origin: 'http://localhost:3000' })); // Allow requests from React
+
+
 
 // PostgreSQL connection configuration
 const pool = new Pool({
@@ -16,25 +18,37 @@ const pool = new Pool({
     port: 5432, // Default PostgreSQL port
 });
 
-app.use(cors());
 app.use(bodyParser.json());
 
 // Fetch all inventory items
-app.get('/api/inventory', (req, res) => {
-    pool.query('SELECT * FROM inventory', (err, result) => {
-        if (err) {
-            console.error('Error fetching inventory:', err);
-            return res.status(500).json({ error: 'Failed to fetch inventory.' });
-        }
-        res.json(result.rows);
-    });
-});
+// app.get('/api/inventory', (req, res) => {
+//     pool.query('SELECT * FROM inventory', (err, result) => {
+//         console.log(result)
+//         if (err) {
+//             console.error('Error fetching inventory:', err);
+//             return res.status(500).json({ error: 'Failed to fetch inventory.' });
+//         }
+//         res.json(result.rows);
+//     });
+// });
+
+app.get('/api/inventory', async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM inventory'); // Adjust the table name
+      res.json(result.rows);
+      console.log(result.rows);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      res.status(500).send('Error fetching products');
+    }
+  });
 
 // Add a new inventory item
 app.post('/api/inventory', (req, res) => {
     console.log('Data received from React:', req.body); // Log the incoming data
 
     const { item_description, unit_price, quality_stocks, unit_measurement } = req.body;
+    console.log(item_description);
 
     // Validation check
     if (!item_description || isNaN(unit_price) || isNaN(quality_stocks) || !unit_measurement) {

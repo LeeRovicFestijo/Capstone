@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './InventoryTable.css';
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faTrash, faSearch, faEdit, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { Modal, Button } from 'react-bootstrap';
 
 const InventoryTable = () => {
     const [inventoryData, setInventoryData] = useState([]);
@@ -8,107 +12,165 @@ const InventoryTable = () => {
     const [editId, setEditId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredData, setFilteredData] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [totalItems, setTotalItems] = useState(0); // New state for total count of items
 
-    // Fetch inventory data from the server on component mount
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10; // Limit items per page to 10
+
+    const fetchInventory = async () => {
+        setIsLoading(true);
+        try {
+            const result = await axios.get('http://localhost:5000/api/inventory');
+            setInventoryData(result.data);
+            setFilteredData(result.data);
+            setTotalItems(result.data.length); // Set the total number of items
+        } catch (error) {
+            console.error('Error fetching inventory:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
-        fetch('/api/inventory')
-            .then(response => response.json())
-            .then(data => {
-                setInventoryData(data);
-                setFilteredData(data); // Initialize filtered data
-            })
-            .catch(err => console.error('Error fetching inventory:', err));
+        fetchInventory();
     }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
+        setFormData({ ...formData, [name]: value });
     };
 
-    const handleAddItem = () => {
-        // Check if form inputs are valid
+    const handleAddInventory = () => {
         if (!formData.itemDescription || !formData.unitPrice || !formData.qualityStocks || !formData.unitMeasurement) {
             alert('Please fill in all fields.');
             return;
         }
 
-        // Ensure that numeric values are properly converted
-        const unitPrice = parseFloat(formData.unitPrice);
-        const qualityStocks = parseInt(formData.qualityStocks, 10);
-
-        const itemData = { 
-            item_description: formData.itemDescription, // Update the key to match the server side
-            unit_price: unitPrice, 
-            quality_stocks: qualityStocks, 
+        const newInventoryData = {
+            item_description: formData.itemDescription,
+            unit_price: parseFloat(formData.unitPrice),
+            quality_stocks: parseInt(formData.qualityStocks, 10),
             unit_measurement: formData.unitMeasurement
         };
 
         const requestUrl = editId ? `http://localhost:5000/api/inventory/${editId}` : 'http://localhost:5000/api/inventory';
         const method = editId ? 'PUT' : 'POST';
 
-        // Send data to the server (either create or update)
         fetch(requestUrl, {
             method: method,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(itemData),
+            body: JSON.stringify(newInventoryData),
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to save item');
-            }
-            return response.json();
-        })
-        .then(savedItem => {
-            if (editId) {
-                setInventoryData(inventoryData.map(item => item.id === savedItem.id ? savedItem : item));
-            } else {
-                setInventoryData([...inventoryData, savedItem]);
-            }
-            // Reset form after success
-            setFormData({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
-            setEditId(null);
-            alert('Item added successfully!');
-            setFilteredData([...inventoryData, savedItem]); // Update filtered data after adding
-        })
-        .catch(err => {
-            console.error('Error saving item:', err);
-            alert('There was an error saving the item. Please try again.');
-        });
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to save inventory');
+                return response.json();
+            })
+            .then(savedInventory => {
+                const updatedInventory = editId
+                    ? inventoryData.map(item => (item.id === savedInventory.id ? savedInventory : item))
+                    : [...inventoryData, savedInventory];
+                setInventoryData(updatedInventory);
+                setFilteredData(updatedInventory);
+                setTotalItems(updatedInventory.length); // Update the total count of items
+                resetForm();
+                alert('Inventory saved successfully!');
+                setShowModal(false);
+            })
+            .catch(err => {
+                console.error('Error saving inventory:', err);
+                alert('Error saving inventory. Please try again.');
+            });
     };
 
-    const handleEditItem = (item) => {
+    const handleEditInventory = (inventory) => {
         setFormData({
-            itemDescription: item.item_description, // Match the key from the server
-            unitPrice: item.unit_price,
-            qualityStocks: item.quality_stocks,
-            unitMeasurement: item.unit_measurement,
+            itemDescription: inventory.item_description,
+            unitPrice: inventory.unit_price,
+            qualityStocks: inventory.quality_stocks,
+            unitMeasurement: inventory.unit_measurement,
         });
-        setEditId(item.id);
+        setEditId(inventory.id);
+        setShowModal(true);
     };
 
-    const handleDeleteItem = (id) => {
-        fetch(`/api/inventory/${id}`, { method: 'DELETE' })
-        .then(() => {
-            setInventoryData(inventoryData.filter(item => item.id !== id));
-            setFilteredData(filteredData.filter(item => item.id !== id)); // Also update filtered data
-        })
-        .catch(err => console.error('Error deleting item:', err));
+    const handleDeleteInventory = (id) => {
+        fetch(`http://localhost:5000/api/inventory/${id}`, { method: 'DELETE' })
+            .then(() => {
+                const updatedInventory = inventoryData.filter(item => item.id !== id);
+                setInventoryData(updatedInventory);
+                setFilteredData(updatedInventory);
+                setTotalItems(updatedInventory.length); // Update the total count of items
+            })
+            .catch(err => console.error('Error deleting inventory:', err));
+    };
+
+    const handleDeleteSelected = async () => {
+        const deletePromises = selectedItems.map(id =>
+            fetch(`http://localhost:5000/api/inventory/${id}`, { method: 'DELETE' })
+                .then(() => id)
+                .catch(err => {
+                    console.error(`Error deleting inventory with id ${id}:`, err);
+                    return null;
+                })
+        );
+
+        const deletedIds = await Promise.all(deletePromises);
+        const updatedInventory = inventoryData.filter(item => !deletedIds.includes(item.id));
+        
+        setInventoryData(updatedInventory);
+        setFilteredData(updatedInventory);
+        setTotalItems(updatedInventory.length); // Update the total count of items
+        setSelectedItems([]);
+    };
+
+    const handleSelectItem = (id) => {
+        setSelectedItems(prevSelectedItems =>
+            prevSelectedItems.includes(id)
+                ? prevSelectedItems.filter(item => item !== id)
+                : [...prevSelectedItems, id]
+        );
+    };
+
+    const handleSelectAll = () => {
+        if (selectedItems.length === filteredData.length) {
+            setSelectedItems([]);
+        } else {
+            setSelectedItems(filteredData.map(item => item.id));
+        }
+    };
+
+    const resetForm = () => {
+        setFormData({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
+        setEditId(null);
     };
 
     const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value);
-    };
-
-    const handleSearch = () => {
-        // Filter the inventory based on the search term
-        const lowercasedFilter = searchTerm.toLowerCase();
-        const filtered = inventoryData.filter(item => 
-            item.item_description.toLowerCase().includes(lowercasedFilter) // Match the key from the server
+        const value = e.target.value;
+        setSearchTerm(value);
+        const lowercasedFilter = value.toLowerCase();
+        const filtered = inventoryData.filter(inventory =>
+            inventory.item_description.toLowerCase().includes(lowercasedFilter)
         );
         setFilteredData(filtered);
+        setCurrentPage(1);
+    };
+
+    // Pagination logic
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    };
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
     };
 
     return (
@@ -118,86 +180,165 @@ const InventoryTable = () => {
                 <div className="d-flex">
                     <input
                         type="text"
-                        placeholder="Search items"
+                        placeholder="Search inventory..."
                         value={searchTerm}
                         onChange={handleSearchChange}
-                        className="form-control mx-2"
-                        style={{ width: '250px' }}
+                        className="search-bar form-control mx-2"
                     />
-                    <button onClick={handleSearch} className="btn btn-primary mx-2">Search</button>
+                    <button className="btn btn-primary">
+                        <FontAwesomeIcon icon={faSearch} />
+                    </button>
                 </div>
             </div>
 
-            <div className="inventory-form my-4">
-                <input
-                    type="text"
-                    name="itemDescription"
-                    placeholder="Item Description"
-                    value={formData.itemDescription}
-                    onChange={handleInputChange}
-                    className="form-control d-inline-block mx-2"
-                    style={{ width: '200px' }}
-                />
-                <input
-                    type="number"
-                    name="unitPrice"
-                    placeholder="Unit Price"
-                    value={formData.unitPrice}
-                    onChange={handleInputChange}
-                    className="form-control d-inline-block mx-2"
-                    style={{ width: '150px' }}
-                />
-                <input
-                    type="number"
-                    name="qualityStocks"
-                    placeholder="Quality in Stocks"
-                    value={formData.qualityStocks}
-                    onChange={handleInputChange}
-                    className="form-control d-inline-block mx-2"
-                    style={{ width: '150px' }}
-                />
-                <input
-                    type="text"
-                    name="unitMeasurement"
-                    placeholder="Unit of Measurement"
-                    value={formData.unitMeasurement}
-                    onChange={handleInputChange}
-                    className="form-control d-inline-block mx-2"
-                    style={{ width: '150px' }}
-                />
-                <button 
-                    onClick={handleAddItem} 
-                    className="btn btn-primary d-inline-block mx-2"
+            <div className="d-flex my-2">
+                <button onClick={() => { resetForm(); setShowModal(true); }} className="btn btn-primary">
+                    <FontAwesomeIcon icon={faPlus} /> Add Inventory
+                </button>
+
+                <button
+                    onClick={handleDeleteSelected}
+                    className="btn btn-danger ms-2"
+                    disabled={selectedItems.length === 0}
                 >
-                    {editId ? 'Update' : 'Add'}
+                    <FontAwesomeIcon icon={faTrash} /> Delete Selected
                 </button>
             </div>
 
-            <table className="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Item Description</th>
-                        <th>Unit Price</th>
-                        <th>Quality in Stocks</th>
-                        <th>Unit of Measurement</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredData.map(item => (
-                        <tr key={item.id}>
-                            <td>{item.item_description}</td> {/* Update to match key */}
-                            <td>{item.unit_price}</td>
-                            <td>{item.quality_stocks}</td>
-                            <td>{item.unit_measurement}</td>
-                            <td>
-                                <button className="btn btn-warning btn-sm mx-1" onClick={() => handleEditItem(item)}>Edit</button>
-                                <button className="btn btn-danger btn-sm mx-1" onClick={() => handleDeleteItem(item.id)}>Delete</button>
-                            </td>
+            <div className="d-flex justify-content-end my-2">
+                <p>Total Items: {totalItems}</p> {/* Display total number of items */}
+            </div>
+
+            {isLoading ? (
+                <p>Loading inventory...</p>
+            ) : currentItems.length === 0 ? (
+                <p>No results found</p>
+            ) : (
+                <table className="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedItems.length === filteredData.length && filteredData.length > 0}
+                                    onChange={handleSelectAll}
+                                />
+                            </th>
+                            <th>Item Description</th>
+                            <th>Unit Price</th>
+                            <th>Quality in Stocks</th>
+                            <th>Unit of Measurement</th>
+                            <th>Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {currentItems.map(inventory => (
+                            <tr key={inventory.id}>
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedItems.includes(inventory.id)}
+                                        onChange={() => handleSelectItem(inventory.id)}
+                                    />
+                                </td>
+                                <td>{inventory.item_description}</td>
+                                <td>{inventory.unit_price}</td>
+                                <td>{inventory.quality_stocks}</td>
+                                <td>{inventory.unit_measurement}</td>
+                                <td>
+                                    <button className="btn btn-warning btn-sm mx-1" onClick={() => handleEditInventory(inventory)}>
+                                        <FontAwesomeIcon icon={faEdit} /> Edit
+                                    </button>
+                                    <button className="btn btn-danger btn-sm mx-1" onClick={() => handleDeleteInventory(inventory.id)}>
+                                        <FontAwesomeIcon icon={faTrash} /> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+
+            {/* Pagination Controls */}
+            <div className="d-flex justify-content-between my-3">
+                <button onClick={handlePrevPage} className="btn btn-secondary" disabled={currentPage === 1}>
+                    Previous
+                </button>
+                <span>Page {currentPage} of {totalPages}</span>
+                <button onClick={handleNextPage} className="btn btn-secondary" disabled={currentPage === totalPages}>
+                    Next
+                </button>
+            </div>
+
+            {/* Modal */}
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{editId ? 'Edit Inventory' : 'Add Inventory'}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <form>
+                        <div className="form-group">
+                            <label htmlFor="itemDescription">Item Description</label>
+                            <input
+                                type="text"
+                                name="itemDescription"
+                                value={formData.itemDescription}
+                                onChange={handleInputChange}
+                                className="form-control my-2"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="unitPrice">Unit Price</label>
+                            <input
+                                type="number"
+                                name="unitPrice"
+                                value={formData.unitPrice}
+                                onChange={handleInputChange}
+                                className="form-control my-2"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="qualityStocks">Quality in Stocks</label>
+                            <input
+                                type="number"
+                                name="qualityStocks"
+                                value={formData.qualityStocks}
+                                onChange={handleInputChange}
+                                className="form-control my-2"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="unitMeasurement">Unit of Measurement</label>
+                            <div className="custom-select-wrapper">
+                                <select
+                                    name="unitMeasurement"
+                                    value={formData.unitMeasurement}
+                                    onChange={handleInputChange}
+                                    className="form-control my-2 custom-select-dropdown"
+                                >
+                                    <option value="">Select Unit of Measurement</option> {/* Placeholder */}
+                                    <option value="bags">Bags</option>
+                                    <option value="pcs">Pcs</option>
+                                    <option value="boxes">Boxes</option>
+                                    <option value="pairs">Pairs</option>
+                                    <option value="roll">Roll</option>
+                                    <option value="pd">Pd</option>
+                                    <option value="gals">Gals</option>
+                                </select>
+                                <FontAwesomeIcon icon={faChevronDown} className="dropdown-icon" />
+                            </div>
+                        </div>
+                    </form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={handleAddInventory}>
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };

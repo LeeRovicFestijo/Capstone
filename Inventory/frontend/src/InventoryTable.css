@@ -1,30 +1,34 @@
+/* Overall container for the content */
 .content {
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
 }
 
-.inventory-header {
+/* Heading */
+.content h1 {
+    margin-left: 15px;
+    margin-top: 10px;
+    font-size: 30px;
+}
+
+/* Inventory form styles */
+.inventory-form {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 20px;
 }
 
-.controls {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.controls input {
+.inventory-form input {
     padding: 8px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-.controls button {
+/* Button in the inventory form */
+.inventory-form button {
     padding: 8px;
     font-size: 16px;
     border: none;
@@ -32,21 +36,22 @@
     background-color: #1ABC9C;
     color: white;
     cursor: pointer;
-    width: 100%;
     transition: background-color 0.3s;
 }
 
-.controls button:hover {
+.inventory-form button:hover {
     background-color: #16a085;
 }
 
+/* Table styles */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
 }
 
-table th, table td {
+table th,
+table td {
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid #ddd;
@@ -91,27 +96,52 @@ table td button:last-child:hover {
     background-color: #c0392b;
 }
 
+/* Custom select dropdown styles */
+.custom-select-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.custom-select-dropdown {
+    appearance: none; /* Remove default arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 2.5rem; /* Space for the icon */
+    padding: 8px; /* Match other input fields */
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dropdown-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Allow clicks through the icon */
+    color: #999; /* Color of the icon */
+}
+
+/* Responsive design for larger screens */
 @media (min-width: 768px) {
     .content {
         width: 80%;
         margin: 0 auto;
     }
 
-    .inventory-header {
+    .inventory-form {
         flex-direction: row;
         align-items: center;
-        justify-content: space-between;
     }
 
-    .controls {
-        flex-direction: row;
-    }
-
-    .controls input {
+    .inventory-form input {
         flex: 1;
     }
 
-    .controls button {
+    .inventory-form button {
         flex: 0 0 100px;
         margin-left: 10px;
     }

@@ -1,42 +1,71 @@
 .sidebar {
-    width: 100%;
+    position: relative;
+    width: 200px;
+    height: 100vh;
     background-color: #2C3E50;
     color: white;
     padding: 20px;
-    box-sizing: border-box;
 }
 
 .sidebar h2 {
-    text-align: center;
+    margin: 40px 0 40px ;
+    font-size: 30px; /* Adjust font size for the heading */
 }
 
 .sidebar ul {
-    list-style-type: none;
+    list-style: none;
     padding: 0;
-    margin: 0;
+    margin-top: 40px;
 }
 
 .sidebar ul li {
-    margin: 10px 0;
+    margin-bottom: 20px; /* Increase spacing between the list items */
 }
 
 .sidebar ul li a {
     color: white;
     text-decoration: none;
-    display: block;
-    padding: 10px;
+    display: flex;
+    align-items: center;
+    font-size: 20px; /* Adjust font size for buttons */
+    padding: 10px 0;  /* Add padding to increase clickable area */
+}
+
+.sidebar ul li a .icon {
+    margin-right: 12px; /* Adjust space between icon and text */
+    font-size: 20px; /* Adjust size of the icons */
+}
+
+.sidebar ul li a:hover {
+    font-size: 18px; /* Increase font size on hover */
 }
 
 .sidebar ul li a.active {
-    background-color: #1ABC9C;
-    border-radius: 5px;
+    font-weight: bold;
 }
 
-.sidebar ul li a.active-site-management {
-    background-color: #3498DB; /* Example color for the active state */
-    border-radius: 5px;
+.logout-button {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
 }
 
+.logout-button a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    font-size: 20px; /* Adjust font size for logout */
+}
+
+.logout-button a .icon {
+    margin-right: 8px;
+    font-size: 20px; /* Adjust icon size for logout */
+}
+
+.logout-button a:hover {
+    text-decoration: underline;
+}
 
 @media (min-width: 768px) {
     .sidebar {
