@@ -108,8 +108,8 @@ function TransactionPage() {
   return (
     <SidebarPOS>
       <div className='row' style={{ height: '97vh' }}>
-        <div className="bg-light p-3 border border-gray">
-          <header className="customer-page-header d-flex align-items-center">
+        <div className="bg-light p-3 border border-gray rounded-right">
+          <header className="order-page-header d-flex justify-content-between">
             <div className='header-filter'>
               <input 
                 type="text" 

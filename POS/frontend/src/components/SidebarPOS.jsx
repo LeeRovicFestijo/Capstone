@@ -38,6 +38,12 @@ function SidebarPOS({children}) {
                     <Link to="/transactions" className={`nav-link-side ${isActive('/transactions') ? 'active' : ''}`}>
                         <FontAwesomeIcon icon={faReceipt} /> Transactions
                     </Link>
+                    <Link to="/accounts" className={`nav-link-side ${isActive('/accounts') ? 'active' : ''}`}>
+                        <FontAwesomeIcon icon={faReceipt} /> Accounts
+                    </Link>
+                    <Link to="/shipment" className={`nav-link-side ${isActive('/shipment') ? 'active' : ''}`}>
+                        <FontAwesomeIcon icon={faReceipt} /> Shipment
+                    </Link>
                 </nav>
                 <div className="mt-auto d-flex flex-column align-items-center">
                     {persistedUser && <p className='user-name'>{persistedUser.account_username}</p>}

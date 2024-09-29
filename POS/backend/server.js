@@ -227,6 +227,15 @@ app.get('/api/transaction', async (req, res) => {
   }
 });
 
+app.get('/api/accounts', async (req, res) => {
+  try {
+      const result = await pool.query('SELECT * FROM employee_account');
+      res.status(200).json(result.rows);
+  } catch (error) {
+      res.status(500).json({ message: 'Error fetching orders', error: error.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

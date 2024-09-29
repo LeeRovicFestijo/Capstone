@@ -252,7 +252,7 @@ input[type='number'] {
     text-align: center;
     color: #888;
     font-size: 12px;
-    margin-bottom: 4px;
+    margin-bottom: -5px;
     font-weight: bold;
 }
   

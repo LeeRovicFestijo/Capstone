@@ -240,7 +240,6 @@ function POSPage() {
                         </div>
                     </div>
                     <div className="col-lg-4 border border-gray rounded-right p-3 d-flex flex-column">
-
                         <div className='col-lg-12'>
                             <div className="d-flex justify-content-between">
                                 {selectedCustomer ? (

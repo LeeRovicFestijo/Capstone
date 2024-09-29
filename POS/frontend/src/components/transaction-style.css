@@ -22,7 +22,7 @@
     color: #007bff;
 }
 
-.customer-page-header {
+.order-page-header {
     display: flex;
     align-items: center;
     height: 50px; /* Fixed height */
@@ -39,7 +39,7 @@
     height: 80%; /* Ensure search input takes full height */
   }
   
-  .btn-all {
+  .btn-all, .bi-filter-square {
     height: 100%;
   }
   
@@ -47,9 +47,13 @@
     height: 60%;
   }
   
-  .bi {
-    height: 100%;
+  .bi-filter-square {
     display: flex;
-    align-items: center;
-    font-size: 38px;
+    align-items: center; 
+    font-size: 35px;
   }
+
+.rounded-right {
+  border-top-right-radius: 0.50rem; 
+  border-bottom-right-radius: 0.50rem; 
+}
