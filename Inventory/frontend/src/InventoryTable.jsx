@@ -15,11 +15,10 @@ const InventoryTable = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
-    const [totalItems, setTotalItems] = useState(0); // New state for total count of items
+    const [totalItems, setTotalItems] = useState(0);
 
-    // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10; // Limit items per page to 10
+    const itemsPerPage = 10;
 
     const fetchInventory = async () => {
         setIsLoading(true);
@@ -27,7 +26,7 @@ const InventoryTable = () => {
             const result = await axios.get('http://localhost:5000/api/inventory');
             setInventoryData(result.data);
             setFilteredData(result.data);
-            setTotalItems(result.data.length); // Set the total number of items
+            setTotalItems(result.data.length);
         } catch (error) {
             console.error('Error fetching inventory:', error);
         } finally {
@@ -75,7 +74,7 @@ const InventoryTable = () => {
                     : [...inventoryData, savedInventory];
                 setInventoryData(updatedInventory);
                 setFilteredData(updatedInventory);
-                setTotalItems(updatedInventory.length); // Update the total count of items
+                setTotalItems(updatedInventory.length);
                 resetForm();
                 alert('Inventory saved successfully!');
                 setShowModal(false);
@@ -103,7 +102,7 @@ const InventoryTable = () => {
                 const updatedInventory = inventoryData.filter(item => item.id !== id);
                 setInventoryData(updatedInventory);
                 setFilteredData(updatedInventory);
-                setTotalItems(updatedInventory.length); // Update the total count of items
+                setTotalItems(updatedInventory.length);
             })
             .catch(err => console.error('Error deleting inventory:', err));
     };
@@ -120,10 +119,10 @@ const InventoryTable = () => {
 
         const deletedIds = await Promise.all(deletePromises);
         const updatedInventory = inventoryData.filter(item => !deletedIds.includes(item.id));
-        
+
         setInventoryData(updatedInventory);
         setFilteredData(updatedInventory);
-        setTotalItems(updatedInventory.length); // Update the total count of items
+        setTotalItems(updatedInventory.length);
         setSelectedItems([]);
     };
 
@@ -159,7 +158,6 @@ const InventoryTable = () => {
         setCurrentPage(1);
     };
 
-    // Pagination logic
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
@@ -174,7 +172,7 @@ const InventoryTable = () => {
     };
 
     return (
-        <div className="content">
+        <div className="inventory-table-container poppins-font">
             <div className="d-flex justify-content-between align-items-center my-4">
                 <h1>Inventory</h1>
                 <div className="d-flex">
@@ -206,7 +204,7 @@ const InventoryTable = () => {
             </div>
 
             <div className="d-flex justify-content-end my-2">
-                <p>Total Items: {totalItems}</p> {/* Display total number of items */}
+                <p>Total Items: {totalItems}</p>
             </div>
 
             {isLoading ? (
@@ -214,7 +212,7 @@ const InventoryTable = () => {
             ) : currentItems.length === 0 ? (
                 <p>No results found</p>
             ) : (
-                <table className="table table-bordered">
+                <table className="table table-bordered inventory-table">
                     <thead>
                         <tr>
                             <th>
@@ -246,11 +244,17 @@ const InventoryTable = () => {
                                 <td>{inventory.quality_stocks}</td>
                                 <td>{inventory.unit_measurement}</td>
                                 <td>
-                                    <button className="btn btn-warning btn-sm mx-1" onClick={() => handleEditInventory(inventory)}>
-                                        <FontAwesomeIcon icon={faEdit} /> Edit
+                                    <button
+                                        onClick={() => handleEditInventory(inventory)}
+                                        className="btn btn-sm btn-warning"
+                                    >
+                                        <FontAwesomeIcon icon={faEdit} />
                                     </button>
-                                    <button className="btn btn-danger btn-sm mx-1" onClick={() => handleDeleteInventory(inventory.id)}>
-                                        <FontAwesomeIcon icon={faTrash} /> Delete
+                                    <button
+                                        onClick={() => handleDeleteInventory(inventory.id)}
+                                        className="btn btn-sm btn-danger mx-2"
+                                    >
+                                        <FontAwesomeIcon icon={faTrash} />
                                     </button>
                                 </td>
                             </tr>
@@ -259,76 +263,79 @@ const InventoryTable = () => {
                 </table>
             )}
 
-            {/* Pagination Controls */}
-            <div className="d-flex justify-content-between my-3">
-                <button onClick={handlePrevPage} className="btn btn-secondary" disabled={currentPage === 1}>
+            <div className="d-flex justify-content-between align-items-center">
+                <button
+                    className="btn btn-outline-primary"
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                >
                     Previous
                 </button>
                 <span>Page {currentPage} of {totalPages}</span>
-                <button onClick={handleNextPage} className="btn btn-secondary" disabled={currentPage === totalPages}>
+                <button
+                    className="btn btn-outline-primary"
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                >
                     Next
                 </button>
             </div>
 
-            {/* Modal */}
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>{editId ? 'Edit Inventory' : 'Add Inventory'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <form>
-                        <div className="form-group">
-                            <label htmlFor="itemDescription">Item Description</label>
-                            <input
-                                type="text"
-                                name="itemDescription"
-                                value={formData.itemDescription}
+                    <div className="form-group">
+                        <label>Item Description</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            name="itemDescription"
+                            value={formData.itemDescription}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Unit Price</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            name="unitPrice"
+                            value={formData.unitPrice}
+                            onChange={handleInputChange}
+                    />
+                    </div>
+                    <div className="form-group">
+                        <label>Quality in Stocks</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            name="qualityStocks"
+                            value={formData.qualityStocks}
+                            onChange={handleInputChange}
+                    />
+                    </div>
+                    <div className="form-group">
+                        <label>Unit of Measurement</label>
+                        <div className="input-group">
+                            <select
+                                className="form-select"
+                                name="unitMeasurement"
+                                value={formData.unitMeasurement}
                                 onChange={handleInputChange}
-                                className="form-control my-2"
-                            />
+                            >
+                                <option value="">Select Unit</option>
+                                <option value="bags">Bags</option>
+                                <option value="pcs">Pcs</option>
+                                <option value="boxes">Boxes</option>
+                                <option value="pairs">Pairs</option>
+                                <option value="roll">Roll</option>
+                                <option value="pd">Pd</option>
+                                <option value="gals">Gals</option>
+                            </select>
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="unitPrice">Unit Price</label>
-                            <input
-                                type="number"
-                                name="unitPrice"
-                                value={formData.unitPrice}
-                                onChange={handleInputChange}
-                                className="form-control my-2"
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="qualityStocks">Quality in Stocks</label>
-                            <input
-                                type="number"
-                                name="qualityStocks"
-                                value={formData.qualityStocks}
-                                onChange={handleInputChange}
-                                className="form-control my-2"
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="unitMeasurement">Unit of Measurement</label>
-                            <div className="custom-select-wrapper">
-                                <select
-                                    name="unitMeasurement"
-                                    value={formData.unitMeasurement}
-                                    onChange={handleInputChange}
-                                    className="form-control my-2 custom-select-dropdown"
-                                >
-                                    <option value="">Select Unit of Measurement</option> {/* Placeholder */}
-                                    <option value="bags">Bags</option>
-                                    <option value="pcs">Pcs</option>
-                                    <option value="boxes">Boxes</option>
-                                    <option value="pairs">Pairs</option>
-                                    <option value="roll">Roll</option>
-                                    <option value="pd">Pd</option>
-                                    <option value="gals">Gals</option>
-                                </select>
-                                <FontAwesomeIcon icon={faChevronDown} className="dropdown-icon" />
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowModal(false)}>

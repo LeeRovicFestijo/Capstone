@@ -1,8 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Apply the font globally to the page */
+body, table, button, input, .modal-content, .form-control, .modal-title {
+    font-family: 'Poppins', sans-serif;
+}
+
 /* Overall container for the content */
 .content {
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Heading */
@@ -10,6 +18,7 @@
     margin-left: 15px;
     margin-top: 10px;
     font-size: 30px;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Inventory form styles */
@@ -25,6 +34,7 @@
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Button in the inventory form */
@@ -37,6 +47,7 @@
     color: white;
     cursor: pointer;
     transition: background-color 0.3s;
+    font-family: 'Poppins', sans-serif;
 }
 
 .inventory-form button:hover {
@@ -48,6 +59,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    font-family: 'Poppins', sans-serif;
 }
 
 table th,
@@ -72,6 +84,7 @@ table td button {
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s;
+    font-family: 'Poppins', sans-serif;
 }
 
 table td button:first-child {
@@ -114,6 +127,7 @@ table td button:last-child:hover {
     border-radius: 4px;
     width: 100%;
     box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
 
 .dropdown-icon {
