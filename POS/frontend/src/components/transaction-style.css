@@ -1,28 +1,55 @@
-.order-history {
-    overflow-y: auto;
-    max-height: calc(100vh - 201px);
-    overflow-x: hidden;
-
-    ::-webkit-scrollbar {
-        width: 12px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #888;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
-
-    ::-webkit-scrollbar-button {
-        display: none;
-    }
-
-    -ms-overflow-style: none; 
-    scrollbar-width: none; 
+.bi-filter-square {
+    background-color: transparent;
+    padding-left: 8px;
+    color: #666666;
 }
+
+.bi-filter-square:hover {
+    /* background-color: #007bff; */
+    color: #007bff;
+}
+
+.btn-all {
+    border: transparent;
+    color: #666666;
+    background-color: transparent;
+    font-weight: bold;
+    font-size: 20px;
+    padding-right: 8px;
+}
+
+.btn-all:hover {
+    color: #007bff;
+}
+
+.customer-page-header {
+    display: flex;
+    align-items: center;
+    height: 50px; /* Fixed height */
+  }
+  
+  .header-filter,
+  .date-picker-container {
+    display: flex;
+    align-items: center;
+    height: 100%; /* Take full height of the header */
+  }
+  
+  .search-bar {
+    height: 80%; /* Ensure search input takes full height */
+  }
+  
+  .btn-all {
+    height: 100%;
+  }
+  
+  .react-datepicker-wrapper {
+    height: 60%;
+  }
+  
+  .bi {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 38px;
+  }

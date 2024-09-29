@@ -3,8 +3,9 @@ import axios from "axios";
 import SidebarPOS from '../components/SidebarPOS';
 import { toast, Flip } from 'react-toastify';
 import ReactDatePicker from "react-datepicker";
-import { Table, TableBody, TableCell, TableHead, TableRow, Paper, Button, TablePagination } from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableRow, Paper, Button, TablePagination, Menu, MenuItem } from '@mui/material';
 import "react-datepicker/dist/react-datepicker.css";
+import '../components/transaction-style.css'; 
 
 function TransactionPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,6 +15,8 @@ function TransactionPage() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10); 
   const [showAll, setShowAll] = useState(true);
+  const [sortOrder, setSortOrder] = useState("Newest");
+  const [anchorEl, setAnchorEl] = useState(null); 
 
   const toastOptions = {
     position: "top-right",
@@ -44,17 +47,23 @@ function TransactionPage() {
     fetchOrders();
   }, []);
 
-  const filteredOrders = orders.filter(order => {
-    const orderDate = new Date(order.order_date);
-    const isMatchingSearchTerm = order.customer_name.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredOrders = orders
+    .filter(order => {
+      const orderDate = new Date(order.order_date);
+      const isMatchingSearchTerm = order.customer_name.toLowerCase().includes(searchTerm.toLowerCase());
 
-    if (showAll) {
-      return isMatchingSearchTerm; 
-    }
+      if (showAll) {
+        return isMatchingSearchTerm; 
+      }
 
-    const isSameDate = selectedDate.toDateString() === orderDate.toDateString();
-    return isSameDate && isMatchingSearchTerm;
-  });
+      const isSameDate = selectedDate.toDateString() === orderDate.toDateString();
+      return isSameDate && isMatchingSearchTerm;
+    })
+    .sort((a, b) => {
+      return sortOrder === "Newest"
+        ? new Date(b.order_date) - new Date(a.order_date)
+        : new Date(a.order_date) - new Date(b.order_date);
+    });
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -77,26 +86,42 @@ function TransactionPage() {
     setSelectedDate(date);
   };
 
-  // Format order_date to remove time and milliseconds
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString(); // Change to your desired format
+  };
+
+  const handleFilterClick = (event) => {
+    setAnchorEl(event.currentTarget); // Anchor to the clicked element
+  };
+
+  // Handle sort option click
+  const handleSortOptionClick = (option) => {
+    setSortOrder(option); // Set the selected sort order
+    setAnchorEl(null); // Close the dropdown
+  };
+
+  const handleCloseDropdown = () => {
+    setAnchorEl(null); // Close the dropdown when clicking outside
   };
 
   return (
     <SidebarPOS>
       <div className='row' style={{ height: '97vh' }}>
         <div className="bg-light p-3 border border-gray">
-          <header className="customer-page-header">
-            <input 
-              type="text" 
-              className="search-bar" 
-              placeholder="Search Customers..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          <header className="customer-page-header d-flex align-items-center">
+            <div className='header-filter'>
+              <input 
+                type="text" 
+                className="search-bar" 
+                placeholder="Search Customers..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <i className='bi bi-filter-square' onClick={handleFilterClick}/>
+            </div>
             <div className="date-picker-container">
-              <button onClick={handleAllButtonClick}>All</button>
+              <button className='btn-all' onClick={handleAllButtonClick}>ALL</button>
               <ReactDatePicker
                 selected={selectedDate}
                 onChange={handleDateChange}
@@ -157,6 +182,22 @@ function TransactionPage() {
               </div>
             )}
           </div>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleCloseDropdown}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          >
+            <MenuItem onClick={() => handleSortOptionClick("Oldest")}>Oldest</MenuItem>
+            <MenuItem onClick={() => handleSortOptionClick("Newest")}>Newest</MenuItem>
+          </Menu>
         </div>
       </div>
     </SidebarPOS>

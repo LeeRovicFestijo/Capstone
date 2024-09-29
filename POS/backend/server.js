@@ -220,7 +220,7 @@ app.post('/api/orders', async (req, res) => {
 
 app.get('/api/transaction', async (req, res) => {
   try {
-      const result = await pool.query('SELECT o.order_id, o.customer_id, o.total_amount, o.order_date, o.order_deliver, o.account_id, o.payment_mode, c.customer_name  FROM orders o LEFT JOIN customer c ON o.customer_id = c.customer_id');
+      const result = await pool.query('SELECT o.order_id, o.customer_id, o.total_amount, o.order_date, o.order_deliver, o.account_id, o.payment_mode, c.customer_name  FROM orders o LEFT JOIN customer c ON o.customer_id = c.customer_id ORDER BY o.order_id DESC');
       res.status(200).json(result.rows);
   } catch (error) {
       res.status(500).json({ message: 'Error fetching orders', error: error.message });
