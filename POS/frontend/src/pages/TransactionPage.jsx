@@ -209,11 +209,11 @@ function getButtonColor(status) {
     case 'Cash':
       return '#20c997';
     case 'Gcash':
-      return '#007bff';
+      return '#2471ce';
     case 'PayMaya':
       return '#28a745';
     case 'Card':
-      return '#17a2b8';
+      return '#4a44d6';
     default:
       return 'default';
   }

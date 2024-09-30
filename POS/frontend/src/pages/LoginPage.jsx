@@ -13,7 +13,7 @@ function LoginPage() {
   const navigate = useNavigate();
 
   const isFormValid = email !== '' && password !== '' && robotChecked;
-  const { user, setPersistedUser } = usePOS();
+  const { setPersistedUser } = usePOS();
 
   const handleNavigate = async (e) => {
     e.preventDefault();
@@ -30,11 +30,11 @@ function LoginPage() {
         if (response.status === 200) {
           const employee = response.data.user;
           console.log(employee);
-          if (employee.account_status === 'Active') {
+          if (employee.account_status === 'Active' && employee.account_role === 'Cashier') {
             setPersistedUser(employee);
             navigate('/pos', { replace: true });
           } else {
-            alert('Account no longer active')
+            alert('Account no longer active or invalid role')
           }
         }
       } catch (error) {
@@ -43,18 +43,6 @@ function LoginPage() {
       }
     }
   };
-
-  // useEffect(() => {
-  //   console.log(user);
-  //   navigate('/pos');
-  // }, [user]);
-
-  // useEffect(() => {
-  //   console.log(user);
-  //   if (user && user.account_status === 'Active') {
-  //     navigate('/pos', { replace: true });
-  //   }
-  // }, [user, navigate]);
 
   return (
     <MainLayout>

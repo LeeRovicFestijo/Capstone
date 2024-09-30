@@ -229,10 +229,85 @@ app.get('/api/transaction', async (req, res) => {
 
 app.get('/api/accounts', async (req, res) => {
   try {
-      const result = await pool.query('SELECT * FROM employee_account');
+      const result = await pool.query('SELECT * FROM employee_account ORDER BY account_id');
       res.status(200).json(result.rows);
   } catch (error) {
       res.status(500).json({ message: 'Error fetching orders', error: error.message });
+  }
+});
+
+app.get('/api/employees', async (req, res) => {
+  try {
+      const result = await pool.query('SELECT * FROM employee ORDER BY employee_id');
+      res.status(200).json(result.rows);
+  } catch (error) {
+      res.status(500).json({ message: 'Error fetching orders', error: error.message });
+  }
+});
+
+app.post('/api/add_account', async (req, res) => {
+  const { account_username, account_password, account_role, account_status, account_email } = req.body;
+  console.log('Received credentials adding account:', req.body);
+
+  try {
+    // Check if the email is already used
+    const emailCheck = await pool.query(
+      'SELECT * FROM employee_account WHERE account_email = $1',
+      [account_email]
+    );
+
+    if (emailCheck.rows.length > 0) {
+      return res.status(400).json({ message: 'Email is already used by another account' });
+    }
+
+    const employeeResult = await pool.query(
+      'SELECT employee_id FROM employee WHERE employee_email = $1',
+      [account_email]
+    );
+
+    if (employeeResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    const employee_id = employeeResult.rows[0].employee_id;
+
+    // Insert the new account
+    const result = await pool.query(
+      'INSERT INTO employee_account (employee_id, account_username, account_password, account_role, account_status, account_email) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [employee_id, account_username, account_password, account_role, account_status, account_email]
+    );
+
+    res.status(201).json({ message: 'Account added successfully', account: result.rows[0] });
+  } catch (error) {
+    console.error('Error adding account:', error);
+    res.status(500).json({ message: 'Error adding account', error: error.message });
+  }
+});
+
+app.post('/api/add_employee', async (req, res) => {
+  const { employee_name, employee_age, employee_address, employee_number, employee_email } = req.body;
+  console.log('Received credentials adding employee:', req.body);
+  console.log('Received credentials adding employee:', employee_name);
+
+  try {
+    const emailCheck = await pool.query(
+        'SELECT * FROM employee WHERE employee_email = $1',
+        [employee_email]
+    );
+
+    if (emailCheck.rows.length > 0) {
+        // Email already used
+        return res.status(400).json({ message: 'Email is already used by another employee' });
+    }
+
+    const result = await pool.query(
+        'INSERT INTO employee (employee_name, employee_age, employee_address, employee_number, employee_email) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [employee_name, employee_age, employee_address, employee_number, employee_email]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error adding employee:', error);
+    res.status(500).json({ message: 'Error adding employee', error: error.message });
   }
 });
 
