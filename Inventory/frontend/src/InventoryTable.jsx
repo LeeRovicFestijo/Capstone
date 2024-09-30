@@ -346,16 +346,30 @@ const InventoryTable = () => {
                     </div>
                     <div className="mb-3">
                         <label htmlFor="unitMeasurement" className="form-label">Unit Measurement</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="unitMeasurement"
-                            name="unitMeasurement"
-                            value={formData.unitMeasurement}
-                            onChange={handleInputChange}
-                        />
+                        <div className="input-group">
+                            <select
+                                className="form-control"
+                                id="unitMeasurement"
+                                name="unitMeasurement"
+                                value={formData.unitMeasurement}
+                                onChange={handleInputChange}
+                            >
+                                <option value="">Select Unit</option>
+                                <option value="bags">Bags</option>
+                                <option value="pcs">Pcs</option>
+                                <option value="boxes">Boxes</option>
+                                <option value="pairs">Pairs</option>
+                                <option value="roll">Roll</option>
+                                <option value="pd">Pd</option>
+                                <option value="gals">Gals</option>
+                            </select>
+                            <span className="input-group-text">
+                                 <FontAwesomeIcon icon={faChevronDown} />
+                            </span>
+                         </div>
                     </div>
                 </Modal.Body>
+
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowModal(false)}>
                         Close
