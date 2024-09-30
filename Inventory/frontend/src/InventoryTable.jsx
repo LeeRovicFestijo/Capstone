@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTrash, faSearch, faEdit, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { Modal, Button } from 'react-bootstrap';
+import { debounce } from 'lodash';
 
 const InventoryTable = () => {
     const [inventoryData, setInventoryData] = useState([]);
@@ -16,7 +17,6 @@ const InventoryTable = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
     const [totalItems, setTotalItems] = useState(0);
-
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
@@ -147,8 +147,7 @@ const InventoryTable = () => {
         setEditId(null);
     };
 
-    const handleSearchChange = (e) => {
-        const value = e.target.value;
+    const handleSearchChange = debounce((value) => {
         setSearchTerm(value);
         const lowercasedFilter = value.toLowerCase();
         const filtered = inventoryData.filter(inventory =>
@@ -156,7 +155,7 @@ const InventoryTable = () => {
         );
         setFilteredData(filtered);
         setCurrentPage(1);
-    };
+    }, 300);
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -175,17 +174,20 @@ const InventoryTable = () => {
         <div className="inventory-table-container poppins-font">
             <div className="d-flex justify-content-between align-items-center my-4">
                 <h1>Inventory</h1>
-                <div className="d-flex">
+                <div className="d-flex position-relative">
                     <input
                         type="text"
                         placeholder="Search inventory..."
-                        value={searchTerm}
-                        onChange={handleSearchChange}
+                        defaultValue={searchTerm}
+                        onChange={(e) => handleSearchChange(e.target.value)}
                         className="search-bar form-control mx-2"
+                        style={{ paddingRight: '2.5rem' }}
                     />
-                    <button className="btn btn-primary">
-                        <FontAwesomeIcon icon={faSearch} />
-                    </button>
+                    <FontAwesomeIcon
+                        icon={faSearch}
+                        className="position-absolute"
+                        style={{ right: '1.5rem', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }}
+                    />
                 </div>
             </div>
 
