@@ -18,7 +18,6 @@ body, table, button, input, .modal-content, .form-control, .modal-title {
     margin-left: 15px;
     margin-top: 10px;
     font-size: 30px;
-    font-family: 'Poppins', sans-serif;
 }
 
 /* Inventory form styles */
@@ -34,7 +33,6 @@ body, table, button, input, .modal-content, .form-control, .modal-title {
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    font-family: 'Poppins', sans-serif;
 }
 
 /* Button in the inventory form */
@@ -47,7 +45,6 @@ body, table, button, input, .modal-content, .form-control, .modal-title {
     color: white;
     cursor: pointer;
     transition: background-color 0.3s;
-    font-family: 'Poppins', sans-serif;
 }
 
 .inventory-form button:hover {
@@ -59,7 +56,6 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-    font-family: 'Poppins', sans-serif;
 }
 
 table th,
@@ -84,7 +80,6 @@ table td button {
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s;
-    font-family: 'Poppins', sans-serif;
 }
 
 table td button:first-child {
@@ -127,7 +122,6 @@ table td button:last-child:hover {
     border-radius: 4px;
     width: 100%;
     box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
 }
 
 .dropdown-icon {
@@ -137,6 +131,37 @@ table td button:last-child:hover {
     transform: translateY(-50%);
     pointer-events: none; /* Allow clicks through the icon */
     color: #999; /* Color of the icon */
+}
+
+/* Pagination styles */
+.pagination {
+    margin-top: 20px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pagination-btn {
+    border: 2px solid #3498db;
+    background: transparent;
+    color: #3498db;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 4px;
+}
+
+.pagination-btn:hover {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.pagination-info {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 500;
 }
 
 /* Responsive design for larger screens */
