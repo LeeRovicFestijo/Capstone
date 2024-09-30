@@ -40,7 +40,13 @@ const Data = {
       price: 209,
       sizes: ['Small', 'Medium', 'Large'],
     },
-   
+    {
+      id: 17,
+      cover: "./images/shops/RerolledBar.jpeg",
+      name: "Rerolled Bar 2.2",
+      price: "88",
+      sizes: ['Small', 'Medium', 'Large'],
+    },
   ],
 }
 export default Data

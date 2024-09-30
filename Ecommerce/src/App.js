@@ -6,12 +6,15 @@ import Data from "./components/Data";
 import Cart from "./common/Cart/Cart";
 import Footer from "./common/footer/Footer";
 import Sdata from "./components/shops/Sdata";
-import ProductDetails from "./components/shops/ProductDetails"; // Import ProductDetails component
+import ProductDetails from "./components/shops/ProductDetails"; 
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 function App() {
   const { productItems } = Data;
   const { shopItems } = Sdata;
   const [CartItem, setCartItem] = useState([]);
+
 
   const addToCart = (product) => {
     const productExit = CartItem.find((item) => item.id === product.id);
@@ -28,6 +31,7 @@ function App() {
     }
   };
 
+
   const decreaseQty = (product) => {
     const productExit = CartItem.find((item) => item.id === product.id);
     if (productExit.qty === 1) {
@@ -43,18 +47,47 @@ function App() {
     }
   };
 
+
+  const allItems = [...productItems, ...shopItems];
+
   return (
     <Router>
       <Header CartItem={CartItem} />
       <Switch>
-        {/* Route for the home page */}
-        <Route path="/" exact component={() => <Pages productItems={productItems} addToCart={addToCart} shopItems={shopItems} />} />
+        <Route
+          path="/"
+          exact
+          component={() => (
+            <Pages
+              productItems={productItems}
+              addToCart={addToCart}
+              shopItems={shopItems}
+            />
+          )}
+        />
 
-        {/* Route for the cart */}
-        <Route path="/cart" exact component={() => <Cart CartItem={CartItem} addToCart={addToCart} decreaseQty={decreaseQty} />} />
+        <Route
+          path="/cart"
+          exact
+          component={() => (
+            <Cart
+              CartItem={CartItem}
+              addToCart={addToCart}
+              decreaseQty={decreaseQty}
+            />
+          )}
+        />
 
-        {/* Route for product details */}
-        <Route path="/product/:productId" exact component={() => <ProductDetails shopItems={shopItems} addToCart={addToCart} />} />
+        <Route
+          path="/product/:productId"
+          exact
+          component={() => (
+            <ProductDetails
+              allItems={allItems}
+              addToCart={addToCart}
+            />
+          )}
+        />
       </Switch>
       <Footer />
     </Router>

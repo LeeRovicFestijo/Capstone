@@ -98,6 +98,7 @@ const Sdata = {
       price: "250",
       sizes: ['Small', 'Medium', 'Large'],
     },
+    
    
   ],
 }

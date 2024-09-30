@@ -21,28 +21,26 @@ const Wrapper = () => {
     {
       cover: <i className="fa-solid fa-headset"></i>,
       title: "Good Customer Service",
-      decs: "We offer competitive prices on our 100 million plus product any range.",
+      decs: "Products are offered at affordable prices.",
     },
   ];
 
   return (
-    <>
-      <section className="wrapper background">
-        <div className="container grid2">
-          {data.map((val, index) => {
-            return (
-              <div className="product" key={index}>
-                <div className="img icon-circle">
-                  <i>{val.cover}</i>
-                </div>
-                <h3>{val.title}</h3>
-                <p>{val.decs}</p>
+    <section className="wrapper background">
+      <div className="container grid2">
+        {data.map((val) => {
+          return (
+            <div className="product" key={val.title}>
+              <div className="img icon-circle">
+                {val.cover}
               </div>
-            );
-          })}
-        </div>
-      </section>
-    </>
+              <h3>{val.title}</h3>
+              <p>{val.decs}</p>
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 };
 
