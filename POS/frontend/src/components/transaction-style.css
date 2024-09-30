@@ -1,0 +1,59 @@
+.bi-filter-square {
+    background-color: transparent;
+    padding-left: 8px;
+    color: #666666;
+}
+
+.bi-filter-square:hover {
+    /* background-color: #007bff; */
+    color: #007bff;
+}
+
+.btn-all {
+    border: transparent;
+    color: #666666;
+    background-color: transparent;
+    font-weight: bold;
+    font-size: 20px;
+    padding-right: 8px;
+}
+
+.btn-all:hover {
+    color: #007bff;
+}
+
+.order-page-header {
+    display: flex;
+    align-items: center;
+    height: 50px; /* Fixed height */
+  }
+  
+  .header-filter,
+  .date-picker-container {
+    display: flex;
+    align-items: center;
+    height: 100%; /* Take full height of the header */
+  }
+  
+  .search-bar {
+    height: 80%; /* Ensure search input takes full height */
+  }
+  
+  .btn-all, .bi-filter-square {
+    height: 100%;
+  }
+  
+  .react-datepicker-wrapper {
+    height: 60%;
+  }
+  
+  .bi-filter-square {
+    display: flex;
+    align-items: center; 
+    font-size: 35px;
+  }
+
+.rounded-right {
+  border-top-right-radius: 0.50rem; 
+  border-bottom-right-radius: 0.50rem; 
+}

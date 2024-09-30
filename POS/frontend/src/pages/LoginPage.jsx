@@ -5,19 +5,15 @@ import axios from 'axios';
 import { usePOS } from '../api/POSProvider';
 
 function LoginPage() {
-  const [id, setId] = useState(''); // Change id to username
+  const [email, setEmail] = useState(''); 
   const [password, setPassword] = useState('');
   const [robotChecked, setRobotChecked] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
-  const isFormValid = id !== '' && password !== '' && robotChecked;
-  const { user, setUser } = usePOS();
-
-  useEffect(() => {
-
-  }, [user]); 
+  const isFormValid = email !== '' && password !== '' && robotChecked;
+  const { user, setPersistedUser } = usePOS();
 
   const handleNavigate = async (e) => {
     e.preventDefault();
@@ -26,15 +22,20 @@ function LoginPage() {
     if (isFormValid) {
       try {
         const response = await axios.post('http://localhost:5001/api/login', {
-          id, // Change id to username
+          email, 
           password,
         });
 
         // If the login is successful, navigate to /pos
         if (response.status === 200) {
           const employee = response.data.user;
-          setUser(employee);
-          navigate('/pos');
+          console.log(employee);
+          if (employee.account_status === 'Active') {
+            setPersistedUser(employee);
+            navigate('/pos', { replace: true });
+          } else {
+            alert('Account no longer active')
+          }
         }
       } catch (error) {
         // Handle login failure
@@ -42,6 +43,18 @@ function LoginPage() {
       }
     }
   };
+
+  // useEffect(() => {
+  //   console.log(user);
+  //   navigate('/pos');
+  // }, [user]);
+
+  // useEffect(() => {
+  //   console.log(user);
+  //   if (user && user.account_status === 'Active') {
+  //     navigate('/pos', { replace: true });
+  //   }
+  // }, [user, navigate]);
 
   return (
     <MainLayout>
@@ -57,14 +70,14 @@ function LoginPage() {
             <p className="mb-4">Enter your credentials below:</p>
             <form onSubmit={handleNavigate}>
               <div className="form-group mb-3">
-                <label htmlFor="username">Enter ID</label> {/* Change id to username */}
+                <label htmlFor="username">Enter Email</label> 
                 <input
                   type="text"
                   className="form-control"
-                  id="id" // Change id to username
-                  value={id} // Update state variable
-                  onChange={(e) => setId(e.target.value)} // Update state variable
-                  placeholder="ID"
+                  id="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)} 
+                  placeholder="Email"
                 />
               </div>
               <div className="form-group mb-3">

@@ -1,5 +1,6 @@
 import React from 'react';
 import './Sidebar.css';
+import { Link } from 'react-router-dom';
 import { FaCashRegister, FaTachometerAlt, FaBoxes, FaChartLine, FaTools, FaUserCircle, FaTruck, FaSignOutAlt } from 'react-icons/fa';
 
 const Sidebar = () => {
@@ -8,43 +9,42 @@ const Sidebar = () => {
             <h2>SIG BUILDERS</h2>
             <ul>
                 <li>
-                    <a href="#">
+                    <Link to="/pos">
                         <FaCashRegister className="icon" /> Point Of Sale
-                    </a>
+                    </Link>
                 </li>
                 <li>
-                    <a href="#">
+                    <Link to="/dashboard">
                         <FaTachometerAlt className="icon" /> Dashboard
-                    </a>
+                    </Link>
                 </li>
                 <li>
-                    <a href="#" className="active">
+                    <Link to="/inventory" className="active">
                         <FaBoxes className="icon" /> Inventory
-                    </a>
+                    </Link>
                 </li>
                 <li>
-                    <a href="#">
+                    <Link to="/reports">
                         <FaChartLine className="icon" /> Reports
-                    </a>
+                    </Link>
                 </li>
                 <li>
-                    <a href="#">
+                    <Link to="/site-management">
                         <FaTools className="icon" /> Site Management
-                    </a>
+                    </Link>
                 </li>
                 <li>
-                    <a href="#">
-                        <FaUserCircle className="icon" /> Accounts
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
+                    <Link to="/shipment">
                         <FaTruck className="icon" /> Shipment
-                    </a>
+                    </Link>
+                </li>
+                <li>
+                    <Link to="/accounts">
+                        <FaUserCircle className="icon" /> Accounts
+                    </Link>
                 </li>
             </ul>
 
-            {/* Logout button at the bottom with icon */}
             <div className="logout-button">
                 <a href="#">
                     <FaSignOutAlt className="icon" /> Logout

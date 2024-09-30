@@ -1,15 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Apply the font globally to the page */
+body, table, button, input, .modal-content, .form-control, .modal-title {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Overall container for the content */
 .content {
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
 
+/* Heading */
 .content h1 {
     margin-left: 15px;
     margin-top: 10px;
     font-size: 30px;
 }
 
+/* Inventory form styles */
 .inventory-form {
     display: flex;
     flex-wrap: wrap;
@@ -24,6 +35,7 @@
     border-radius: 4px;
 }
 
+/* Button in the inventory form */
 .inventory-form button {
     padding: 8px;
     font-size: 16px;
@@ -39,6 +51,7 @@
     background-color: #16a085;
 }
 
+/* Table styles */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -91,6 +104,67 @@ table td button:last-child:hover {
     background-color: #c0392b;
 }
 
+/* Custom select dropdown styles */
+.custom-select-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.custom-select-dropdown {
+    appearance: none; /* Remove default arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 2.5rem; /* Space for the icon */
+    padding: 8px; /* Match other input fields */
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dropdown-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Allow clicks through the icon */
+    color: #999; /* Color of the icon */
+}
+
+/* Pagination styles */
+.pagination {
+    margin-top: 20px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pagination-btn {
+    border: 2px solid #3498db;
+    background: transparent;
+    color: #3498db;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 4px;
+}
+
+.pagination-btn:hover {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.pagination-info {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 500;
+}
+
+/* Responsive design for larger screens */
 @media (min-width: 768px) {
     .content {
         width: 80%;
