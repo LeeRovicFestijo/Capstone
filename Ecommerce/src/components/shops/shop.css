@@ -1,0 +1,175 @@
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa; 
+  margin: 0;
+  padding: 0;
+}
+
+.shop {
+  padding: 1px;
+  box-sizing: border-box;
+}
+
+.chead h1 {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.chead h1:nth-child(2) {
+  opacity: 0.5;
+  border-left: 3px solid rgba(0, 0, 0, 0.5);
+  padding-left: 70px;
+}
+
+.product-item {
+  flex: 0 1 18%; /* Adjust the flex-basis for item size */
+  max-width: 300px; /* Optional: Set a max width for product items */
+  margin-left: auto; /* Push items to the right */
+}
+.shop-product-container {
+  display: flex; /* Change from grid to flex */
+  flex-wrap: wrap; /* Allow items to wrap onto the next line */
+  justify-content: flex-start; /* Align items to the left */
+  gap: 30px; /* Space between items */
+  margin: 1px auto; /* Center horizontally */
+  width: 100%; /* Adjust container width */
+  max-width: auto; /* Set max width */
+  height: auto; /* Auto-adjust the height based on content */
+  padding: 20px; /* Optional: Add padding inside the container */
+}
+
+
+/* Adjusted Product Box */
+.product {
+  background-color: #fff;
+  padding: 10px; 
+  border-radius: 5px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  height: auto; 
+  max-height: 350px; 
+  max-width: 300px;
+  display: flex;
+  flex-direction: column; 
+  justify-content: space-between;
+  overflow: hidden; 
+
+}
+
+.shopproduct img {
+  width: 100%; /* Make the image fill the entire width of the product container */
+  height: 200px; /* Set a fixed height for the image */
+  object-fit: cover; /* Ensures the image covers the area while maintaining aspect ratio */
+  border-radius: 5px; /* Keep the border-radius for a nice rounded effect */
+}
+
+
+/* Hover Effect */
+.product:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Adjusted hover effect */
+}
+
+/* Adjusted Details */
+.product-details {
+  margin-top: 5px; /* Reduced space above product details */
+  font-size: 14px; 
+}
+
+/* Typography Adjustments */
+h3.product-name {
+  font-size: 16px; /* Smaller heading size */
+  margin: 0; /* Removed margin to reduce height */
+}
+
+.price h4 {
+  font-size: 14px; /* Adjusted price font size */
+  margin: 0; /* Removed margin */
+}
+
+.actions {
+  margin-top: 5px; /* Reduce space for buttons */
+}
+
+/* Responsive Product Content */
+.product-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Adjusted minimum size */
+  gap: 50px; /* Space between items */
+}
+
+/* Large screens (1200px and above) */
+@media (min-width: 1200px) {
+  .product-container {
+    grid-template-columns: repeat(4, 1fr); /* 4 columns for larger screens */
+    justify-content: end; /* Align items to the right */
+  }
+}
+
+/* Extra large screens (1600px and above) */
+@media (min-width: 1600px) {
+  .product-container {
+    grid-template-columns: repeat(5, 1fr); /* 5 columns for extra large screens */
+    justify-content: end; /* Align items to the right */
+  }
+}
+
+/* For very large screens (1980px and above) */
+@media (min-width: 1980px) {
+  .product-container {
+    grid-template-columns: repeat(6, 1fr); /* 6 columns for very large screens */
+    justify-content: end; /* Align items to the right */
+  }
+}
+
+@media (max-width: 1400px) {
+  .product-content {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  .product-content {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .product-content {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .product-content {
+    grid-template-columns: repeat(1, 1fr); /* Single column on small screens */
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Button Styles */
+.category button {
+  padding: 10px;
+  background: none;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 500;
+}

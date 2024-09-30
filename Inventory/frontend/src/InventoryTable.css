@@ -1,8 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Apply the font globally to the page */
+body, table, button, input, .modal-content, .form-control, .modal-title {
+    font-family: 'Poppins', sans-serif;
+}
+
 /* Overall container for the content */
 .content {
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Heading */
@@ -123,6 +131,37 @@ table td button:last-child:hover {
     transform: translateY(-50%);
     pointer-events: none; /* Allow clicks through the icon */
     color: #999; /* Color of the icon */
+}
+
+/* Pagination styles */
+.pagination {
+    margin-top: 20px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pagination-btn {
+    border: 2px solid #3498db;
+    background: transparent;
+    color: #3498db;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 4px;
+}
+
+.pagination-btn:hover {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.pagination-info {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 500;
 }
 
 /* Responsive design for larger screens */

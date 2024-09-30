@@ -1,0 +1,440 @@
+.cart-items {
+  background: #f6f9fc;
+  padding: 100px; /* Remove excess padding */
+  height: auto; /* Let it adjust to content */
+}
+.containercart {
+  display: flex;
+  justify-content: center; /* Center the children */
+  align-items: flex-start; /* Align items to the top */
+  margin-top: 16px; /* Optional: space from the top if needed */
+}
+
+.cart-summary {
+  width: 300px; /* Fixed width for the summary section */
+  padding: 16px; /* Add some padding */
+  border: 1px solid #ccc; /* Optional border for better visual separation */
+  margin: 0 auto; /* Center the summary section */
+  align-self: flex-start; /* Aligns the summary to the top */
+}
+
+/* Optional: If you want to ensure that the cart details also takes the remaining space */
+.cart-details {
+  flex: 1; /* Allow this section to take available space */
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+
+
+.cart-summary h2 {
+  margin-bottom: 16px; /* Add space below the header */
+}
+
+.d_flex {
+  display: flex;
+  align-items: center; /* Align items vertically centered */
+  justify-content: space-between; /* Align items on opposite ends */
+}
+
+
+.cart-details {
+  width: 75%; 
+  max-height: 600px;
+  overflow-y: auto;
+}
+.imgcart {
+  width: 200px; /* Set the desired width of the image container */
+  height: 200px; /* Set the desired height of the image container */
+  overflow: hidden; /* Ensure overflow is hidden */
+}
+
+.imgcart img {
+  width: 100%; /* Make the image take the full width of the container */
+  height: 100%; /* Make the image take the full height of the container */
+  object-fit: cover; /* Maintain aspect ratio while covering the container */
+}
+
+.cart-list {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  align-items: center;
+  max-width: 1200px;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+  position: relative; /* Set relative positioning on the cart item container */
+
+}
+.cart-info {
+  flex: 1; /* Take up remaining space for product name */
+  padding: 0 10px; /* Spacing around product info */
+  display: flex; /* Flex to allow alignment */
+  flex-direction: column; /* Stack items vertically */
+  justify-content: center; /* Center align items vertically */
+}
+.cart-items-function {
+  display: flex;
+  align-items: center; /* Center align buttons and text */
+  justify-content: flex-start; /* Align items to the start */
+  margin-top: 10px; /* Add space between product name and controls */
+}
+
+.cart-product-info h3 {
+  margin: 0;
+}
+
+.cart-product-info p {
+  font-size: 16px;
+  margin: 5px 0;
+}
+
+.cart-quantity-control {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cartControl {
+  display: flex;
+  align-items: center; /* Vertically center */
+  justify-content: center; /* Horizontally center */
+}
+
+.qty-btn {
+  width: 35px;
+  height: 35px;
+  font-size: 18px;
+  background-color: #ddd;
+  border: none;
+  margin: 0 100px; /* Adjust the margin for more space */
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left:50px; 
+  margin-right: 50px; 
+
+}
+
+.item-qty {
+  font-size: 18px;
+  margin: 0 50px;
+    margin-left:50px; 
+    margin-right: 50px; 
+ 
+  
+}
+.price {
+  font-size: 18px; /* Adjust price size as needed */
+  color: red; /* Ensure price styling is distinct */
+  margin-left: 20px; /* Space between qty and price */
+  align-self: center; /* Align price to the start to match product name */
+}
+.cart-product-price p {
+  text-align: right;
+  font-size: 18px;
+  color: red;
+}
+
+
+.removeCart {
+  position: absolute; /* Position it absolutely within the container */
+  top: 10px; /* Adjust the value as needed */
+  right: 10px; /* Adjust the value as needed */
+  background: transparent; /* Make background transparent */
+  border: none; /* Remove border */
+  cursor: pointer; /* Change cursor to pointer */
+  color: #ff0000; /* Change color if desired */
+}
+
+.removeCart:hover {
+  color: #ff3333; /* Optional: Change color on hover */
+}
+.cart-total {
+  width: 30%; /* Set a fixed width for the cart summary */
+  padding: 20px;
+  border: 1px solid #ddd; /* Optional: add a border for distinction */
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: add some shadow */
+  margin-left: 1000px;
+}
+.cart-total h2 {
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+
+.cart-total h4 {
+  margin: 0;
+}
+
+.buy-button {
+  background-color: #1b305b;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.buy-button:hover {
+  background-color: #1a2c4d;
+}
+
+.no-items {
+  color: #000;
+  font-size: 18px;
+  margin-top: 30px;
+}
+
+.free-label {
+  font-size: 16px;
+  color: green;
+  font-weight: bold;
+}
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Ensure the popup appears above other content */
+}
+
+.popup-inner {
+  position: relative; /* Keep the positioning relative for the inner container */
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%; /* Set width for mobile responsiveness */
+  max-width: 400px; /* Limit maximum width */
+  max-height: 90vh; /* Max height for the popup */
+  overflow-y: auto; /* Allow vertical scrolling */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Optional shadow for better visibility */
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+}
+
+/* Style for the close button */
+.close-popup {
+  position: absolute; /* Position it absolutely within the popup */
+  top: 15px; /* Positioning from the top */
+  right: 20px; /* Positioning from the right */
+  background-color: transparent; /* Make background transparent */
+  border: none; /* Remove border */
+  font-size: 24px; /* Increase font size */
+  cursor: pointer; /* Change cursor to pointer */
+  color: #ff0000; /* Change color to red */
+  transition: color 0.3s; /* Add transition for color change */
+}
+
+.close-popup:hover {
+  color: #cc0000; /* Darker shade on hover */
+}
+
+
+/* cart.css */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7); /* Darker overlay for better contrast */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it's on top of other content */
+}
+
+/* Popup Inner */
+.popup-inner {
+  background: #ffffff; /* Clean white background */
+  padding: 30px; /* Generous padding for a spacious feel */
+  border-radius: 10px; /* Rounded corners for a softer look */
+  width: 90%; /* Responsive width */
+  max-width: 500px; /* Limit the maximum width */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Subtle shadow for depth */
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+}
+
+/* Close Button */
+.close-popup {
+  align-self: flex-end; /* Position close button at the top-right corner */
+  border: none;
+  background: none;
+  font-size: 24px; /* Larger close button */
+  cursor: pointer; /* Pointer cursor for usability */
+  color: #888; /* Neutral gray for the close button */
+  transition: color 0.3s; /* Smooth transition */
+}
+
+.close-popup:hover {
+  color: #1B305B; /* Change color on hover */
+}.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7); /* Darker overlay for better contrast */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it's on top of other content */
+}
+
+/* Popup Inner */
+.popup-inner {
+  background: #ffffff; /* Clean white background */
+  padding: 30px; /* Generous padding for a spacious feel */
+  border-radius: 10px; /* Rounded corners for a softer look */
+  width: 90%; /* Responsive width */
+  max-width: 500px; /* Limit the maximum width */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Subtle shadow for depth */
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+}
+
+/* Close Button */
+.close-popup {
+  align-self: flex-end; /* Position close button at the top-right corner */
+  border: none;
+  background: none;
+  font-size: 24px; /* Larger close button */
+  cursor: pointer; /* Pointer cursor for usability */
+  color: #888; /* Neutral gray for the close button */
+  transition: color 0.3s; /* Smooth transition */
+}
+
+.close-popup:hover {
+  color: #1B305B; /* Change color on hover */
+}
+
+@media (max-width: 768px) { /* Adjust for tablet and smaller screens */
+  .popup-inner {
+    width: 95%; /* Wider width on smaller screens */
+    padding: 15px; /* Adjust padding */
+  }
+  
+  .payment-buttons {
+    flex-direction: column; /* Stack payment buttons vertically */
+    align-items: stretch; /* Stretch buttons to full width */
+  }
+}
+
+@media (max-width: 480px) { /* Adjust for mobile screens */
+  .popup-inner {
+    padding: 10px; /* Less padding on mobile */
+  }
+
+  .summary-item p {
+    font-size: 14px; /* Smaller font size for mobile */
+  }
+
+  .payment-btn {
+    padding: 8px; /* Smaller padding for buttons */
+  }
+}
+
+/* Optional: To style the scrollbar (works in WebKit browsers like Chrome, Safari) */
+.popup-inner::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.popup-inner::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Round edges of the scrollbar thumb */
+}
+
+.popup-inner::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Darker color on hover */
+}
+.popup-inner h2 {
+  font-size: 24px; /* Larger title */
+  margin-bottom: 20px; /* Space below the title */
+  color: #333; /* Dark color for contrast */
+  font-weight: bold; /* Bold for emphasis */
+}
+
+.popup-inner p {
+  font-size: 16px; /* Standard font size */
+  line-height: 1.5; /* Improved line height for readability */
+  color: #555; /* Soft gray for body text */
+}
+.payment-buttons {
+  display: flex; /* Use flexbox to arrange buttons in a row */
+  gap: 10px; /* Add gap between buttons */
+}
+.payment-methods {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column; 
+}
+.payment-btn {
+  background-color: white; /* Set background color to white */
+  color: #1B305B; /* Set text color to blue */
+  border: 2px solid #1B305B; /* Optional: add a border */
+  padding: 10px 15px; /* Add padding for better spacing */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effects */
+  margin-top: 10px;
+  margin: 10px 0;
+}
+
+.payment-btn:hover {
+  background-color: #1B305B; /* Change background on hover for visual effect */
+  color: white; /* Change text color to white on hover */
+}
+
+/* Change styles when button is active */
+.payment-btn.active {
+  background-color: #1B305B; /* Change background color to blue when selected */
+  color: white; /* Change text color to white when selected */
+}
+
+/* Make the location input larger */
+.large-location-input {
+  width: 95%; /* Full width of the container */ 
+  height: 50px; /* Increase height for better touch targets */
+  padding: 12px; /* Padding for better spacing */
+  font-size: 16px; /* Increase font size for readability */
+  border: 1px solid #ccc; /* Border style */
+  border-radius: 6px; /* Rounded corners */
+  margin-top: 10px; /* Space above the input field */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+/* Optional: Style on focus */
+.large-location-input:focus {
+  border-color: #1B305B; /* Change border color on focus */
+  outline: none; /* Remove default outline */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Highlighting effect */
+}
+.button-container {
+  display: flex; /* Use flexbox for alignment */
+  justify-content: center; /* Center horizontally */
+  margin-top: 20px; /* Optional: add space above the button */
+}
+
+.confirm-payment {
+  background-color: #1B305B; /* Background color */
+  color: white; /* Text color */
+  border: none; /* Remove border */
+  padding: 10px 20px; /* Padding for better spacing */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s; /* Smooth transition */
+}
+
+.confirm-payment:hover {
+  background-color: #1B305B; /* Darker shade on hover */
+}

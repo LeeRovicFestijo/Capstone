@@ -1,13 +1,30 @@
+html, body {
+  height: 100%; /* Ensure full height for the body */
+  margin: 0; /* Remove default margin */
+}
+
+body {
+  display: flex;
+  flex-direction: column; /* Set the body to a column layout */
+}
+
+main {
+  flex: 1; /* Allow the main content to take the remaining space */
+  position: relative; /* Allow z-index to work properly */
+  z-index: 1; /* Set higher z-index for main content */
+}
+
 footer {
   background-color: #1B305B;
   padding: 20px;
   color: #ffffff;
-  position: relative;
+  position: relative; /* Footer remains relative */
   width: 100%;
-  z-index: 1000;
+  z-index: 0; /* Lower z-index to push it behind other elements */
 }
 
-footer h1, footer h2 {
+footer h1,
+footer h2 {
   font-weight: bold;
   font-size: 22px; /* Slightly increased font size for headers */
   color: #1B305B;
@@ -16,7 +33,8 @@ footer h1, footer h2 {
   text-align: left;
 }
 
-footer p, footer li {
+footer p,
+footer li {
   font-size: 16px; /* Increased font size for better readability */
   color: #1B305B;
   margin-bottom: 10px;
@@ -77,4 +95,3 @@ footer .box ul {
     text-align: left;
   }
 }
-  
