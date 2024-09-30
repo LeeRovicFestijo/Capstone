@@ -282,6 +282,13 @@ const InventoryTable = () => {
                         </tbody>
                     </table>
 
+                    {filteredData.length === 0 && (
+                        <div className="text-center my-3">
+                            <p>No results found for "{searchTerm}".</p>
+                        </div>
+                    )}
+
+
                     <div className="pagination d-flex justify-content-between align-items-center">
                         <button
                             onClick={handlePrevPage}
