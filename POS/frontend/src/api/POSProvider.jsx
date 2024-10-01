@@ -20,8 +20,7 @@ export function POSProvider({ children }) {
     setSelectedCustomerLocal(null)
     setIsCustomerAdded(false)
     setUser(null);
-    setPersistedUser(null);
-    // localStorage.removeItem('persistedUser');
+    setPersistedUser('');
   };
 
   const payment = () => {

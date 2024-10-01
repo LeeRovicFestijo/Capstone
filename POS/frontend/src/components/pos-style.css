@@ -255,6 +255,23 @@ input[type='number'] {
     margin-bottom: -5px;
     font-weight: bold;
 }
+
+.sidebar {
+    transition: transform 0.3s ease;
+    position: relative;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    width: 100%; 
+}
+
+.custom-modal .modal-content {
+    display: flex;
+    flex-direction: column;
+}
+
   
 
 
