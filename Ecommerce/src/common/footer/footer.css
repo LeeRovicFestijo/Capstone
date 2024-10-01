@@ -1,32 +1,32 @@
 html, body {
-  height: 100%; /* Ensure full height for the body */
-  margin: 0; /* Remove default margin */
+  height: 100%;  
+  margin: 0; 
 }
 
 body {
   display: flex;
-  flex-direction: column; /* Set the body to a column layout */
+  flex-direction: column; 
 }
 
 main {
-  flex: 1; /* Allow the main content to take the remaining space */
-  position: relative; /* Allow z-index to work properly */
-  z-index: 1; /* Set higher z-index for main content */
+  flex: 1;
+  position: relative; 
+  z-index: 1; 
 }
 
 footer {
   background-color: #1B305B;
   padding: 20px;
   color: #ffffff;
-  position: relative; /* Footer remains relative */
+  position: relative;
   width: 100%;
-  z-index: 0; /* Lower z-index to push it behind other elements */
+  z-index: 0; 
 }
 
 footer h1,
 footer h2 {
   font-weight: bold;
-  font-size: 22px; /* Slightly increased font size for headers */
+  font-size: 22px; 
   color: #1B305B;
   margin-bottom: 10px;
   margin-top: 0;
@@ -35,22 +35,22 @@ footer h2 {
 
 footer p,
 footer li {
-  font-size: 16px; /* Increased font size for better readability */
+  font-size: 16px; 
   color: #1B305B;
   margin-bottom: 10px;
 }
 
 footer .container {
   display: flex;
-  justify-content: space-between; /* Changed to space-between for even distribution */
+  justify-content: space-between; 
   flex-wrap: wrap;
   padding: 0 20px;
-  max-width: 1400px; /* Increased max-width for the container */
+  max-width: 1400px; 
   margin: 0 auto;
 }
 
 footer .box {
-  flex: 1 1 calc(33.33% - 20px); /* Adjusted to allow three boxes side by side */
+  flex: 1 1 calc(33.33% - 20px); 
   padding: 30px;
   box-sizing: border-box;
   background-color: #ffffff;
@@ -59,7 +59,7 @@ footer .box {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); 
   display: flex;
   flex-direction: column;
-  margin: 10px; /* Added margin for spacing between boxes */
+  margin: 10px; 
 }
 
 footer .box ul {

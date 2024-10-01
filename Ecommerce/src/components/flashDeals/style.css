@@ -126,7 +126,6 @@
     color: #666;
   }
 
-  /* Add this CSS code to your existing styles */
 
   @keyframes moveRight {
     10% {
@@ -136,7 +135,7 @@
       transform: translateX(50px); 
     }
     100% {
-      transform: translateX(0); /* Back to original position */
+      transform: translateX(0); 
     }
   }
 
@@ -144,143 +143,138 @@
   .popup-content {
     animation: fadeIn 0.3s ease, slideUp 0.3s ease;
   }
-  /* FlashCard Component Styles */
   .flash-card-container {
-    padding: 20px; /* Padding around the card container */
+    padding: 20px; 
   }
 
   .box {
-    margin: 10px; /* Adjusts spacing between products */
+    margin: 10px; 
   }
 
   .product {
-    border: 1px solid #ddd; /* Optional: add a border around each product */
-    border-radius: 5px; /* Optional: rounded corners */
-    overflow: hidden; /* Ensures the image stays within the box */
+    border: 1px solid #ddd; 
+    border-radius: 5px; 
+    overflow: hidden; 
   }
 
   .img {
-    height: 200px; /* Set a fixed height for the image container */
+    height: 200px; 
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* Ensures the image stays within the box */
+    overflow: hidden; 
   }
   
   .img img {
-    width: 80%; /* Image width fills the container */
-    height: 100%; /* Image height fills the container */
-    object-fit: cover; /* Ensures the image covers the entire box without distortion */
-    border-radius: 10px; /* Optional: rounded corners */
-    transition: transform 0.3s ease; /* Smooth scaling effect on hover */
+    width: 80%; 
+    height: 100%; 
+    object-fit: cover;
+    border-radius: 10px; 
+    transition: transform 0.3s ease; 
   }
   
   .img img:hover {
-    transform: scale(1.05); /* Slight zoom effect on hover */
+    transform: scale(1.05); 
   }
   
-  /* Product Details */
   .fproduct-details {
-    padding: 15px; /* Padding inside product details */
-    text-align: center; /* Center text alignment */
+    padding: 15px; 
+    text-align: center; 
   }
 
   .product-details h3 {
-    font-size: 1.25rem; /* Adjust font size for the product name */
-    color: #333; /* Dark color for text */
-    margin: 10px 0; /* Margin for spacing */
+    font-size: 1.25rem; 
+    color: #333; 
+    margin: 10px 0; 
   }
 
   .fprice {
-    color: #e63946; /* Color for the price */
-    font-weight: bold; /* Bold text for emphasis */
+    color: #e63946; 
+    font-weight: bold; 
   }
 
-  /* Popup Styles */
   .product-popup {
-    position: fixed; /* Fixed position to overlay */
-    top: 0; /* Align to the top */
-    left: 0; /* Align to the left */
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    background-color: rgba(0, 0, 0, 0.7); /* Dark background with opacity */
-    display: flex; /* Use flexbox for centering */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    z-index: 1000; /* Ensure it is on top */
-    opacity: 0; /* Initially hidden */
-    transition: opacity 0.3s ease; /* Fade effect */
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; 
+    opacity: 0; 
+    transition: opacity 0.3s ease; 
   }
 
   .product-popup.show {
-    opacity: 1; /* Show when active */
+    opacity: 1; 
   }
 
   .popup-content {
-    background: #fff; /* White background for popup */
-    border-radius: 8px; /* Rounded corners */
-    width: 90%; /* Responsive width */
-    max-width: 600px; /* Maximum width */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow for depth */
-    padding: 20px; /* Padding for popup content */
-    position: relative; /* For positioning close button */
+    background: #fff; 
+    border-radius: 8px;
+    width: 90%; 
+    max-width: 600px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
+    padding: 20px;
+    position: relative; 
   }
 
   .close-popup {
-    position: absolute; /* Positioning for the close button */
-    top: 10px; /* Distance from the top */
-    right: 10px; /* Distance from the right */
-    font-size: 1.5rem; /* Larger font size */
-    cursor: pointer; /* Pointer cursor on hover */
-    color: #333; /* Dark color for close button */
+    position: absolute; 
+    top: 10px; 
+    right: 10px; 
+    font-size: 1.5rem; 
+    cursor: pointer;
+    color: #333; 
   }
 
-  /* Popup Inner */
   .popup-inner {
-    display: flex; /* Flexbox for layout */
-    flex-direction: row; /* Horizontal alignment */
+    display: flex; 
+    flex-direction: row;
   }
 
   .left-side {
-    flex: 1; /* Take available space */
-    margin-right: 20px; /* Space between sides */
+    flex: 1; 
+    margin-right: 20px; 
   }
 
   .left-side img {
-    width: 100%; /* Full width for the image */
-    border-radius: 8px; /* Rounded corners */
+    width: 100%;
+    border-radius: 8px; 
   }
 
   .right-side {
-    flex: 1; /* Take available space */
+    flex: 1; 
   }
 
-  /* Size and Quantity Selection */
+  
   .size-selection, .quantity-selection {
-    margin: 15px 0; /* Margin for spacing */
+    margin: 15px 0;
   }
 
-  /* Add to Cart Button */
   .add-to-cart-btn {
-    background-color: #2a9d8f; /* Main button color */
-    color: white; /* Text color */
-    padding: 10px 15px; /* Padding */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    font-size: 1rem; /* Font size */
-    transition: background-color 0.3s; /* Transition for background color */
+    background-color: #2a9d8f;
+    color: white;
+    padding: 10px 15px;
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    font-size: 1rem;
+    transition: background-color 0.3s; 
   }
 
   .add-to-cart-btn:hover {
-    background-color: #21867a; /* Darker shade on hover */
+    background-color: #21867a; 
   }
   .slick-prev, .slick-next {
-    width: 50px; /* Increase width for easier click area */
-    height: 50px; /* Increase height for easier click area */
-    top: 50%; /* Center vertically */
-    transform: translateY(-50%); /* Center vertically using transform */
-    z-index: 1000; /* Ensure arrows are on top */
+    width: 50px; 
+    height: 50px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    z-index: 1000; 
   }
 
   .slick-prev {
@@ -291,11 +285,11 @@
     right: 30px;
   }
 
-  /* Additional styling for the buttons */
+  
   .slick-prev, .slick-next {
-    background: transparent; /* Make background transparent */
-    border: none; /* Remove default border */
-    cursor: pointer; /* Change cursor to pointer */
+    background: transparent; 
+    border: none; 
+    cursor: pointer; 
   }
 
 

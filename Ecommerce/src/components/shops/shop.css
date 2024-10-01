@@ -88,8 +88,25 @@ h3.product-name {
 }
 
 .actions {
-  margin-top: 5px; /* Reduce space for buttons */
+  display: flex;
+  justify-content: center; /* Center the button horizontally */
+  margin-top: 10px; /* Optional: Add some space above the button */
 }
+
+.view-details-btn {
+  padding: 10px 20px; /* Add padding to the button for better appearance */
+  cursor: pointer; /* Change cursor to pointer on hover */
+  background-color: #1B305B; /* Example background color */
+  color: #fff; /* Example text color */
+  border: none; /* Remove default border */
+  border-radius: 5px; /* Rounded corners */
+  transition: background-color 0.3s ease; /* Smooth background color transition */
+}
+
+.view-details-btn:hover {
+  background-color: #1B3B05; /* Darker shade on hover */
+}
+
 
 /* Responsive Product Content */
 .product-content {
