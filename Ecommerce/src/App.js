@@ -7,6 +7,7 @@ import Cart from "./common/Cart/Cart";
 import Footer from "./common/footer/Footer";
 import Sdata from "./components/shops/Sdata";
 import ProductDetails from "./components/shops/ProductDetails"; 
+import Profile from "./common/profile/Profile";  // Import the Profile component
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -14,7 +15,9 @@ function App() {
   const { productItems } = Data;
   const { shopItems } = Sdata;
   const [CartItem, setCartItem] = useState([]);
-
+  
+  // State to handle the profile modal
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const addToCart = (product) => {
     const productExit = CartItem.find((item) => item.id === product.id);
@@ -31,7 +34,6 @@ function App() {
     }
   };
 
-
   const decreaseQty = (product) => {
     const productExit = CartItem.find((item) => item.id === product.id);
     if (productExit.qty === 1) {
@@ -47,12 +49,12 @@ function App() {
     }
   };
 
-
   const allItems = [...productItems, ...shopItems];
 
   return (
     <Router>
       <Header CartItem={CartItem} />
+
       <Switch>
         <Route
           path="/"
@@ -88,7 +90,18 @@ function App() {
             />
           )}
         />
+
+        {/* Profile button trigger, set modal open */}
+        <button onClick={() => setIsProfileOpen(true)}>My Profile</button>
+
+        {/* Render Profile modal if it's open */}
+        {isProfileOpen && (
+          <Profile closeProfile={() => setIsProfileOpen(false)} />
+        )}
+
+        {/* Other routes */}
       </Switch>
+
       <Footer />
     </Router>
   );

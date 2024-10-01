@@ -7,11 +7,11 @@ const Cart = ({ CartItem, addToCart, decreaseQty, handleBuy, removeFromCart }) =
     location: "",
     paymentMethod: "",
   });
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(""); // New state variable
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(""); 
 
   const totalPrice = CartItem.reduce((price, item) => price + item.qty * item.price, 0);
   const shippingCost = 98;
-  const finalPrice = totalPrice + shippingCost; // No voucher discount applied
+  const finalPrice = totalPrice + shippingCost; 
 
   const handleBuyClick = () => {
     setShowPopup(true);
@@ -19,8 +19,8 @@ const Cart = ({ CartItem, addToCart, decreaseQty, handleBuy, removeFromCart }) =
 
   const closePopup = () => {
     setShowPopup(false);
-    setCheckoutDetails({ location: "", paymentMethod: "" }); // Resetting state
-    setSelectedPaymentMethod(""); // Reset selected payment method
+    setCheckoutDetails({ location: "", paymentMethod: "" }); 
+    setSelectedPaymentMethod(""); 
   };
 
   const handleConfirmPayment = () => {
@@ -35,7 +35,7 @@ const Cart = ({ CartItem, addToCart, decreaseQty, handleBuy, removeFromCart }) =
     }
 
     handleBuy(finalPrice, location, paymentMethod);
-    closePopup(); // Close popup after confirming payment
+    closePopup(); 
   };
 
   const handleKeyPress = useCallback((e) => {
@@ -95,14 +95,12 @@ const Cart = ({ CartItem, addToCart, decreaseQty, handleBuy, removeFromCart }) =
         </div>
       </div>
 
-      {/* Popup for Checkout Process */}
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup-inner">
             <h2>Checkout</h2>
             <button className="close-popup" onClick={closePopup}>×</button>
 
-            {/* Order Summary */}
             <div className="cart-summary">
               <h3>Order Summary</h3>
               {CartItem.map((item) => (
@@ -131,10 +129,10 @@ const Cart = ({ CartItem, addToCart, decreaseQty, handleBuy, removeFromCart }) =
                 {["Cash on Delivery" , "G Cash"].map((method) => (
                   <button
                     key={method}
-                    className={`payment-btn ${selectedPaymentMethod === method ? "active" : ""}`} // Use selectedPaymentMethod
+                    className={`payment-btn ${selectedPaymentMethod === method ? "active" : ""}`} 
                     onClick={() => {
                       setCheckoutDetails((prev) => ({ ...prev, paymentMethod: method }));
-                      setSelectedPaymentMethod(method); // Update the selected payment method
+                      setSelectedPaymentMethod(method); 
                     }}
                   >
                     {method}
