@@ -11,7 +11,7 @@ function Accounts() {
   const [employees, setEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10); 
+  const [rowsPerPage, setRowsPerPage] = useState(9); 
   const [anchorEl, setAnchorEl] = useState(null); 
   const [anchorElFilter, setanchorElFilter] = useState(null); 
   const [currentView, setCurrentView] = useState("Accounts");
@@ -89,7 +89,7 @@ function Accounts() {
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(parseInt(event.target.value, 9));
     setPage(0);
   };
 
@@ -145,86 +145,6 @@ function Accounts() {
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  // const handleFormSubmit = async () => {
-  //   if (modalType === "Account") {
-  //     const { account_username, account_password, account_confirmPassword, account_role, account_status, account_email } = formData;
-  //     const errors = [];
-
-  //     // Check for empty fields
-  //     if (!account_username || !account_email || !account_password || !account_confirmPassword || !account_role || !account_status) {
-  //       errors.push("All fields are required.");
-  //     }
-
-  //     // Email format validation
-  //     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //     if (account_email && !emailPattern.test(account_email)) {
-  //       errors.push("Please enter a valid email address.");
-  //     }
-
-  //     // Password confirmation validation
-  //     if (account_password !== account_confirmPassword) {
-  //       errors.push("Passwords do not match.");
-  //     }
-
-  //     // If there are errors, show them
-  //     if (errors.length > 0) {
-  //       alert(errors.join("\n")); // or you could use a dialog/modal for displaying errors
-  //       return; // Prevent submission
-  //     }
-
-  //     try {
-  //       const response = await axios.post('http://localhost:5001/api/add_account', {
-  //         account_username, account_password, account_role, account_status, account_email
-  //       });
-  //       if (response.status === 201) {
-  //         handleCloseModal();
-  //         fetchAccounts();
-  //         //pop up message
-  //       } else {
-  //           alert(response.data.message);
-  //       }
-  //     } catch (error) {
-  //         console.error('Error creating order:', error);
-  //         alert('Failed to add account. Please try again.');
-  //     }
-
-  //   } else if (modalType === "Employee") {
-  //     const { employee_name, employee_email, employee_address, employee_age, employee_number } = formData;
-  //     const errors = [];
-
-  //     // Check for empty fields
-  //     if (!employee_name || !employee_email || !employee_address || !employee_age || !employee_number) {
-  //       errors.push("All fields are required.");
-  //     }
-
-  //     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //     if (employee_email && !emailPattern.test(employee_email)) {
-  //       errors.push("Please enter a valid email address.");
-  //     }
-
-  //     if (errors.length > 0) {
-  //       alert(errors.join("\n")); // or you could use a dialog/modal for displaying errors
-  //       return; // Prevent submission
-  //     }
-
-  //     try {
-  //       const response = await axios.post('http://localhost:5001/api/add_employee', {
-  //         employee_name, employee_email, employee_address, employee_age, employee_number
-  //       });
-  //       if (response.status === 201) {
-  //         handleCloseModal();
-  //         fetchEmployees();
-  //         //pop up message
-  //       } else {
-  //           alert(response.data.message);
-  //       }
-  //     } catch (error) {
-  //         console.error('Error creating order:', error);
-  //         alert('Failed to add employee. Please try again.');
-  //     }
-  //   }
-  // };
 
   const handleFormSubmit = async () => {
     const errors = [];
@@ -401,6 +321,7 @@ function Accounts() {
                           {currentView === "Accounts" ? (
                             <>
                               <TableCell>Name</TableCell>
+                              <TableCell>Role</TableCell>
                               <TableCell>Email Address</TableCell>
                               <TableCell>Status</TableCell>
                               <TableCell>Action</TableCell>
@@ -423,6 +344,7 @@ function Accounts() {
                             <TableCell>{item.account_username || item.employee_name}</TableCell>
                             {currentView === "Accounts" ? (
                               <>
+                                <TableCell>{item.account_role}</TableCell>
                                 <TableCell>{item.account_email}</TableCell>
                                 <TableCell>
                                   <Button variant="outlined" color={getButtonColor(item.account_status)}>
@@ -445,7 +367,7 @@ function Accounts() {
                     </Table>
                   </Paper>
                   <TablePagination
-                    rowsPerPageOptions={[5, 10]}
+                    rowsPerPageOptions={[5, 9]}
                     component="div"
                     count={filteredData.length}
                     rowsPerPage={rowsPerPage}
