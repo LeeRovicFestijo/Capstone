@@ -284,6 +284,37 @@ app.post('/api/add_account', async (req, res) => {
   }
 });
 
+app.put('/api/accounts/:id', async (req, res) => {
+  const { id } = req.params;
+  const { account_username, account_password, account_role, account_status, account_email } = req.body;
+
+  try {
+    const accountResult = await pool.query(
+      'UPDATE employee_account SET account_username = $1, account_password = $2, account_role = $3, account_status = $4, account_email = $5 WHERE account_id = $6 RETURNING *',
+      [account_username, account_password, account_role, account_status, account_email, id]
+    );
+    if (accountResult.rowCount === 0) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    const { employee_id, account_email: updatedAccountEmail } = accountResult.rows[0];
+
+    // Now, update the employee table using the employee_id and account_email
+    const employeeResult = await pool.query(
+      'UPDATE employee SET employee_email = $1 WHERE employee_id = $2 RETURNING *',
+      [updatedAccountEmail, employee_id]
+    );
+
+    res.status(200).json({
+      updatedAccount: accountResult.rows[0],
+      updatedEmployee: employeeResult.rows[0],
+    });
+  } catch (error) {
+    console.error('Error updating account:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.post('/api/add_employee', async (req, res) => {
   const { employee_name, employee_age, employee_address, employee_number, employee_email } = req.body;
   console.log('Received credentials adding employee:', req.body);
@@ -308,6 +339,37 @@ app.post('/api/add_employee', async (req, res) => {
   } catch (error) {
     console.error('Error adding employee:', error);
     res.status(500).json({ message: 'Error adding employee', error: error.message });
+  }
+});
+
+app.put('/api/employees/:id', async (req, res) => {
+  const { id } = req.params;
+  const { employee_name, employee_email, employee_address, employee_age, employee_number } = req.body;
+
+  try {
+    const employeeResult = await pool.query(
+      'UPDATE employee SET employee_name = $1, employee_email = $2, employee_address = $3, employee_age = $4, employee_number = $5 WHERE employee_id = $6 RETURNING *',
+      [employee_name, employee_email, employee_address, employee_age, employee_number, id]
+    );
+    if (employeeResult.rowCount === 0) {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
+
+    const { employee_id, employee_email: updatedEmployeeEmail } = employeeResult.rows[0];
+
+    // Now, update the employee table using the employee_id and account_email
+    const accountResult = await pool.query(
+      'UPDATE employee_account SET account_email = $1 WHERE employee_id = $2 RETURNING *',
+      [updatedEmployeeEmail, employee_id]
+    );
+
+    res.status(200).json({
+      updatedAccount: accountResult.rows[0],
+      updatedEmployee: employeeResult.rows[0],
+    });
+  } catch (error) {
+    console.error('Error updating employee:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

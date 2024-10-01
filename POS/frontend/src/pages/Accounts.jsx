@@ -18,7 +18,9 @@ function Accounts() {
   const [filterStatus, setFilterStatus] = useState("All");
   const [sortStatus, setSortStatus] = useState("Oldest");
   const [openModal, setOpenModal] = useState(false);
-  const [modalType, setModalType] = useState(""); // 'Account' or 'Employee'
+  const [modalType, setModalType] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editItemId, setEditItemId] = useState(null);
   const [formData, setFormData] = useState("");
 
   const fetchAccounts = async () => {
@@ -50,31 +52,9 @@ function Accounts() {
     fetchEmployees();
   }, []);
 
-  // const getFilteredData = () => {
-  //   const data = currentView === "Accounts" ? accounts : employees;
-  //   return data.filter(item => {
-  //     const isMatchingSearchTerm = item.account_username?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-  //                                  item.employee_name?.toLowerCase().includes(searchTerm.toLowerCase());
-  //     const isMatchingStatus = filterStatus === "All" || item.account_status === filterStatus || item.employee_status === filterStatus;
-  //     return isMatchingSearchTerm && isMatchingStatus;
-  //   });
-
-  //   if (currentView === "Employees") {
-  //     if (filterStatus === "Oldest") {
-  //       return filteredData.sort((a, b) => new Date(a.employee_joining_date) - new Date(b.employee_joining_date));
-  //     } else if (filterStatus === "Newest") {
-  //       return filteredData.sort((a, b) => new Date(b.employee_joining_date) - new Date(a.employee_joining_date));
-  //     }
-  //   }
-  
-  //   return filteredData; 
-  // };
-
   const getFilteredData = () => {
-    // Determine the data source based on the current view
     const data = currentView === "Accounts" ? accounts : employees;
-  
-    // Filter data based on search term and status
+
     const filteredData = data.filter(item => {
       const isMatchingSearchTerm =
         item.account_username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -144,9 +124,17 @@ function Accounts() {
     setSortStatus(status);
   };
 
-  const handleOpenModal = (type) => {
+  const handleOpenModal = (type, item = null) => {
     setModalType(type);
-    setFormData({ username: '', email: '', password: '' });
+    if (item) {
+      setFormData(item);
+      setIsEditing(true);
+      setEditItemId(item.account_id || item.employee_id);
+    } else {
+      setFormData({});
+      setIsEditing(false);
+      setEditItemId(null);
+    }
     setOpenModal(true);
   };
 
@@ -158,82 +146,214 @@ function Accounts() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // const handleFormSubmit = async () => {
+  //   if (modalType === "Account") {
+  //     const { account_username, account_password, account_confirmPassword, account_role, account_status, account_email } = formData;
+  //     const errors = [];
+
+  //     // Check for empty fields
+  //     if (!account_username || !account_email || !account_password || !account_confirmPassword || !account_role || !account_status) {
+  //       errors.push("All fields are required.");
+  //     }
+
+  //     // Email format validation
+  //     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //     if (account_email && !emailPattern.test(account_email)) {
+  //       errors.push("Please enter a valid email address.");
+  //     }
+
+  //     // Password confirmation validation
+  //     if (account_password !== account_confirmPassword) {
+  //       errors.push("Passwords do not match.");
+  //     }
+
+  //     // If there are errors, show them
+  //     if (errors.length > 0) {
+  //       alert(errors.join("\n")); // or you could use a dialog/modal for displaying errors
+  //       return; // Prevent submission
+  //     }
+
+  //     try {
+  //       const response = await axios.post('http://localhost:5001/api/add_account', {
+  //         account_username, account_password, account_role, account_status, account_email
+  //       });
+  //       if (response.status === 201) {
+  //         handleCloseModal();
+  //         fetchAccounts();
+  //         //pop up message
+  //       } else {
+  //           alert(response.data.message);
+  //       }
+  //     } catch (error) {
+  //         console.error('Error creating order:', error);
+  //         alert('Failed to add account. Please try again.');
+  //     }
+
+  //   } else if (modalType === "Employee") {
+  //     const { employee_name, employee_email, employee_address, employee_age, employee_number } = formData;
+  //     const errors = [];
+
+  //     // Check for empty fields
+  //     if (!employee_name || !employee_email || !employee_address || !employee_age || !employee_number) {
+  //       errors.push("All fields are required.");
+  //     }
+
+  //     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //     if (employee_email && !emailPattern.test(employee_email)) {
+  //       errors.push("Please enter a valid email address.");
+  //     }
+
+  //     if (errors.length > 0) {
+  //       alert(errors.join("\n")); // or you could use a dialog/modal for displaying errors
+  //       return; // Prevent submission
+  //     }
+
+  //     try {
+  //       const response = await axios.post('http://localhost:5001/api/add_employee', {
+  //         employee_name, employee_email, employee_address, employee_age, employee_number
+  //       });
+  //       if (response.status === 201) {
+  //         handleCloseModal();
+  //         fetchEmployees();
+  //         //pop up message
+  //       } else {
+  //           alert(response.data.message);
+  //       }
+  //     } catch (error) {
+  //         console.error('Error creating order:', error);
+  //         alert('Failed to add employee. Please try again.');
+  //     }
+  //   }
+  // };
+
   const handleFormSubmit = async () => {
+    const errors = [];
+
     if (modalType === "Account") {
-      const { account_username, account_password, account_confirmPassword, account_role, account_status, account_email } = formData;
-      const errors = [];
+      const { account_username, account_email, account_password, account_confirmPassword, account_role, account_status } = formData;
 
-      // Check for empty fields
-      if (!account_username || !account_email || !account_password || !account_confirmPassword || !account_role || !account_status) {
-        errors.push("All fields are required.");
-      }
-
-      // Email format validation
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (account_email && !emailPattern.test(account_email)) {
-        errors.push("Please enter a valid email address.");
-      }
-
-      // Password confirmation validation
-      if (account_password !== account_confirmPassword) {
-        errors.push("Passwords do not match.");
-      }
-
-      // If there are errors, show them
-      if (errors.length > 0) {
-        alert(errors.join("\n")); // or you could use a dialog/modal for displaying errors
-        return; // Prevent submission
-      }
-
-      try {
-        const response = await axios.post('http://localhost:5001/api/add_account', {
-          account_username, account_password, account_role, account_status, account_email
-        });
-        if (response.status === 201) {
-          handleCloseModal();
-          fetchAccounts();
-          //pop up message
-        } else {
-            alert(response.data.message);
+      if (isEditing) {
+        if (!account_username || !account_email || !account_password || !account_confirmPassword || !account_role || !account_status) {
+          errors.push("All fields are required.");
         }
-      } catch (error) {
-          console.error('Error creating order:', error);
-          alert('Failed to add account. Please try again.');
-      }
+  
+        // Email format validation
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (account_email && !emailPattern.test(account_email)) {
+          errors.push("Please enter a valid email address.");
+        }
+  
+        // Password confirmation validation
+        if (account_password !== account_confirmPassword) {
+          errors.push("Passwords do not match.");
+        }
+  
+        // If there are errors, show them
+        if (errors.length > 0) {
+          alert(errors.join("\n")); // or you could use a dialog/modal for displaying errors
+          return; // Prevent submission
+        }
 
+        // Update existing account
+        try {
+          const response = await axios.put(`http://localhost:5001/api/accounts/${editItemId}`, formData);
+          if (response.status === 200) {
+            fetchAccounts();
+            fetchEmployees();
+            handleCloseModal();
+          }
+        } catch (error) {
+          console.error('Error updating account:', error);
+        }
+      } else {
+        // Add new account
+        if (!account_username || !account_email || !account_password || !account_confirmPassword || !account_role || !account_status) {
+          errors.push("All fields are required.");
+        }
+  
+        // Email format validation
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (account_email && !emailPattern.test(account_email)) {
+          errors.push("Please enter a valid email address.");
+        }
+  
+        // Password confirmation validation
+        if (account_password !== account_confirmPassword) {
+          errors.push("Passwords do not match.");
+        }
+  
+        // If there are errors, show them
+        if (errors.length > 0) {
+          alert(errors.join("\n")); // or you could use a dialog/modal for displaying errors
+          return; // Prevent submission
+        }
+
+        try {
+          const response = await axios.post('http://localhost:5001/api/add_account', {
+            account_username, account_email, account_password, account_confirmPassword, account_role, account_status
+          });
+          if (response.status === 201) {
+            fetchAccounts();
+            handleCloseModal();
+          }
+        } catch (error) {
+          console.error('Error adding account:', error);
+        }
+      }
     } else if (modalType === "Employee") {
       const { employee_name, employee_email, employee_address, employee_age, employee_number } = formData;
-      const errors = [];
 
-      // Check for empty fields
-      if (!employee_name || !employee_email || !employee_address || !employee_age || !employee_number) {
-        errors.push("All fields are required.");
-      }
-
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (employee_email && !emailPattern.test(employee_email)) {
-        errors.push("Please enter a valid email address.");
-      }
-
-      if (errors.length > 0) {
-        alert(errors.join("\n")); // or you could use a dialog/modal for displaying errors
-        return; // Prevent submission
-      }
-
-      try {
-        const response = await axios.post('http://localhost:5001/api/add_employee', {
-          employee_name, employee_email, employee_address, employee_age, employee_number
-        });
-        if (response.status === 201) {
-          handleCloseModal();
-          fetchEmployees();
-          //pop up message
-        } else {
-            alert(response.data.message);
+      if (isEditing) {
+        if (!employee_name || !employee_email || !employee_address || !employee_age || !employee_number) {
+          errors.push("All fields are required.");
         }
-      } catch (error) {
-          console.error('Error creating order:', error);
-          alert('Failed to add employee. Please try again.');
+  
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (employee_email && !emailPattern.test(employee_email)) {
+          errors.push("Please enter a valid email address.");
+        }
+  
+        if (errors.length > 0) {
+          alert(errors.join("\n")); // or you could use a dialog/modal for displaying errors
+          return; // Prevent submission
+        }
+
+        // Update existing employee
+        try {
+          const response = await axios.put(`http://localhost:5001/api/employees/${editItemId}`, formData);
+          if (response.status === 200) {
+            fetchEmployees();
+            fetchAccounts();
+            handleCloseModal();
+          }
+        } catch (error) {
+          console.error('Error updating employee:', error);
+        }
+      } else {
+        if (!employee_name || !employee_email || !employee_address || !employee_age || !employee_number) {
+          errors.push("All fields are required.");
+        }
+  
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (employee_email && !emailPattern.test(employee_email)) {
+          errors.push("Please enter a valid email address.");
+        }
+  
+        if (errors.length > 0) {
+          alert(errors.join("\n")); // or you could use a dialog/modal for displaying errors
+          return; // Prevent submission
+        }
+
+        // Add new employee
+        try {
+          const response = await axios.post('http://localhost:5001/api/add_employee', formData);
+          if (response.status === 201) {
+            fetchEmployees();
+            handleCloseModal();
+          }
+        } catch (error) {
+          console.error('Error adding employee:', error);
+        }
       }
     }
   };
@@ -318,7 +438,7 @@ function Accounts() {
                                 <TableCell>{item.employee_email}</TableCell>
                               </>
                             )}
-                            <TableCell><button className='btn-primary'>Edit</button></TableCell>
+                            <TableCell><button className='btn-primary' onClick={() => handleOpenModal(currentView === "Accounts" ? "Account" : "Employee", item)}>Edit</button></TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -338,7 +458,7 @@ function Accounts() {
             )}
           </div>
           <Dialog open={openModal} onClose={handleCloseModal}>
-            <DialogTitle>Add {modalType}</DialogTitle>
+            <DialogTitle>{isEditing ? `Edit ${modalType}` : `Add ${modalType}`}</DialogTitle>
             <DialogContent>
               {modalType === "Account" ? (
                 <>
@@ -348,7 +468,7 @@ function Accounts() {
                     name="account_username"
                     label="Username"
                     fullWidth
-                    value={formData.account_username}
+                    value={formData.account_username || ""}
                     onChange={handleInputChange}
                   />
                   <TextField
@@ -356,16 +476,17 @@ function Accounts() {
                     name="account_email"
                     label="Email Address"
                     fullWidth
-                    value={formData.account_email}
+                    value={formData.account_email || ""}
                     onChange={handleInputChange}
                   />
+
                   <TextField
                     margin="dense"
                     name="account_password"
                     label="Password"
                     type="password"
                     fullWidth
-                    value={formData.account_password}
+                    value={formData.account_password || ""}
                     onChange={handleInputChange}
                   />
                   <TextField
@@ -374,15 +495,16 @@ function Accounts() {
                     label="Confirm Password"
                     type="password"
                     fullWidth
-                    value={formData.account_confirmPassword}
+                    value={formData.account_confirmPassword || ""}
                     onChange={handleInputChange}
                   />
+
                   <TextField
                     margin="dense"
                     name="account_role"
                     label="Role"
                     fullWidth
-                    value={formData.account_role}
+                    value={formData.account_role || ""}
                     onChange={handleInputChange}
                   />
                   <FormControl fullWidth margin="dense">
@@ -390,7 +512,7 @@ function Accounts() {
                     <Select
                       labelId="status-select-label"
                       name="account_status"
-                      value={formData.account_status}
+                      value={formData.account_status || ""}
                       onChange={handleInputChange}
                       label="Status"
                     >
@@ -407,7 +529,7 @@ function Accounts() {
                     name="employee_name"
                     label="Name"
                     fullWidth
-                    value={formData.employee_name}
+                    value={formData.employee_name || ""}
                     onChange={handleInputChange}
                   />
                   <TextField
@@ -416,7 +538,7 @@ function Accounts() {
                     label="Age"
                     type="number"
                     fullWidth
-                    value={formData.employee_age}
+                    value={formData.employee_age || ""}
                     onChange={handleInputChange}
                   />
                   <TextField
@@ -424,7 +546,7 @@ function Accounts() {
                     name="employee_address"
                     label="Address"
                     fullWidth
-                    value={formData.employee_address}
+                    value={formData.employee_address || ""}
                     onChange={handleInputChange}
                   />
                   <TextField
@@ -432,7 +554,7 @@ function Accounts() {
                     name="employee_number"
                     label="Phone Number"
                     fullWidth
-                    value={formData.employee_number}
+                    value={formData.employee_number || ""}
                     onChange={handleInputChange}
                   />
                   <TextField
@@ -440,7 +562,7 @@ function Accounts() {
                     name="employee_email"
                     label="Email Address"
                     fullWidth
-                    value={formData.employee_email}
+                    value={formData.employee_email || ""}
                     onChange={handleInputChange}
                   />
                 </>
@@ -448,7 +570,7 @@ function Accounts() {
             </DialogContent>
             <DialogActions>
               <Button onClick={handleCloseModal}>Cancel</Button>
-              <Button onClick={handleFormSubmit}>Add</Button>
+              <Button onClick={handleFormSubmit}>{isEditing ? "Update" : "Add"}</Button>
             </DialogActions>
           </Dialog>
           <Menu
