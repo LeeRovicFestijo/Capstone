@@ -1,11 +1,10 @@
-/* SliderStyles.css */
 .box {
     display: flex;
     align-items: center;
     padding: 40px;
-    background-color: #faf9f9; /* Light background for contrast */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    background-color: #faf9f9;
+    border-radius: 10px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
     transition: transform 0.3s;
     margin-bottom: 10px; 
     height: auto;
@@ -41,10 +40,10 @@
   }
   
   .slick-dots li button:before {
-    color: #333; /* Dot color */
+    color: #333; 
   }
   
   .slick-dots li.slick-active button:before {
-    color: #000000; /* Active dot color */
+    color: #000000; 
   }
   

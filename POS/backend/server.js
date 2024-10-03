@@ -1,7 +1,10 @@
 const express = require('express');
+const multer = require('multer');
 const axios = require('axios');
 const cors = require('cors');
 const { Pool } = require('pg');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 app.use(express.json());
@@ -16,6 +19,9 @@ const pool = new Pool({
   password: '12345678',
   port: 5433,
 });
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // Endpoint to validate user credentials
 app.post('/api/login', async (req, res) => {
@@ -36,6 +42,60 @@ app.post('/api/login', async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: 'Login failed. Incorrect username or Password.', error: error.message });
+  }
+});
+
+app.get('/api/user_profile', async (req, res) => {
+  const account_id = req.query.account_id;
+
+  try {
+    const result = await pool.query('SELECT * FROM employee_account WHERE account_id = $1', [account_id]);
+
+    if (result.rows.length > 0) {
+      const userProfile = result.rows[0];
+
+      if (userProfile.account_profile) {
+        // Convert Buffer to base64 string
+        const base64Image = userProfile.account_profile.toString('base64');
+        userProfile.account_profile = `data:image/jpeg;base64,${base64Image}`; // Adjust MIME type if necessary
+      }
+      res.status(200).json(userProfile); // Return the first row
+
+    } else {
+        res.status(404).json({ message: 'User not found' }); // Handle case where no user is found
+    }
+  } catch (error) {
+      res.status(500).json({ message: 'Error fetching profile', error: error.message });
+  }
+});
+
+app.post('/api/update-account', upload.single('account_profile'), async (req, res) => {
+  const { account_id, employee_id, account_username, account_email, account_password } = req.body;
+  const account_profile = req.file ? req.file.buffer : null;
+  console.log(account_profile);
+
+  if (req.file && req.file.mimetype.startsWith('image/') || !req.file) {
+    try {
+        const accountUpdateResult = await pool.query(
+            'UPDATE employee_account SET account_username = $1, account_email = $2, account_password = $3, account_profile = $4 WHERE account_id = $5 RETURNING *',
+            [account_username, account_email, account_password, account_profile, account_id]
+        );
+
+        const employeeUpdateResult = await pool.query(
+            'UPDATE employee SET employee_email = $1 WHERE employee_id = $2 RETURNING *',
+            [account_email, employee_id] 
+        );
+
+        res.status(200).json({
+            account: accountUpdateResult.rows[0], 
+            employee: employeeUpdateResult.rows[0] 
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating profile', error: error.message });
+    }
+  } else {
+      return res.status(400).json({ message: 'Invalid file type. Only images are allowed.' });
   }
 });
 
@@ -229,10 +289,147 @@ app.get('/api/transaction', async (req, res) => {
 
 app.get('/api/accounts', async (req, res) => {
   try {
-      const result = await pool.query('SELECT * FROM employee_account');
+      const result = await pool.query('SELECT * FROM employee_account ORDER BY account_id');
       res.status(200).json(result.rows);
   } catch (error) {
       res.status(500).json({ message: 'Error fetching orders', error: error.message });
+  }
+});
+
+app.get('/api/employees', async (req, res) => {
+  try {
+      const result = await pool.query('SELECT * FROM employee ORDER BY employee_id');
+      res.status(200).json(result.rows);
+  } catch (error) {
+      res.status(500).json({ message: 'Error fetching orders', error: error.message });
+  }
+});
+
+app.post('/api/add_account', async (req, res) => {
+  const { account_username, account_password, account_role, account_status, account_email } = req.body;
+  console.log('Received credentials adding account:', req.body);
+
+  try {
+    // Check if the email is already used
+    const emailCheck = await pool.query(
+      'SELECT * FROM employee_account WHERE account_email = $1',
+      [account_email]
+    );
+
+    if (emailCheck.rows.length > 0) {
+      return res.status(400).json({ message: 'Email is already used by another account' });
+    }
+
+    const employeeResult = await pool.query(
+      'SELECT employee_id FROM employee WHERE employee_email = $1',
+      [account_email]
+    );
+
+    if (employeeResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    const employee_id = employeeResult.rows[0].employee_id;
+
+    // Insert the new account
+    const result = await pool.query(
+      'INSERT INTO employee_account (employee_id, account_username, account_password, account_role, account_status, account_email) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [employee_id, account_username, account_password, account_role, account_status, account_email]
+    );
+
+    res.status(201).json({ message: 'Account added successfully', account: result.rows[0] });
+  } catch (error) {
+    console.error('Error adding account:', error);
+    res.status(500).json({ message: 'Error adding account', error: error.message });
+  }
+});
+
+app.put('/api/accounts/:id', async (req, res) => {
+  const { id } = req.params;
+  const { account_username, account_password, account_role, account_status, account_email } = req.body;
+
+  try {
+    const accountResult = await pool.query(
+      'UPDATE employee_account SET account_username = $1, account_password = $2, account_role = $3, account_status = $4, account_email = $5 WHERE account_id = $6 RETURNING *',
+      [account_username, account_password, account_role, account_status, account_email, id]
+    );
+    if (accountResult.rowCount === 0) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    const { employee_id, account_email: updatedAccountEmail } = accountResult.rows[0];
+
+    // Now, update the employee table using the employee_id and account_email
+    const employeeResult = await pool.query(
+      'UPDATE employee SET employee_email = $1 WHERE employee_id = $2 RETURNING *',
+      [updatedAccountEmail, employee_id]
+    );
+
+    res.status(200).json({
+      updatedAccount: accountResult.rows[0],
+      updatedEmployee: employeeResult.rows[0],
+    });
+  } catch (error) {
+    console.error('Error updating account:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/add_employee', async (req, res) => {
+  const { employee_name, employee_age, employee_address, employee_number, employee_email } = req.body;
+  console.log('Received credentials adding employee:', req.body);
+  console.log('Received credentials adding employee:', employee_name);
+
+  try {
+    const emailCheck = await pool.query(
+        'SELECT * FROM employee WHERE employee_email = $1',
+        [employee_email]
+    );
+
+    if (emailCheck.rows.length > 0) {
+        // Email already used
+        return res.status(400).json({ message: 'Email is already used by another employee' });
+    }
+
+    const result = await pool.query(
+        'INSERT INTO employee (employee_name, employee_age, employee_address, employee_number, employee_email) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [employee_name, employee_age, employee_address, employee_number, employee_email]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error adding employee:', error);
+    res.status(500).json({ message: 'Error adding employee', error: error.message });
+  }
+});
+
+app.put('/api/employees/:id', async (req, res) => {
+  const { id } = req.params;
+  const { employee_name, employee_email, employee_address, employee_age, employee_number } = req.body;
+
+  try {
+    const employeeResult = await pool.query(
+      'UPDATE employee SET employee_name = $1, employee_email = $2, employee_address = $3, employee_age = $4, employee_number = $5 WHERE employee_id = $6 RETURNING *',
+      [employee_name, employee_email, employee_address, employee_age, employee_number, id]
+    );
+    if (employeeResult.rowCount === 0) {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
+
+    const { employee_id, employee_email: updatedEmployeeEmail } = employeeResult.rows[0];
+
+    // Now, update the employee table using the employee_id and account_email
+    const accountResult = await pool.query(
+      'UPDATE employee_account SET account_email = $1 WHERE employee_id = $2 RETURNING *',
+      [updatedEmployeeEmail, employee_id]
+    );
+
+    res.status(200).json({
+      updatedAccount: accountResult.rows[0],
+      updatedEmployee: employeeResult.rows[0],
+    });
+  } catch (error) {
+    console.error('Error updating employee:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

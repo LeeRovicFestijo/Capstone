@@ -1,11 +1,12 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import './productdetails.css'; 
+import './productdetails.css';
 
-function ProductDetails({ shopItems, addToCart }) {
-  const { productId } = useParams(); 
+function ProductDetails({ allItems, addToCart }) {
+  const { productId } = useParams();
 
-  const selectedProduct = shopItems.find((item) => item.id === parseInt(productId));
+  // Find the selected product from merged items
+  const selectedProduct = allItems.find((item) => item.id === parseInt(productId));
 
   if (!selectedProduct) {
     return <div className="not-found">Product not found</div>;
@@ -31,4 +32,3 @@ function ProductDetails({ shopItems, addToCart }) {
 }
 
 export default ProductDetails;
-

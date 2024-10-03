@@ -3,6 +3,7 @@ import {
   Routes,
   Route
 } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import LoginPage from './pages/LoginPage';
 import POSPage from './pages/POSPage';
 import CustomerPage from './pages/CustomerPage';

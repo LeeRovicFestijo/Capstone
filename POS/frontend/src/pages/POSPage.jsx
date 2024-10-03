@@ -5,7 +5,7 @@ import { toast, Flip } from 'react-toastify';
 import { usePOS } from '../api/POSProvider';
 import '../components/pos-style.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faUndo, faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import SidebarPOS from '../components/SidebarPOS'; 
 import ProceedModal from '../components/ProceedModal';
 
@@ -281,14 +281,11 @@ function POSPage() {
                                             }}
                                         >
                                             <div className="d-flex align-items-center p-3">
-                                                <i
-                                                className={`bi ${collapsedItemIndex === key ? 'bi-chevron-up' : 'bi-chevron-right'}`}
-                                                data-bs-toggle="collapse"
-                                                data-bs-target={`#collapse${key}`}
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() => setCollapsedItemIndex(collapsedItemIndex === key ? null : key)}
-                                                aria-expanded={collapsedItemIndex === key}
-                                                aria-controls={`collapse${key}`}
+                                                <FontAwesomeIcon
+                                                    icon={collapsedItemIndex === key ? faChevronDown : faChevronRight}
+                                                    onClick={() => setCollapsedItemIndex(collapsedItemIndex === key ? null : key)}
+                                                    style={{ cursor: 'pointer' }}
+                                                    aria-expanded={collapsedItemIndex === key}
                                                 />
 
                                                 <div className="mx-2">{cartProduct.quantity}</div>
