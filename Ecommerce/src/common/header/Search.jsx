@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react"; // Import useState
-import { Link } from "react-router-dom"; // Removed useHistory as it's not used anymore
+import React, { useEffect, useState } from "react"; 
+import { Link } from "react-router-dom"; 
 import "./Header.css";
-import Profile from "../profile/Profile"; // Import Profile component
+import Profile from "../profile/Profile"; 
 
 const Search = ({ CartItem }) => {
-  const [isProfileOpen, setIsProfileOpen] = useState(false); // State for opening/closing profile sidebar
+  const [isProfileOpen, setIsProfileOpen] = useState(false); 
 
   useEffect(() => {
     const handleScroll = () => {

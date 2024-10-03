@@ -3,17 +3,17 @@
 }
 
 .TopCate .container {
-  max-width: 1700px; /* Set a maximum width for the box */
-  margin: 0 auto; /* Center the box */
-  padding: 20px; /* Add padding for spacing */
-  border: 1px solid #ccc; /* Box border */
-  border-radius: 8px; /* Rounded corners */
-  background-color: #fff; /* Background color of the box */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  max-width: 1700px; 
+  margin: 0 auto; 
+  padding: 20px; 
+  border: 1px solid #ccc; 
+  border-radius: 8px;
+  background-color: #fff; 
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
 }
 
 .box-container {
-  margin-top: 20px; /* Spacing above the TopCart */
+  margin-top: 20px; 
 }
 
 .TopCate img {

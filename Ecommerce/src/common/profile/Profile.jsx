@@ -15,14 +15,13 @@ const Profile = ({ closeProfile }) => {
 
   return (
     <div className="profile-sidebar">
-      {/* Conditionally render the Back Button only when not showing profile details */}
       {!showProfileDetails && (
         <button 
           className="back-button" 
           onClick={closeProfile} 
           aria-label="Close Profile"
         >
-          &gt; {/* Right-facing angle bracket */}
+          &gt; 
         </button>
       )}
 
@@ -31,6 +30,7 @@ const Profile = ({ closeProfile }) => {
           <div className="menu-options">
             <h3>Menu</h3>
             <button className="profile-button" onClick={handleProfileClick}>Profile</button>
+            <button className="profile-button" onClick={handleProfileClick}>Mail</button>
             <button className="profile-button" onClick={handleLogout}>Log Out</button>
           </div>
         ) : (

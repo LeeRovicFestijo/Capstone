@@ -1,42 +1,38 @@
 .cart-items {
   background: #f6f9fc;
-  padding: 100px; /* Remove excess padding */
-  height: auto; /* Let it adjust to content */
+  padding: 100px; 
+  height: auto; 
 }
 .containercart {
   display: flex;
-  justify-content: center; /* Center the children */
-  align-items: flex-start; /* Align items to the top */
-  margin-top: 16px; /* Optional: space from the top if needed */
+  justify-content: center; 
+  align-items: flex-start; 
+  margin-top: 16px; 
 }
 
 .cart-summary {
-  width: 300px; /* Fixed width for the summary section */
-  padding: 16px; /* Add some padding */
-  border: 1px solid #ccc; /* Optional border for better visual separation */
-  margin: 0 auto; /* Center the summary section */
-  align-self: flex-start; /* Aligns the summary to the top */
+  width: 300px; 
+  padding: 16px; 
+  border: 1px solid #ccc; 
+  margin: 0 auto; 
+  align-self: flex-start; 
 }
 
-/* Optional: If you want to ensure that the cart details also takes the remaining space */
 .cart-details {
-  flex: 1; /* Allow this section to take available space */
+  flex: 1; 
   max-height: 600px;
   overflow-y: auto;
 }
 
-
-
 .cart-summary h2 {
-  margin-bottom: 16px; /* Add space below the header */
+  margin-bottom: 16px; 
 }
 
 .d_flex {
   display: flex;
-  align-items: center; /* Align items vertically centered */
-  justify-content: space-between; /* Align items on opposite ends */
+  align-items: center; 
+  justify-content: space-between; 
 }
-
 
 .cart-details {
   width: 75%; 
@@ -44,15 +40,15 @@
   overflow-y: auto;
 }
 .imgcart {
-  width: 200px; /* Set the desired width of the image container */
-  height: 200px; /* Set the desired height of the image container */
-  overflow: hidden; /* Ensure overflow is hidden */
+  width: 200px; 
+  height: 200px; 
+  overflow: hidden; 
 }
 
 .imgcart img {
-  width: 100%; /* Make the image take the full width of the container */
-  height: 100%; /* Make the image take the full height of the container */
-  object-fit: cover; /* Maintain aspect ratio while covering the container */
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
 }
 
 .cart-list {
@@ -63,21 +59,21 @@
   padding: 15px;
   margin-bottom: 10px;
   border-bottom: 1px solid #ccc;
-  position: relative; /* Set relative positioning on the cart item container */
+  position: relative; 
 
 }
 .cart-info {
-  flex: 1; /* Take up remaining space for product name */
-  padding: 0 10px; /* Spacing around product info */
-  display: flex; /* Flex to allow alignment */
-  flex-direction: column; /* Stack items vertically */
-  justify-content: center; /* Center align items vertically */
+  flex: 1; 
+  padding: 0 10px; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
 }
 .cart-items-function {
   display: flex;
-  align-items: center; /* Center align buttons and text */
-  justify-content: flex-start; /* Align items to the start */
-  margin-top: 10px; /* Add space between product name and controls */
+  align-items: center; 
+  justify-content: flex-start; 
+  margin-top: 10px; 
 }
 
 .cart-product-info h3 {
@@ -97,8 +93,8 @@
 
 .cartControl {
   display: flex;
-  align-items: center; /* Vertically center */
-  justify-content: center; /* Horizontally center */
+  align-items: center; 
+  justify-content: center; 
 }
 
 .qty-btn {
@@ -107,7 +103,7 @@
   font-size: 18px;
   background-color: #ddd;
   border: none;
-  margin: 0 100px; /* Adjust the margin for more space */
+  margin: 0 100px; 
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -122,14 +118,13 @@
   margin: 0 50px;
     margin-left:50px; 
     margin-right: 50px; 
- 
-  
+
 }
 .price {
-  font-size: 18px; /* Adjust price size as needed */
-  color: red; /* Ensure price styling is distinct */
-  margin-left: 20px; /* Space between qty and price */
-  align-self: center; /* Align price to the start to match product name */
+  font-size: 18px; 
+  color: red; 
+  margin-left: 20px; 
+  align-self: center; 
 }
 .cart-product-price p {
   text-align: right;
@@ -137,27 +132,26 @@
   color: red;
 }
 
-
 .removeCart {
-  position: absolute; /* Position it absolutely within the container */
-  top: 10px; /* Adjust the value as needed */
-  right: 10px; /* Adjust the value as needed */
-  background: transparent; /* Make background transparent */
-  border: none; /* Remove border */
-  cursor: pointer; /* Change cursor to pointer */
-  color: #ff0000; /* Change color if desired */
+  position: absolute; 
+  top: 10px; 
+  right: 10px; 
+  background: transparent; 
+  border: none; 
+  cursor: pointer; 
+  color: #ff0000; 
 }
 
 .removeCart:hover {
-  color: #ff3333; /* Optional: Change color on hover */
+  color: #ff3333; 
 }
 .cart-total {
-  width: 30%; /* Set a fixed width for the cart summary */
+  width: 30%; 
   padding: 20px;
-  border: 1px solid #ddd; /* Optional: add a border for distinction */
+  border: 1px solid #ddd; 
   border-radius: 8px;
   background-color: #f9f9f9;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: add some shadow */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
   margin-left: 1000px;
 }
 .cart-total h2 {
@@ -204,174 +198,166 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* Ensure the popup appears above other content */
+  z-index: 1000; 
 }
 
 .popup-inner {
-  position: relative; /* Keep the positioning relative for the inner container */
+  position: relative; 
   background: white;
   padding: 20px;
   border-radius: 8px;
-  width: 90%; /* Set width for mobile responsiveness */
-  max-width: 400px; /* Limit maximum width */
-  max-height: 90vh; /* Max height for the popup */
-  overflow-y: auto; /* Allow vertical scrolling */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Optional shadow for better visibility */
+  width: 90%; 
+  max-width: 400px; 
+  max-height: 90vh; 
+  overflow-y: auto; 
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
   display: flex;
-  flex-direction: column; /* Stack elements vertically */
+  flex-direction: column; 
 }
 
-/* Style for the close button */
 .close-popup {
-  position: absolute; /* Position it absolutely within the popup */
-  top: 15px; /* Positioning from the top */
-  right: 20px; /* Positioning from the right */
-  background-color: transparent; /* Make background transparent */
-  border: none; /* Remove border */
-  font-size: 24px; /* Increase font size */
-  cursor: pointer; /* Change cursor to pointer */
-  color: #ff0000; /* Change color to red */
-  transition: color 0.3s; /* Add transition for color change */
+  position: absolute; 
+  top: 15px; 
+  right: 20px; 
+  background-color: transparent; 
+  border: none; 
+  font-size: 24px; 
+  cursor: pointer; 
+  color: #ff0000; 
+  transition: color 0.3s; 
 }
 
 .close-popup:hover {
-  color: #cc0000; /* Darker shade on hover */
+  color: #cc0000; 
 }
 
-
-/* cart.css */
 .popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7); /* Darker overlay for better contrast */
+  background: rgba(0, 0, 0, 0.7); 
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000; /* Ensure it's on top of other content */
+  z-index: 1000; 
 }
 
-/* Popup Inner */
 .popup-inner {
-  background: #ffffff; /* Clean white background */
-  padding: 30px; /* Generous padding for a spacious feel */
-  border-radius: 10px; /* Rounded corners for a softer look */
-  width: 90%; /* Responsive width */
-  max-width: 500px; /* Limit the maximum width */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Subtle shadow for depth */
+  background: #ffffff; 
+  padding: 30px; 
+  border-radius: 10px; 
+  width: 90%; 
+  max-width: 500px; 
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); 
   display: flex;
-  flex-direction: column; /* Stack children vertically */
+  flex-direction: column; 
 }
 
-/* Close Button */
 .close-popup {
-  align-self: flex-end; /* Position close button at the top-right corner */
+  align-self: flex-end; 
   border: none;
   background: none;
-  font-size: 24px; /* Larger close button */
-  cursor: pointer; /* Pointer cursor for usability */
-  color: #888; /* Neutral gray for the close button */
-  transition: color 0.3s; /* Smooth transition */
+  font-size: 24px; 
+  cursor: pointer; 
+  color: #888; 
+  transition: color 0.3s; 
 }
 
 .close-popup:hover {
-  color: #1B305B; /* Change color on hover */
+  color: #1B305B; 
 }.popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7); /* Darker overlay for better contrast */
+  background: rgba(0, 0, 0, 0.7); 
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000; /* Ensure it's on top of other content */
+  z-index: 1000; 
 }
 
-/* Popup Inner */
 .popup-inner {
-  background: #ffffff; /* Clean white background */
-  padding: 30px; /* Generous padding for a spacious feel */
-  border-radius: 10px; /* Rounded corners for a softer look */
-  width: 90%; /* Responsive width */
-  max-width: 500px; /* Limit the maximum width */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Subtle shadow for depth */
+  background: #ffffff; 
+  padding: 30px; 
+  border-radius: 10px; 
+  width: 90%; 
+  max-width: 500px; 
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); 
   display: flex;
-  flex-direction: column; /* Stack children vertically */
+  flex-direction: column; 
 }
 
-/* Close Button */
 .close-popup {
-  align-self: flex-end; /* Position close button at the top-right corner */
+  align-self: flex-end; 
   border: none;
   background: none;
-  font-size: 24px; /* Larger close button */
-  cursor: pointer; /* Pointer cursor for usability */
-  color: #888; /* Neutral gray for the close button */
-  transition: color 0.3s; /* Smooth transition */
+  font-size: 24px; 
+  cursor: pointer; 
+  color: #888; 
+  transition: color 0.3s; 
 }
 
 .close-popup:hover {
-  color: #1B305B; /* Change color on hover */
+  color: #1B305B; 
 }
 
-@media (max-width: 768px) { /* Adjust for tablet and smaller screens */
+@media (max-width: 768px) { 
   .popup-inner {
-    width: 95%; /* Wider width on smaller screens */
-    padding: 15px; /* Adjust padding */
+    width: 95%; 
+    padding: 15px; 
   }
-  
+
   .payment-buttons {
-    flex-direction: column; /* Stack payment buttons vertically */
-    align-items: stretch; /* Stretch buttons to full width */
+    flex-direction: column; 
+    align-items: stretch; 
   }
 }
 
-@media (max-width: 480px) { /* Adjust for mobile screens */
+@media (max-width: 480px) { 
   .popup-inner {
-    padding: 10px; /* Less padding on mobile */
+    padding: 10px; 
   }
 
   .summary-item p {
-    font-size: 14px; /* Smaller font size for mobile */
+    font-size: 14px; 
   }
 
   .payment-btn {
-    padding: 8px; /* Smaller padding for buttons */
+    padding: 8px; 
   }
 }
 
-/* Optional: To style the scrollbar (works in WebKit browsers like Chrome, Safari) */
 .popup-inner::-webkit-scrollbar {
-  width: 8px; /* Width of the scrollbar */
+  width: 8px; 
 }
 
 .popup-inner::-webkit-scrollbar-thumb {
-  background-color: #888; /* Color of the scrollbar thumb */
-  border-radius: 10px; /* Round edges of the scrollbar thumb */
+  background-color: #888; 
+  border-radius: 10px; 
 }
 
 .popup-inner::-webkit-scrollbar-thumb:hover {
-  background-color: #555; /* Darker color on hover */
+  background-color: #555; 
 }
 .popup-inner h2 {
-  font-size: 24px; /* Larger title */
-  margin-bottom: 20px; /* Space below the title */
-  color: #333; /* Dark color for contrast */
-  font-weight: bold; /* Bold for emphasis */
+  font-size: 24px; 
+  margin-bottom: 20px; 
+  color: #333; 
+  font-weight: bold; 
 }
 
 .popup-inner p {
-  font-size: 16px; /* Standard font size */
-  line-height: 1.5; /* Improved line height for readability */
-  color: #555; /* Soft gray for body text */
+  font-size: 16px; 
+  line-height: 1.5; 
+  color: #555; 
 }
 .payment-buttons {
-  display: flex; /* Use flexbox to arrange buttons in a row */
-  gap: 10px; /* Add gap between buttons */
+  display: flex; 
+  gap: 10px; 
 }
 .payment-methods {
   margin-top: 20px;
@@ -379,62 +365,59 @@
   flex-direction: column; 
 }
 .payment-btn {
-  background-color: white; /* Set background color to white */
-  color: #1B305B; /* Set text color to blue */
-  border: 2px solid #1B305B; /* Optional: add a border */
-  padding: 10px 15px; /* Add padding for better spacing */
-  border-radius: 5px; /* Rounded corners */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effects */
+  background-color: white; 
+  color: #1B305B; 
+  border: 2px solid #1B305B; 
+  padding: 10px 15px; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: background-color 0.3s, color 0.3s; 
   margin-top: 10px;
   margin: 10px 0;
 }
 
 .payment-btn:hover {
-  background-color: #1B305B; /* Change background on hover for visual effect */
-  color: white; /* Change text color to white on hover */
+  background-color: #1B305B; 
+  color: white; 
 }
 
-/* Change styles when button is active */
 .payment-btn.active {
-  background-color: #1B305B; /* Change background color to blue when selected */
-  color: white; /* Change text color to white when selected */
+  background-color: #1B305B; 
+  color: white; 
 }
 
-/* Make the location input larger */
 .large-location-input {
-  width: 95%; /* Full width of the container */ 
-  height: 50px; /* Increase height for better touch targets */
-  padding: 12px; /* Padding for better spacing */
-  font-size: 16px; /* Increase font size for readability */
-  border: 1px solid #ccc; /* Border style */
-  border-radius: 6px; /* Rounded corners */
-  margin-top: 10px; /* Space above the input field */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  width: 95%;  
+  height: 50px; 
+  padding: 12px; 
+  font-size: 16px; 
+  border: 1px solid #ccc; 
+  border-radius: 6px; 
+  margin-top: 10px; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
 }
 
-/* Optional: Style on focus */
 .large-location-input:focus {
-  border-color: #1B305B; /* Change border color on focus */
-  outline: none; /* Remove default outline */
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Highlighting effect */
+  border-color: #1B305B; 
+  outline: none; 
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); 
 }
 .button-container {
-  display: flex; /* Use flexbox for alignment */
-  justify-content: center; /* Center horizontally */
-  margin-top: 20px; /* Optional: add space above the button */
+  display: flex; 
+  justify-content: center; 
+  margin-top: 20px; 
 }
 
 .confirm-payment {
-  background-color: #1B305B; /* Background color */
-  color: white; /* Text color */
-  border: none; /* Remove border */
-  padding: 10px 20px; /* Padding for better spacing */
-  border-radius: 5px; /* Rounded corners */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: background-color 0.3s; /* Smooth transition */
+  background-color: #1B305B; 
+  color: white; 
+  border: none; 
+  padding: 10px 20px; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: background-color 0.3s; 
 }
 
 .confirm-payment:hover {
-  background-color: #1B305B; /* Darker shade on hover */
+  background-color: #1B305B; 
 }

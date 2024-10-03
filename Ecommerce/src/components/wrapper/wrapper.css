@@ -1,62 +1,62 @@
 .wrapper {
-  text-align: center; /* Center text */
+  text-align: center; 
   margin-top: 100px;
   margin-bottom: 100px;
 }
 
 .wrapper .container {
   display: flex;
-  justify-content: center; /* Center items horizontally */
-  align-items: flex-start; /* Maintain alignment vertically */
-  gap: 80px; /* Reduced gap for a tighter layout */
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  justify-content: center; 
+  align-items: flex-start; 
+  gap: 80px; 
+  flex-wrap: wrap; 
 }
 
 .wrapper .product {
-  flex: 0 1 calc(20% - 24px); /* Base size for five items per row, considering the gap */
+  flex: 0 1 calc(20% - 24px); 
   box-sizing: border-box;
-  padding: 15px; /* Adjusted padding for better size */
-  background: #ffffff; /* Background for visibility */
-  border-radius: 10px; /* Rounded corners */
-  transition: transform 0.3s; /* Optional: Transition effect */
-  margin: 0; /* Remove margin for tighter spacing */
+  padding: 15px; 
+  background: #ffffff; 
+  border-radius: 10px; 
+  transition: transform 0.3s; 
+  margin: 0; 
 }
 
 .wrapper .product:hover {
-  transform: scale(1.05); /* Optional: Scale effect on hover */
+  transform: scale(1.05); 
 }
 
 .wrapper .img {
-  margin: 0 auto 10px; /* Center the image and add space below */
-  width: 80px; /* Adjusted width for better size */
-  height: 80px; /* Adjusted height for better size */
+  margin: 0 auto 10px; 
+  width: 80px; 
+  height: 80px; 
   line-height: 80px;
 }
 
 .wrapper .img i {
-  font-size: 50px; /* Increased icon size for better visibility */
-  color: #1b305b(0, 0%, 99%); /* Changed icon color to white */
+  font-size: 50px; 
+  color: #1b305b(0, 0%, 99%); 
 }
 
 .wrapper .product h3 {
   font-weight: 500;
-  color: #1b305b; /* Changed title color to white */
+  color: #1b305b; 
 }
 
 .wrapper p {
   font-size: 15px;
   margin-top: 5px; 
-  color: #1b305b; /* Changed paragraph color to white */
+  color: #1b305b; 
 }
 
 @media (max-width: 768px) {
   .wrapper .product {
-    flex: 0 1 calc(50% - 20px); /* Two per row on smaller screens */
+    flex: 0 1 calc(50% - 20px); 
   }
 }
 
 @media (max-width: 480px) {
   .wrapper .product {
-    flex: 0 1 calc(100% - 20px); /* One per row on mobile */
+    flex: 0 1 calc(100% - 20px); 
   }
 }
