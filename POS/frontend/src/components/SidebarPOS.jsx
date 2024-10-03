@@ -43,6 +43,19 @@ function SidebarPOS({children}) {
         fetchUser();
     }, []);
 
+    useEffect(() => {
+        if (persistedUser) {
+            setFormData({
+                account_id: persistedUser.account_id,
+                employee_id: persistedUser.employee_id,
+                account_username: persistedUser.account_username,
+                account_email: persistedUser.account_email,
+                account_password: persistedUser.account_password,
+                account_profile: persistedUser.account_profile,
+            });
+        }
+    }, [persistedUser]);
+
     const handleShowModal = () => {
         setShowModal(true);
     };
@@ -74,6 +87,7 @@ function SidebarPOS({children}) {
     };
 
     const handleSubmit = async () => {
+        console.log(formData);
         const { account_id, employee_id, account_username, account_email, account_password } = formData;
         const errors = [];
 
@@ -106,14 +120,16 @@ function SidebarPOS({children}) {
             });
 
             if (response.status === 200) {
-                await fetchUser(); // Refresh the user data
-                const updatedUserData = response.data.account;
-                setFormData({
-                    account_username: updatedUserData.account_username,
-                    account_email: updatedUserData.account_email,
-                    account_password: updatedUserData.account_password,
-                    account_profile: updatedUserData.account_profile, // if you're saving the profile image
-                });
+                // await fetchUser(); 
+                // const updatedUserData = response.data.account;
+                // setFormData({
+                //     account_username: updatedUserData.account_username,
+                //     account_email: updatedUserData.account_email,
+                //     account_password: updatedUserData.account_password,
+                //     account_profile: updatedUserData.account_profile, // if you're saving the profile image
+                // });
+                // window.location.reload();
+
                 handleCloseModal(); // Close the modal after success
             }
         } catch (error) {
@@ -158,9 +174,6 @@ function SidebarPOS({children}) {
                         <Link to="/transactions" className={`nav-link-side ${isActive('/transactions') ? 'active' : ''}`}>
                             <FontAwesomeIcon icon={faReceipt} /> Transactions
                         </Link>
-                        <Link to="/accounts" className={`nav-link-side ${isActive('/accounts') ? 'active' : ''}`}>
-                            <FontAwesomeIcon icon={faReceipt} /> Accounts
-                        </Link>
                         <Link to="/shipment" className={`nav-link-side ${isActive('/shipment') ? 'active' : ''}`}>
                             <FontAwesomeIcon icon={faReceipt} /> Shipment
                         </Link>
@@ -183,7 +196,7 @@ function SidebarPOS({children}) {
                     {children}
                 </div>
             </div>
-            <Modal show={showModal} onHide={handleCloseModal} centered>
+            <Modal show={showModal} onHide={handleCloseModal} centered className='custom-user-modal'>
                 <Modal.Header closeButton>
                     <Modal.Title className="text-center w-100">Account Details</Modal.Title>
                 </Modal.Header>
@@ -238,7 +251,7 @@ function SidebarPOS({children}) {
                                         onChange={handleFilePreview}
                                     />
                                     {previewImage && (
-                                        <img src={previewImage} alt="Preview" className="mt-2" style={{ width: '100%', height: 'auto' }} />
+                                        <img src={previewImage} alt="Preview" className="mt-2" style={{ width: '30%', height: 'auto', display: 'block', margin: '0 auto' }} />
                                     )}
                                 </Form.Group>
                             </Col>
@@ -250,12 +263,14 @@ function SidebarPOS({children}) {
                     </Form>
                 </Modal.Body>
             </Modal>
-            <Modal show={showLogoutModal} onHide={() => setShowLogoutModal(false)} size="sm" className='custom-modal'>
+
+            <Modal show={showLogoutModal} onHide={() => setShowLogoutModal(false)} centered size="sm" className='custom-modal'>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Logout</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
-                    <p>Are you sure you want to log out? Changes may not be saved.</p>
+                <Modal.Body style={{maxHeight: '200px'}}>
+                    <h5>Are you sure you want to log out?</h5>
+                    <p>Changes may not be saved.</p>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowLogoutModal(false)}>

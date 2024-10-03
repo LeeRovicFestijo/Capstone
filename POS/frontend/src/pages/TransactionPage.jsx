@@ -3,13 +3,15 @@ import axios from "axios";
 import SidebarPOS from '../components/SidebarPOS';
 import { toast, Flip } from 'react-toastify';
 import ReactDatePicker from "react-datepicker";
-import { Table, TableBody, TableCell, TableHead, TableRow, Paper, Button, TablePagination, Menu, MenuItem } from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, Button, TablePagination, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import "react-datepicker/dist/react-datepicker.css";
 import '../components/transaction-style.css'; 
 
 function TransactionPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [orders, setOrder] = useState([]);
+  const [orderDetails, setOrderDetails] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(0);
@@ -17,6 +19,7 @@ function TransactionPage() {
   const [showAll, setShowAll] = useState(true);
   const [sortOrder, setSortOrder] = useState("Newest");
   const [anchorEl, setAnchorEl] = useState(null); 
+  const [selectedPayment, setSelectedPayment] = useState("");
 
   const toastOptions = {
     position: "top-right",
@@ -48,22 +51,23 @@ function TransactionPage() {
   }, []);
 
   const filteredOrders = orders
-    .filter(order => {
-      const orderDate = new Date(order.order_date);
-      const isMatchingSearchTerm = order.customer_name.toLowerCase().includes(searchTerm.toLowerCase());
+  .filter(order => {
+    const orderDate = new Date(order.order_date);
+    const isMatchingSearchTerm = order.customer_name.toLowerCase().includes(searchTerm.toLowerCase());
 
-      if (showAll) {
-        return isMatchingSearchTerm; 
-      }
+    let matchesDateAndSearchTerm = showAll
+      ? isMatchingSearchTerm
+      : selectedDate.toDateString() === orderDate.toDateString() && isMatchingSearchTerm;
 
-      const isSameDate = selectedDate.toDateString() === orderDate.toDateString();
-      return isSameDate && isMatchingSearchTerm;
-    })
-    .sort((a, b) => {
-      return sortOrder === "Newest"
-        ? new Date(b.order_date) - new Date(a.order_date)
-        : new Date(a.order_date) - new Date(b.order_date);
-    });
+    const matchesPaymentMethod = selectedPayment ? order.payment_mode === selectedPayment : true;
+
+    return matchesDateAndSearchTerm && matchesPaymentMethod;
+  })
+  .sort((a, b) => {
+    return sortOrder === "Newest"
+      ? new Date(b.order_date) - new Date(a.order_date)
+      : new Date(a.order_date) - new Date(b.order_date);
+  });
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -74,11 +78,26 @@ function TransactionPage() {
     setPage(0);
   };
 
+  const handleOrderDetails = async (order_id) => {
+    setIsLoading(true);
+    try {
+      const result = await axios.get('http://localhost:5001/api/order-details', {params: {order_id}}); 
+      setOrderDetails(result.data);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   const handleAllButtonClick = () => {
     setShowAll(true);
     setSelectedDate(new Date());
     setSearchTerm("");
+    setSelectedPayment("")
     setPage(0);
+    setAnchorEl(null);
   };
 
   const handleDateChange = (date) => {
@@ -97,7 +116,11 @@ function TransactionPage() {
 
   // Handle sort option click
   const handleSortOptionClick = (option) => {
-    setSortOrder(option); // Set the selected sort order
+    if (["Cash", "GCash", "PayMaya", "Card"].includes(option)) {
+      setSelectedPayment(option); // Set selected payment filter
+    } else {
+      setSortOrder(option); // If it's not a payment option, handle sorting
+    }
     setAnchorEl(null); // Close the dropdown
   };
 
@@ -118,10 +141,11 @@ function TransactionPage() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <i className='bi bi-filter-square' onClick={handleFilterClick}/>
+              <button className='filter-btn btn-primary' onClick={handleFilterClick}>
+                <i className='bi bi-funnel'/> Filter
+              </button>
             </div>
             <div className="date-picker-container">
-              <button className='btn-all' onClick={handleAllButtonClick}>ALL</button>
               <ReactDatePicker
                 selected={selectedDate}
                 onChange={handleDateChange}
@@ -147,12 +171,11 @@ function TransactionPage() {
                           <TableCell>Total Amount</TableCell>
                           <TableCell>Ship</TableCell>
                           <TableCell>Payment</TableCell>
-                          <TableCell>More</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
                         {filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
-                          <TableRow key={order.order_id}>
+                          <TableRow key={order.order_id} style={{cursor:'pointer'}} onClick={() => handleOrderDetails(order.order_id)}>
                             <TableCell>{order.order_id}</TableCell>
                             <TableCell>{order.customer_name}</TableCell>
                             <TableCell>{formatDate(order.order_date)}</TableCell>
@@ -163,7 +186,6 @@ function TransactionPage() {
                                 {order.payment_mode}
                               </Button>
                             </TableCell>
-                            <TableCell>...</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -195,9 +217,50 @@ function TransactionPage() {
               horizontal: 'left',
             }}
           >
+            <MenuItem onClick={handleAllButtonClick}>All</MenuItem>
             <MenuItem onClick={() => handleSortOptionClick("Oldest")}>Oldest</MenuItem>
             <MenuItem onClick={() => handleSortOptionClick("Newest")}>Newest</MenuItem>
+            <MenuItem onClick={() => handleSortOptionClick("Cash")}>Cash</MenuItem>
+            <MenuItem onClick={() => handleSortOptionClick("GCash")}>GCash</MenuItem>
+            <MenuItem onClick={() => handleSortOptionClick("PayMaya")}>PayMaya</MenuItem>
+            <MenuItem onClick={() => handleSortOptionClick("Card")}>Card</MenuItem>
           </Menu>
+          <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+            <DialogTitle>Order Details</DialogTitle>
+            <DialogContent>
+              {orderDetails && orderDetails.length > 0 ? ( // Check if shipmentDetails is an array and has elements
+                <TableContainer>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Product Name</TableCell>
+                        <TableCell>Quantity</TableCell>
+                        <TableCell>Measurement</TableCell>
+                        <TableCell>Price</TableCell>
+                        <TableCell>Total Price</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {orderDetails.map((product, index) => ( // Loop through the array of products
+                        <TableRow key={index}>
+                          <TableCell>{product.item_description}</TableCell>
+                          <TableCell>{product.order_quantity}</TableCell>
+                          <TableCell>{product.unit_measurement}</TableCell>
+                          <TableCell>{product.unit_price}</TableCell>
+                          <TableCell>{product.total_amount}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <p>No order details available.</p> // Handle case where no data is available
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setIsModalOpen(false)} color="primary">Close</Button>
+            </DialogActions>
+          </Dialog>
         </div>
       </div>
     </SidebarPOS>

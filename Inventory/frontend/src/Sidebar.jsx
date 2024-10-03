@@ -5,7 +5,7 @@ import { FaCashRegister, FaTachometerAlt, FaBoxes, FaChartLine, FaTools, FaUserC
 
 const Sidebar = () => {
     return (
-        <div className="sidebar">
+        <div className="sidebar col-lg-1">
             <h2>SIG BUILDERS</h2>
             <ul>
                 <li>

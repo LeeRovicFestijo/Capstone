@@ -270,6 +270,13 @@ input[type='number'] {
 .custom-modal .modal-content {
     display: flex;
     flex-direction: column;
+    max-height: 40vh;
+}
+
+.custom-user-modal .modal-content {
+    display: flex;
+    flex-direction: column;
+    height: 75vh;
 }
 
   
