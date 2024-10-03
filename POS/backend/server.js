@@ -1,7 +1,10 @@
 const express = require('express');
+const multer = require('multer');
 const axios = require('axios');
 const cors = require('cors');
 const { Pool } = require('pg');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 app.use(express.json());
@@ -16,6 +19,9 @@ const pool = new Pool({
   password: '12345678',
   port: 5433,
 });
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // Endpoint to validate user credentials
 app.post('/api/login', async (req, res) => {
@@ -36,6 +42,60 @@ app.post('/api/login', async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: 'Login failed. Incorrect username or Password.', error: error.message });
+  }
+});
+
+app.get('/api/user_profile', async (req, res) => {
+  const account_id = req.query.account_id;
+
+  try {
+    const result = await pool.query('SELECT * FROM employee_account WHERE account_id = $1', [account_id]);
+
+    if (result.rows.length > 0) {
+      const userProfile = result.rows[0];
+
+      if (userProfile.account_profile) {
+        // Convert Buffer to base64 string
+        const base64Image = userProfile.account_profile.toString('base64');
+        userProfile.account_profile = `data:image/jpeg;base64,${base64Image}`; // Adjust MIME type if necessary
+      }
+      res.status(200).json(userProfile); // Return the first row
+
+    } else {
+        res.status(404).json({ message: 'User not found' }); // Handle case where no user is found
+    }
+  } catch (error) {
+      res.status(500).json({ message: 'Error fetching profile', error: error.message });
+  }
+});
+
+app.post('/api/update-account', upload.single('account_profile'), async (req, res) => {
+  const { account_id, employee_id, account_username, account_email, account_password } = req.body;
+  const account_profile = req.file ? req.file.buffer : null;
+  console.log(account_profile);
+
+  if (req.file && req.file.mimetype.startsWith('image/') || !req.file) {
+    try {
+        const accountUpdateResult = await pool.query(
+            'UPDATE employee_account SET account_username = $1, account_email = $2, account_password = $3, account_profile = $4 WHERE account_id = $5 RETURNING *',
+            [account_username, account_email, account_password, account_profile, account_id]
+        );
+
+        const employeeUpdateResult = await pool.query(
+            'UPDATE employee SET employee_email = $1 WHERE employee_id = $2 RETURNING *',
+            [account_email, employee_id] 
+        );
+
+        res.status(200).json({
+            account: accountUpdateResult.rows[0], 
+            employee: employeeUpdateResult.rows[0] 
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating profile', error: error.message });
+    }
+  } else {
+      return res.status(400).json({ message: 'Invalid file type. Only images are allowed.' });
   }
 });
 
