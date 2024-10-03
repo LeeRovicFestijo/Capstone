@@ -12,8 +12,8 @@
 }
 .search {
   display: flex;
-  justify-content: center; /* Center the search bar */
-  align-items: center; /* Center items vertically */
+  justify-content: center; 
+  align-items: center; 
   padding: 10px 20px;
   background-color: #1B305B;
   position: relative;

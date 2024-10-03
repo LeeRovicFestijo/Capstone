@@ -73,7 +73,7 @@
   }
   
   .product-details-card {
-    width: calc(20% - 10px); /* 20% width for each card with some space between */
+    width: calc(20% - 10px); 
     margin: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
@@ -82,7 +82,7 @@
     transition: transform 0.2s;
   }
   .product-details-card:hover {
-    transform: scale(1.05); /* Slight zoom effect on hover */
+    transform: scale(1.05);  
   }
   
   .product-image img {
