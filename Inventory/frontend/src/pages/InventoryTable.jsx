@@ -24,7 +24,7 @@ const InventoryTable = () => {
     const [deleteMode, setDeleteMode] = useState('');
     const [totalItems, setTotalItems] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 14;
+    const itemsPerPage = 10;
 
     const fetchInventory = async () => {
         setIsLoading(true);
