@@ -3,8 +3,8 @@ import '../components/InventoryTable.css';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrash, faSearch, faEdit } from '@fortawesome/free-solid-svg-icons';
-import { Modal, Button } from 'react-bootstrap';
+import { faPlus, faTrash, faSearch, faEdit, faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { Modal, Button, Dropdown } from 'react-bootstrap';
 import { debounce } from 'lodash';
 import { toast, Flip } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -25,6 +25,19 @@ const InventoryTable = () => {
     const [totalItems, setTotalItems] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
+
+    // New user profile state
+    const [user, setUser] = useState({
+        name: 'John Doe', // Placeholder name
+        email: 'johndoe@gmail.com',
+        password: '********',
+        avatar: '', // Add avatar URL if available, otherwise show icon
+    });
+
+    const [showProfileModal, setShowProfileModal] = useState(false); // State for controlling the profile modal
+
+    // Update user profile state for edit form
+    const [editUser, setEditUser] = useState({ ...user });
 
     const fetchInventory = async () => {
         setIsLoading(true);
@@ -55,6 +68,23 @@ const InventoryTable = () => {
         theme: "light",
         transition: Flip,
     }
+
+    const handleProfileClick = () => {
+        setEditUser({ ...user }); // Reset the edit form with the current user info
+        setShowProfileModal(true); // Show the profile modal
+    };
+
+    const handleProfileInputChange = (e) => {
+        const { name, value } = e.target;
+        setEditUser({ ...editUser, [name]: value });
+    };
+
+    const handleProfileSave = () => {
+        // Simulate saving data (API call can be made here)
+        setUser({ ...editUser });
+        setShowProfileModal(false);
+        toast.success('Profile updated successfully!', toastOptions);
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -230,6 +260,74 @@ const InventoryTable = () => {
                         style={{ right: '1.5rem', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }}
                     />
                 </div>
+
+                {/* User Profile */}
+            <Dropdown>
+                <Dropdown.Toggle variant="light" className="profile-dropdown d-flex align-items-center" id="dropdown-basic">
+                    {/* Show user avatar or icon */}
+                    {user.avatar ? (
+                        <img src={user.avatar} alt="user avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                    ) : (
+                        <FontAwesomeIcon icon={faUserCircle} style={{ fontSize: '2rem', color: '#aaa' }} />
+                    )}
+                    <span className="ms-2">{user.name}</span>
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+                    <Dropdown.Item onClick={handleProfileClick}>Profile</Dropdown.Item>
+                    <Dropdown.Item href="#/logout">Logout</Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
+
+            {/* Profile Modal */}
+            <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>User Profile</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="form-group">
+                        <label htmlFor="name">Username</label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value={editUser.name}
+                            onChange={handleProfileInputChange}
+                            className="form-control"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="email">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={editUser.email}
+                            onChange={handleProfileInputChange}
+                            className="form-control"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            value={editUser.password}
+                            onChange={handleProfileInputChange}
+                            className="form-control"
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowProfileModal(false)}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={handleProfileSave}>
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Modal>
             </div>
             <hr />
 

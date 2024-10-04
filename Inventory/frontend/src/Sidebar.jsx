@@ -49,11 +49,6 @@ const Sidebar = () => {
                 </li>
             </ul>
 
-            <div className="logout-button">
-                <a href="#">
-                    <FaSignOutAlt className="icon" /> Logout
-                </a>
-            </div>
         </div>
     );
 };
