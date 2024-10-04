@@ -16,21 +16,21 @@ app.use(cors({ origin: 'http://localhost:3000' })); // Allow requests from React
 
 
 // PostgreSQL connection configuration
-// const pool = new Pool({
-//     user: 'postgres',
-//     host: 'localhost',
-//     database: 'sigbuilder',
-//     password: '$Andrei1515',
-//     port: 5432, // Default PostgreSQL port
-// });
+ const pool = new Pool({
+     user: 'postgres',
+     host: 'localhost',
+     database: 'sigbuilder',
+     password: '$Andrei1515',
+     port: 5432, // Default PostgreSQL port
+ });
 
-const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'sigbuilder',
-    password: '12345678',
-    port: 5433,
-  });
+// const pool = new Pool({
+//    user: 'postgres',
+//       host: 'localhost',
+//    database: 'sigbuilder',
+//    password: '12345678',
+//    port: 5433,
+//  });
 
 app.use(bodyParser.json());
 
