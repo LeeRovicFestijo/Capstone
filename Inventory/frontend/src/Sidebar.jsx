@@ -1,18 +1,27 @@
 import React from 'react';
 import './Sidebar.css';
 import { Link } from 'react-router-dom';
-import { FaCashRegister, FaTachometerAlt, FaBoxes, FaChartLine, FaTools, FaUserCircle, FaTruck, FaSignOutAlt } from 'react-icons/fa';
+import { FaTachometerAlt, FaBoxes, FaChartLine, FaUserCircle, FaTruck, FaSignOutAlt } from 'react-icons/fa';
+import { ToastContainer, Flip } from 'react-toastify';
 
 const Sidebar = () => {
     return (
-        <div className="sidebar col-lg-1">
+        <div className="sidebar col-lg-2">
+            <ToastContainer
+                position="top-right"
+                autoClose={1000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                transition={Flip}
+            />
             <h2>SIG BUILDERS</h2>
             <ul>
-                <li>
-                    <Link to="/pos">
-                        <FaCashRegister className="icon" /> Point Of Sale
-                    </Link>
-                </li>
                 <li>
                     <Link to="/dashboard">
                         <FaTachometerAlt className="icon" /> Dashboard
@@ -26,11 +35,6 @@ const Sidebar = () => {
                 <li>
                     <Link to="/reports">
                         <FaChartLine className="icon" /> Reports
-                    </Link>
-                </li>
-                <li>
-                    <Link to="/site-management">
-                        <FaTools className="icon" /> Site Management
                     </Link>
                 </li>
                 <li>

@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';  // Import Router components
 import Sidebar from './Sidebar';  // Sidebar component
-import InventoryTable from './InventoryTable';  // Your InventoryTable component
+import InventoryTable from './pages/InventoryTable';  // Your InventoryTable component
 import Dashboard from './pages/Dashboard';  // Assuming Dashboard.jsx is in /pages directory
 import PointOfSale from './pages/PointOfSale';  // Point of Sale page
 import Reports from './pages/Reports';  // Reports page

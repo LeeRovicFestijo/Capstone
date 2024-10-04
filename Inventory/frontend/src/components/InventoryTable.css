@@ -8,16 +8,14 @@ body, table, button, input, .modal-content, .form-control, .modal-title {
 /* Overall container for the content */
 .content {
     width: 100%;
-    padding: 20px;
+    padding: 10px;
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
 }
 
 /* Heading */
 .content h1 {
-    margin-left: 15px;
-    margin-top: 10px;
-    font-size: 30px;
+    font-size: 27px;
 }
 
 /* Inventory form styles */
@@ -82,25 +80,25 @@ table td button {
     transition: background-color 0.3s;
 }
 
-table td button:first-child {
+.edit-btn {
     background-color: #3498db;
     color: white;
     border: none;
     border-radius: 4px;
 }
 
-table td button:first-child:hover {
+.edit-btn:hover {
     background-color: #2980b9;
 }
 
-table td button:last-child {
+.delete-btn {
     background-color: #e74c3c;
     color: white;
     border: none;
     border-radius: 4px;
 }
 
-table td button:last-child:hover {
+.delete-btn:hover {
     background-color: #c0392b;
 }
 
@@ -131,37 +129,6 @@ table td button:last-child:hover {
     transform: translateY(-50%);
     pointer-events: none; /* Allow clicks through the icon */
     color: #999; /* Color of the icon */
-}
-
-/* Pagination styles */
-.pagination {
-    margin-top: 20px;
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.pagination-btn {
-    border: 2px solid #3498db;
-    background: transparent;
-    color: #3498db;
-    padding: 8px 16px;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-    border-radius: 4px;
-}
-
-.pagination-btn:hover {
-    background-color: #3498db;
-    color: #fff;
-}
-
-.pagination-info {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-weight: 500;
 }
 
 /* Responsive design for larger screens */

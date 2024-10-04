@@ -1,0 +1,85 @@
+.btn-primary {
+    background-color: #007bff; 
+    color: white; 
+    border: none;
+    border-radius: 5px; 
+    padding: 10px 15px; 
+    padding-right: 15px; 
+    font-size: 16px; 
+    cursor: pointer; 
+    transition: background-color 0.3s ease, transform 0.3s ease; 
+}
+
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+.btn-primary:active {
+    background-color: #004080; /* Even darker shade on click */
+    transform: translateY(0); /* Reset lift effect */
+}
+
+.btn-primary i {
+    margin-right: 5px; /* Spacing between icon and text */
+}
+
+.filter-btn, .add-btn {
+    background-color: #007bff; /* Primary color */
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding for spacing */
+    padding-left: 8px; /* Set left padding to 8px */
+    padding-right: 15px; /* Keep right padding as 15px */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Pointer on hover */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition for hover effects */
+    margin-left: 10px; /* Add left margin to create space between input and button */
+}
+
+
+.filter-btn:hover, .add-btn:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+.filter-btn:active, .add-btn:active {
+    background-color: #004080; /* Even darker shade on click */
+    transform: translateY(0); /* Reset lift effect */
+}
+
+.filter-btn i, .add-btn i {
+    margin-right: 5px; /* Spacing between icon and text */
+}
+
+.pagination {
+    margin-top: 10px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pagination-btn {
+    border: 2px solid #007bff;
+    background: transparent;
+    color: #007bff;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 4px;
+}
+
+.pagination-btn:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.pagination-info {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 500;
+}

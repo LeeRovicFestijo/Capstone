@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import './InventoryTable.css';
+import '../components/InventoryTable.css';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrash, faSearch, faEdit, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash, faSearch, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { Modal, Button } from 'react-bootstrap';
 import { debounce } from 'lodash';
+import { toast, Flip } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const InventoryTable = () => {
     const [inventoryData, setInventoryData] = useState([]);
@@ -22,12 +24,12 @@ const InventoryTable = () => {
     const [deleteMode, setDeleteMode] = useState('');
     const [totalItems, setTotalItems] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 14;
 
     const fetchInventory = async () => {
         setIsLoading(true);
         try {
-            const result = await axios.get('http://localhost:5000/api/inventory');
+            const result = await axios.get('http://localhost:5001/api/inventory');
             setInventoryData(result.data);
             setFilteredData(result.data);
             setTotalItems(result.data.length);
@@ -42,6 +44,18 @@ const InventoryTable = () => {
         fetchInventory();
     }, []);
 
+    const toastOptions = {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Flip,
+    }
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -53,7 +67,7 @@ const InventoryTable = () => {
 
     const handleAddInventory = () => {
         if (!formData.itemDescription || !formData.unitPrice || !formData.qualityStocks || !formData.unitMeasurement) {
-            alert('Please fill in all fields.');
+            toast.error('Please fill in all fields!', toastOptions)
             return;
         }
 
@@ -61,10 +75,13 @@ const InventoryTable = () => {
             item_description: formData.itemDescription,
             unit_price: parseFloat(formData.unitPrice),
             quality_stocks: parseInt(formData.qualityStocks, 10),
-            unit_measurement: formData.unitMeasurement
+            unit_measurement: formData.unitMeasurement,
         };
 
-        const requestUrl = editId ? `http://localhost:5000/api/inventory/${editId}` : 'http://localhost:5000/api/inventory';
+        console.log(editId);
+        console.log(formData);
+
+        const requestUrl = editId ? `http://localhost:5001/api/inventory/${editId}` : 'http://localhost:5001/api/inventory';
         const method = editId ? 'PUT' : 'POST';
 
         const formDataToSubmit = new FormData();
@@ -74,32 +91,21 @@ const InventoryTable = () => {
         formDataToSubmit.append('unit_measurement', newInventoryData.unit_measurement);
 
         if (formFile) {
-            formDataToSubmit.append('image', formFile);
+            formDataToSubmit.append('item_image', formFile);
         }
+
+        console.log(formDataToSubmit);
 
         fetch(requestUrl, {
             method: method,
             body: formDataToSubmit,
         })
             .then(response => {
-                if (!response.ok) throw new Error('Failed to save inventory');
-                return response.json();
+                console.log('Inventory updated:', response);
+                fetchInventory();
             })
-            .then(savedInventory => {
-                const updatedInventory = editId
-                    ? inventoryData.map(item => (item.id === savedInventory.id ? savedInventory : item))
-                    : [...inventoryData, savedInventory];
-                setInventoryData(updatedInventory);
-                setFilteredData(updatedInventory);
-                setTotalItems(updatedInventory.length);
-                resetForm();
-                alert('Inventory saved successfully!');
-                setShowModal(false);
-            })
-            .catch(err => {
-                console.error('Error saving inventory:', err);
-                alert('Error saving inventory. Please try again.');
-            });
+            toast.success('Inventory saved successfully!', toastOptions)
+            setShowModal(false);
     };
 
     const handleEditInventory = (inventory) => {
@@ -109,18 +115,16 @@ const InventoryTable = () => {
             qualityStocks: inventory.quality_stocks,
             unitMeasurement: inventory.unit_measurement,
         });
-        setEditId(inventory.id);
+        setEditId(inventory.item_id);
         setShowModal(true);
     };
 
     const handleDeleteInventory = async (id) => {
         try {
-            await fetch(`http://localhost:5000/api/inventory/${id}`, { method: 'DELETE' });
-            const updatedInventory = inventoryData.filter(item => item.id !== id);
-            setInventoryData(updatedInventory);
-            setFilteredData(updatedInventory);
-            setTotalItems(updatedInventory.length);
+            await fetch(`http://localhost:5001/api/inventory/${id}`, { method: 'DELETE' });
+            fetchInventory();
             setItemToDelete(null);
+            toast.success('Item deleted successfully!', toastOptions)
         } catch (err) {
             console.error('Error deleting inventory:', err);
         }
@@ -128,7 +132,7 @@ const InventoryTable = () => {
 
     const handleDeleteSelected = async () => {
         const deletePromises = selectedItems.map(id =>
-            fetch(`http://localhost:5000/api/inventory/${id}`, { method: 'DELETE' })
+            fetch(`http://localhost:5001/api/inventory/${id}`, { method: 'DELETE' })
                 .then(() => id)
                 .catch(err => {
                     console.error(`Error deleting inventory with id ${id}:`, err);
@@ -137,12 +141,9 @@ const InventoryTable = () => {
         );
 
         const deletedIds = await Promise.all(deletePromises);
-        const updatedInventory = inventoryData.filter(item => !deletedIds.includes(item.id));
-
-        setInventoryData(updatedInventory);
-        setFilteredData(updatedInventory);
-        setTotalItems(updatedInventory.length);
+        fetchInventory();
         setSelectedItems([]);
+        toast.success('Selected Items deleted successfully!', toastOptions)
     };
 
     const confirmDeleteItem = (id) => {
@@ -212,7 +213,7 @@ const InventoryTable = () => {
 
     return (
         <div className="inventory-table-container poppins-font">
-            <div className="d-flex justify-content-between align-items-center my-4">
+            <div className="d-flex justify-content-between align-items-center mt-4">
                 <h1>Inventory</h1>
                 <div className="d-flex position-relative">
                     <input
@@ -230,6 +231,7 @@ const InventoryTable = () => {
                     />
                 </div>
             </div>
+            <hr />
 
             <div className="d-flex my-2">
                 <button onClick={() => { resetForm(); setShowModal(true); }} className="btn btn-primary">
@@ -264,12 +266,12 @@ const InventoryTable = () => {
                 </thead>
                 <tbody>
                     {currentItems.map(inventory => (
-                        <tr key={inventory.id}>
+                        <tr key={inventory.item_id}>
                             <td>
                                 <input
                                     type="checkbox"
-                                    checked={selectedItems.includes(inventory.id)}
-                                    onChange={() => handleSelectItem(inventory.id)}
+                                    checked={selectedItems.includes(inventory.item_id)}
+                                    onChange={() => handleSelectItem(inventory.item_id)}
                                 />
                             </td>
                             <td>{inventory.item_description}</td>
@@ -277,13 +279,17 @@ const InventoryTable = () => {
                             <td>{inventory.quality_stocks}</td>
                             <td>{inventory.unit_measurement}</td>
                             <td>
-                                {inventory.image && <img src={inventory.image} alt="item" style={{ width: '50px', height: '50px' }} />}
+                                {inventory.item_image ? (
+                                    <img src={inventory.item_image} alt="item" style={{ width: '50px', height: '50px' }} />
+                                    ) : (
+                                    <span>No image</span>
+                                )}
                             </td>
-                            <td>
-                                <button className="btn btn-sm btn-warning mx-1" onClick={() => handleEditInventory(inventory)}>
+                            <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                <button className="edit-btn mx-1" onClick={() => handleEditInventory(inventory)}>
                                     <FontAwesomeIcon icon={faEdit} />
                                 </button>
-                                <button className="btn btn-sm btn-danger mx-1" onClick={() => confirmDeleteItem(inventory.id)}>
+                                <button className="delete-btn mx-1" onClick={() => confirmDeleteItem(inventory.item_id)}>
                                     <FontAwesomeIcon icon={faTrash} />
                                 </button>
                             </td>
@@ -296,15 +302,23 @@ const InventoryTable = () => {
             {!isLoading && filteredData.length === 0 && <p>No inventory found.</p>}
 
             <div className="pagination">
-                <Button onClick={handlePrevPage} disabled={currentPage === 1}>
+                <button
+                    className="pagination-btn"
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                >
                     Previous
-                </Button>
-                <span className="mx-3">
+                </button>
+                <span className="pagination-info">
                     Page {currentPage} of {totalPages}
                 </span>
-                <Button onClick={handleNextPage} disabled={currentPage === totalPages}>
+                <button
+                    className="pagination-btn"
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                >
                     Next
-                </Button>
+                </button>
             </div>
 
             <Modal show={showModal} onHide={() => setShowModal(false)}>
@@ -358,11 +372,11 @@ const InventoryTable = () => {
                         
                     </div>
                     <div className="form-group">
-                        <label htmlFor="image">Image</label>
+                        <label htmlFor="item_image">Image</label>
                         <input
                             type="file"
-                            id="image"
-                            name="image"
+                            id="item_image"
+                            name="item_image"
                             onChange={handleFileChange}
                             className="form-control"
                         />

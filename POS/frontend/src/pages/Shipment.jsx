@@ -152,8 +152,8 @@ function Shipment() {
 
   return (
     <SidebarPOS>
-      <div className='row' style={{ height: '97vh' }}>
-        <div className="bg-light p-3 border border-gray rounded-right">
+      <div className='row'>
+        <div className="container">
           <header className="order-page-header d-flex justify-content-between">
             <div className='header-filter'>
               <input 

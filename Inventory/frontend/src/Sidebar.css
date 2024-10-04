@@ -12,8 +12,9 @@
 }
 
 .sidebar h2 {
+    align-items: center;
     margin: 40px 0 40px;
-    font-size: 30px; /* Adjust font size for the heading */
+    font-size: 27px; /* Adjust font size for the heading */
     font-family: 'Poppins', sans-serif; /* Ensure Poppins is applied */
 }
 

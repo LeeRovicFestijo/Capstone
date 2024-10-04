@@ -1,0 +1,92 @@
+/* shipment-style.css */
+.shipment-history {
+    padding: 10px;
+  }
+  
+  .order-page-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .search-bar {
+    width: 300px;
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s ease;
+  }
+  
+  .search-bar:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
+.filter-btn {
+    background-color: #007bff; /* Primary color */
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding for spacing */
+    padding-left: 8px; /* Set left padding to 8px */
+    padding-right: 15px; /* Keep right padding as 15px */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Pointer on hover */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition for hover effects */
+    margin-left: 10px; /* Add left margin to create space between input and button */
+}
+
+
+.filter-btn:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+.filter-btn:active {
+    background-color: #004080; /* Even darker shade on click */
+    transform: translateY(0); /* Reset lift effect */
+}
+
+.filter-btn i {
+    margin-right: 5px; /* Spacing between icon and text */
+}
+  
+.date-picker-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+  
+.shipment-history .MuiTableCell-root {
+    font-size: 14px;
+}
+  
+  @media (max-width: 768px) {
+    .order-page-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .search-bar, .filter-btn {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  
+    .shipment-history .MuiTableCell-root {
+      font-size: 12px;
+      padding: 8px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .search-bar {
+      font-size: 14px;
+    }
+  
+    .shipment-history {
+      padding: 10px;
+    }
+  }
+  
