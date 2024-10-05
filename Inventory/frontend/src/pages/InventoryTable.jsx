@@ -208,7 +208,7 @@ const InventoryTable = () => {
         if (selectedItems.length === filteredData.length) {
             setSelectedItems([]);
         } else {
-            setSelectedItems(filteredData.map(item => item.id));
+            setSelectedItems(filteredData.map(item => item.item_id));
         }
     };
 
@@ -350,7 +350,7 @@ const InventoryTable = () => {
                         <th>
                             <input
                                 type="checkbox"
-                                checked={selectedItems.length === filteredData.length}
+                                checked={selectedItems.length === filteredData.length && filteredData.length > 0}
                                 onChange={handleSelectAll}
                             />
                         </th>
