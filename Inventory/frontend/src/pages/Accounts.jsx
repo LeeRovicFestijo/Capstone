@@ -11,7 +11,7 @@ const Accounts = () => {
   const [accounts, setAccounts] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [rowsPerPage, setRowsPerPage] = useState(9); 
+  const [rowsPerPage] = useState(9); 
   const [anchorEl, setAnchorEl] = useState(null); 
   const [anchorElFilter, setanchorElFilter] = useState(null); 
   const [currentView, setCurrentView] = useState("Accounts");

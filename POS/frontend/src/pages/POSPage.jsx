@@ -177,7 +177,6 @@ function POSPage() {
     };
 
     const handleRemoveChange = (cartProduct) => {
-        console.log("titi")
         setLastScrollPosition(scrollableRef.current.scrollTop); 
         removeProduct(cartProduct);
         setTimeout(() => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from "axios";
 import ReactDatePicker from "react-datepicker";
-import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, Button, TablePagination, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, Button, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import "react-datepicker/dist/react-datepicker.css";
 import '../components/shipment-style.css'; 
 
@@ -13,7 +13,7 @@ const Shipment = () => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedShipment, setSelectedShipment] = useState(null)
     const [searchTerm, setSearchTerm] = useState("");
-    const [rowsPerPage, setRowsPerPage] = useState(9); 
+    const [rowsPerPage] = useState(9); 
     const [showAll, setShowAll] = useState(true);
     const [sortOrder, setSortOrder] = useState("Newest");
     const [anchorEl, setAnchorEl] = useState(null); 

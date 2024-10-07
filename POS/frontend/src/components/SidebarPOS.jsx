@@ -120,15 +120,6 @@ function SidebarPOS({children}) {
             });
 
             if (response.status === 200) {
-                // await fetchUser(); 
-                // const updatedUserData = response.data.account;
-                // setFormData({
-                //     account_username: updatedUserData.account_username,
-                //     account_email: updatedUserData.account_email,
-                //     account_password: updatedUserData.account_password,
-                //     account_profile: updatedUserData.account_profile, // if you're saving the profile image
-                // });
-                // window.location.reload();
 
                 handleCloseModal(); // Close the modal after success
             }

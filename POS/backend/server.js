@@ -26,7 +26,6 @@ const upload = multer({ storage: storage });
 // Endpoint to validate user credentials
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body; // Change id to username
-  console.log('Received credentials:', req.body);
 
   try {
     // Query PostgreSQL for employee accounts
@@ -301,94 +300,6 @@ app.get('/api/transaction', async (req, res) => {
 });
 
 app.get('/api/order-details', async (req, res) => {
-  const { order_id } = req.query;
-
-  const query = `
-    SELECT 
-      t.order_id, 
-      t.item_id, 
-      t.order_quantity, 
-      i.item_description, 
-      i.unit_price, 
-      i.unit_measurement, 
-      (t.order_quantity * i.unit_price) AS total_amount
-    FROM 
-      transactions t
-    JOIN 
-      inventory i ON t.item_id = i.item_id
-    JOIN 
-      orders o ON t.order_id = o.order_id
-    WHERE t.order_id = $1
-  `;
-
-  try {
-    const result = await pool.query(query, [order_id]);
-    res.status(200).json(result.rows);
-  } catch (error) {
-      res.status(500).json({ message: 'Error fetching order details', error: error.message });
-  }
-});
-
-app.get('/api/shipment-order', async (req, res) => {
-  try {
-    const query = `
-      SELECT 
-          sh.shipment_id,
-          sh.order_id,
-          o.order_date,
-          o.total_amount,
-          o.payment_mode,
-          sh.shipping_address,
-          sh.shipping_status,
-          c.customer_id,
-          c.customer_name
-      FROM 
-          shipment sh
-      JOIN 
-          orders o ON sh.order_id = o.order_id
-      JOIN 
-          customer c ON o.customer_id = c.customer_id
-      GROUP BY 
-          sh.shipment_id, 
-          sh.order_id, 
-          o.order_date, 
-          o.total_amount, 
-          o.payment_mode, 
-          sh.shipping_address, 
-          sh.shipping_status, 
-          c.customer_id, 
-          c.customer_name;
-    `;
-      const result = await pool.query(query);
-      res.status(200).json(result.rows);
-  } catch (error) {
-      res.status(500).json({ message: 'Error fetching shipment orders', error: error.message });
-  }
-});
-
-app.put('/api/shipment-order/:id', async (req, res) => {
-  const order_id = req.params.id; // Get the order ID from the URL
-  const { shipping_status } = req.body; // Get the new status from the request body
-  console.log(order_id, shipping_status);
-
-  try {
-    const result = await pool.query(
-      'UPDATE shipment SET shipping_status = $1 WHERE order_id = $2 RETURNING *',
-      [shipping_status, order_id]
-    );
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
-
-    res.status(200).json(result.rows[0]); // Send back the updated order
-  } catch (error) {
-    console.error('Error updating order:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-app.get('/api/shipment-details', async (req, res) => {
   const { order_id } = req.query;
 
   const query = `

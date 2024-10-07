@@ -29,8 +29,7 @@ function LoginPage() {
         // If the login is successful, navigate to /pos
         if (response.status === 200) {
           const employee = response.data.user;
-          console.log(employee);
-          if (employee.account_status === 'Active' && employee.account_role === 'Cashier') {
+          if (employee.account_status === 'Active' && (employee.account_role === 'Cashier' || employee.account_role === 'Admin')) {
             setPersistedUser(employee);
             navigate('/pos', { replace: true });
           } else {
@@ -106,10 +105,6 @@ function LoginPage() {
               >
                 Login
               </button>
-              <small className="form-text text-muted text-center mt-3">
-                By continuing, you agree to our <a href="#">Terms of Service</a>{" "}
-                and <a href="#">Privacy Policy</a>.
-              </small>
             </form>
           </div>
         </div>
