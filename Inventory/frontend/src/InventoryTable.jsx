@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import '../components/InventoryTable.css';
+import './InventoryTable.css';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrash, faSearch, faEdit, faUserCircle } from '@fortawesome/free-solid-svg-icons';
-import { Modal, Button, Dropdown } from 'react-bootstrap';
+import { faPlus, faTrash, faSearch, faEdit, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { Modal, Button } from 'react-bootstrap';
 import { debounce } from 'lodash';
-import { toast, Flip } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const InventoryTable = () => {
     const [inventoryData, setInventoryData] = useState([]);
@@ -26,23 +24,10 @@ const InventoryTable = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
-    // New user profile state
-    const [user, setUser] = useState({
-        name: 'John Doe', // Placeholder name
-        email: 'johndoe@gmail.com',
-        password: '********',
-        avatar: '', // Add avatar URL if available, otherwise show icon
-    });
-
-    const [showProfileModal, setShowProfileModal] = useState(false); // State for controlling the profile modal
-
-    // Update user profile state for edit form
-    const [editUser, setEditUser] = useState({ ...user });
-
     const fetchInventory = async () => {
         setIsLoading(true);
         try {
-            const result = await axios.get('http://localhost:5001/api/inventory');
+            const result = await axios.get('http://localhost:5000/api/inventory');
             setInventoryData(result.data);
             setFilteredData(result.data);
             setTotalItems(result.data.length);
@@ -57,35 +42,6 @@ const InventoryTable = () => {
         fetchInventory();
     }, []);
 
-    const toastOptions = {
-        position: "top-right",
-        autoClose: 1000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Flip,
-    }
-
-    const handleProfileClick = () => {
-        setEditUser({ ...user }); // Reset the edit form with the current user info
-        setShowProfileModal(true); // Show the profile modal
-    };
-
-    const handleProfileInputChange = (e) => {
-        const { name, value } = e.target;
-        setEditUser({ ...editUser, [name]: value });
-    };
-
-    const handleProfileSave = () => {
-        // Simulate saving data (API call can be made here)
-        setUser({ ...editUser });
-        setShowProfileModal(false);
-        toast.success('Profile updated successfully!', toastOptions);
-    };
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -97,7 +53,7 @@ const InventoryTable = () => {
 
     const handleAddInventory = () => {
         if (!formData.itemDescription || !formData.unitPrice || !formData.qualityStocks || !formData.unitMeasurement) {
-            toast.error('Please fill in all fields!', toastOptions)
+            alert('Please fill in all fields.');
             return;
         }
 
@@ -105,13 +61,10 @@ const InventoryTable = () => {
             item_description: formData.itemDescription,
             unit_price: parseFloat(formData.unitPrice),
             quality_stocks: parseInt(formData.qualityStocks, 10),
-            unit_measurement: formData.unitMeasurement,
+            unit_measurement: formData.unitMeasurement
         };
 
-        console.log(editId);
-        console.log(formData);
-
-        const requestUrl = editId ? `http://localhost:5001/api/inventory/${editId}` : 'http://localhost:5001/api/inventory';
+        const requestUrl = editId ? `http://localhost:5000/api/inventory/${editId}` : 'http://localhost:5000/api/inventory';
         const method = editId ? 'PUT' : 'POST';
 
         const formDataToSubmit = new FormData();
@@ -121,21 +74,32 @@ const InventoryTable = () => {
         formDataToSubmit.append('unit_measurement', newInventoryData.unit_measurement);
 
         if (formFile) {
-            formDataToSubmit.append('item_image', formFile);
+            formDataToSubmit.append('image', formFile);
         }
-
-        console.log(formDataToSubmit);
 
         fetch(requestUrl, {
             method: method,
             body: formDataToSubmit,
         })
             .then(response => {
-                console.log('Inventory updated:', response);
-                fetchInventory();
+                if (!response.ok) throw new Error('Failed to save inventory');
+                return response.json();
             })
-            toast.success('Inventory saved successfully!', toastOptions)
-            setShowModal(false);
+            .then(savedInventory => {
+                const updatedInventory = editId
+                    ? inventoryData.map(item => (item.id === savedInventory.id ? savedInventory : item))
+                    : [...inventoryData, savedInventory];
+                setInventoryData(updatedInventory);
+                setFilteredData(updatedInventory);
+                setTotalItems(updatedInventory.length);
+                resetForm();
+                alert('Inventory saved successfully!');
+                setShowModal(false);
+            })
+            .catch(err => {
+                console.error('Error saving inventory:', err);
+                alert('Error saving inventory. Please try again.');
+            });
     };
 
     const handleEditInventory = (inventory) => {
@@ -145,16 +109,18 @@ const InventoryTable = () => {
             qualityStocks: inventory.quality_stocks,
             unitMeasurement: inventory.unit_measurement,
         });
-        setEditId(inventory.item_id);
+        setEditId(inventory.id);
         setShowModal(true);
     };
 
     const handleDeleteInventory = async (id) => {
         try {
-            await fetch(`http://localhost:5001/api/inventory/${id}`, { method: 'DELETE' });
-            fetchInventory();
+            await fetch(`http://localhost:5000/api/inventory/${id}`, { method: 'DELETE' });
+            const updatedInventory = inventoryData.filter(item => item.id !== id);
+            setInventoryData(updatedInventory);
+            setFilteredData(updatedInventory);
+            setTotalItems(updatedInventory.length);
             setItemToDelete(null);
-            toast.success('Item deleted successfully!', toastOptions)
         } catch (err) {
             console.error('Error deleting inventory:', err);
         }
@@ -162,7 +128,7 @@ const InventoryTable = () => {
 
     const handleDeleteSelected = async () => {
         const deletePromises = selectedItems.map(id =>
-            fetch(`http://localhost:5001/api/inventory/${id}`, { method: 'DELETE' })
+            fetch(`http://localhost:5000/api/inventory/${id}`, { method: 'DELETE' })
                 .then(() => id)
                 .catch(err => {
                     console.error(`Error deleting inventory with id ${id}:`, err);
@@ -171,9 +137,12 @@ const InventoryTable = () => {
         );
 
         const deletedIds = await Promise.all(deletePromises);
-        fetchInventory();
+        const updatedInventory = inventoryData.filter(item => !deletedIds.includes(item.id));
+
+        setInventoryData(updatedInventory);
+        setFilteredData(updatedInventory);
+        setTotalItems(updatedInventory.length);
         setSelectedItems([]);
-        toast.success('Selected Items deleted successfully!', toastOptions)
     };
 
     const confirmDeleteItem = (id) => {
@@ -208,7 +177,7 @@ const InventoryTable = () => {
         if (selectedItems.length === filteredData.length) {
             setSelectedItems([]);
         } else {
-            setSelectedItems(filteredData.map(item => item.item_id));
+            setSelectedItems(filteredData.map(item => item.id));
         }
     };
 
@@ -243,7 +212,7 @@ const InventoryTable = () => {
 
     return (
         <div className="inventory-table-container poppins-font">
-            <div className="d-flex justify-content-between align-items-center mt-4">
+            <div className="d-flex justify-content-between align-items-center my-4">
                 <h1>Inventory</h1>
                 <div className="d-flex position-relative">
                     <input
@@ -260,76 +229,7 @@ const InventoryTable = () => {
                         style={{ right: '1.5rem', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }}
                     />
                 </div>
-
-                {/* User Profile */}
-            <Dropdown>
-                <Dropdown.Toggle variant="light" className="profile-dropdown d-flex align-items-center" id="dropdown-basic">
-                    {/* Show user avatar or icon */}
-                    {user.avatar ? (
-                        <img src={user.avatar} alt="user avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
-                    ) : (
-                        <FontAwesomeIcon icon={faUserCircle} style={{ fontSize: '2rem', color: '#aaa' }} />
-                    )}
-                    <span className="ms-2">{user.name}</span>
-                </Dropdown.Toggle>
-
-                <Dropdown.Menu>
-                    <Dropdown.Item onClick={handleProfileClick}>Profile</Dropdown.Item>
-                    <Dropdown.Item href="#/logout">Logout</Dropdown.Item>
-                </Dropdown.Menu>
-            </Dropdown>
-
-            {/* Profile Modal */}
-            <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>User Profile</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <div className="form-group">
-                        <label htmlFor="name">Username</label>
-                        <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            value={editUser.name}
-                            onChange={handleProfileInputChange}
-                            className="form-control"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={editUser.email}
-                            onChange={handleProfileInputChange}
-                            className="form-control"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={editUser.password}
-                            onChange={handleProfileInputChange}
-                            className="form-control"
-                        />
-                    </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowProfileModal(false)}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleProfileSave}>
-                        Save Changes
-                    </Button>
-                </Modal.Footer>
-            </Modal>
             </div>
-            <hr />
 
             <div className="d-flex my-2">
                 <button onClick={() => { resetForm(); setShowModal(true); }} className="btn btn-primary">
@@ -350,7 +250,7 @@ const InventoryTable = () => {
                         <th>
                             <input
                                 type="checkbox"
-                                checked={selectedItems.length === filteredData.length && filteredData.length > 0}
+                                checked={selectedItems.length === filteredData.length}
                                 onChange={handleSelectAll}
                             />
                         </th>
@@ -364,12 +264,12 @@ const InventoryTable = () => {
                 </thead>
                 <tbody>
                     {currentItems.map(inventory => (
-                        <tr key={inventory.item_id}>
+                        <tr key={inventory.id}>
                             <td>
                                 <input
                                     type="checkbox"
-                                    checked={selectedItems.includes(inventory.item_id)}
-                                    onChange={() => handleSelectItem(inventory.item_id)}
+                                    checked={selectedItems.includes(inventory.id)}
+                                    onChange={() => handleSelectItem(inventory.id)}
                                 />
                             </td>
                             <td>{inventory.item_description}</td>
@@ -377,17 +277,13 @@ const InventoryTable = () => {
                             <td>{inventory.quality_stocks}</td>
                             <td>{inventory.unit_measurement}</td>
                             <td>
-                                {inventory.item_image ? (
-                                    <img src={inventory.item_image} alt="item" style={{ width: '50px', height: '50px' }} />
-                                    ) : (
-                                    <span>No image</span>
-                                )}
+                                {inventory.image && <img src={inventory.image} alt="item" style={{ width: '50px', height: '50px' }} />}
                             </td>
-                            <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                <button className="edit-btn mx-1" onClick={() => handleEditInventory(inventory)}>
+                            <td>
+                                <button className="btn btn-sm btn-warning mx-1" onClick={() => handleEditInventory(inventory)}>
                                     <FontAwesomeIcon icon={faEdit} />
                                 </button>
-                                <button className="delete-btn mx-1" onClick={() => confirmDeleteItem(inventory.item_id)}>
+                                <button className="btn btn-sm btn-danger mx-1" onClick={() => confirmDeleteItem(inventory.id)}>
                                     <FontAwesomeIcon icon={faTrash} />
                                 </button>
                             </td>
@@ -400,23 +296,15 @@ const InventoryTable = () => {
             {!isLoading && filteredData.length === 0 && <p>No inventory found.</p>}
 
             <div className="pagination">
-                <button
-                    className="pagination-btn"
-                    onClick={handlePrevPage}
-                    disabled={currentPage === 1}
-                >
+                <Button onClick={handlePrevPage} disabled={currentPage === 1}>
                     Previous
-                </button>
-                <span className="pagination-info">
+                </Button>
+                <span className="mx-3">
                     Page {currentPage} of {totalPages}
                 </span>
-                <button
-                    className="pagination-btn"
-                    onClick={handleNextPage}
-                    disabled={currentPage === totalPages}
-                >
+                <Button onClick={handleNextPage} disabled={currentPage === totalPages}>
                     Next
-                </button>
+                </Button>
             </div>
 
             <Modal show={showModal} onHide={() => setShowModal(false)}>
@@ -470,11 +358,11 @@ const InventoryTable = () => {
                         
                     </div>
                     <div className="form-group">
-                        <label htmlFor="item_image">Image</label>
+                        <label htmlFor="image">Image</label>
                         <input
                             type="file"
-                            id="item_image"
-                            name="item_image"
+                            id="image"
+                            name="image"
                             onChange={handleFileChange}
                             className="form-control"
                         />
