@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
+import axios from 'axios';
 import { useEcommerce } from "../Api/EcommerceApi";
 import { toast, Flip } from 'react-toastify';
 import MainLayout from '../layout/MainLayout'
 import "../style/cart-style.css";
 
 function CartPage() {
-    const { cart, setCart, totalAmount, setTotalAmount, selectedCustomer, setSelectedCustomer, selectedCustomerLocal, setIsCustomerAdded, persistedUser, persistedCustomer, payment, customerName, setCustomerName, placeholderImage } = useEcommerce();
+    const { cart, setCart, persistedCustomer, placeholderImage } = useEcommerce();
     const [showPopup, setShowPopup] = useState(false);
     const [checkoutDetails, setCheckoutDetails] = useState({
       location: "",
@@ -18,7 +19,11 @@ function CartPage() {
     const finalPrice = totalPrice + shippingCost; 
   
     const handleBuyClick = () => {
-      setShowPopup(true);
+        if (cart.length !== 0) {
+            setShowPopup(true);
+        } else {
+            toast.error('Put something on your cart first!', toastOptions)
+        }
     };
   
     const closePopup = () => {
@@ -27,21 +32,53 @@ function CartPage() {
       setSelectedPaymentMethod(""); 
     };
   
-    const handleConfirmPayment = () => {
-      const { paymentMethod, location } = checkoutDetails;
-      if (!persistedCustomer) {
-        toast.error('Sign in first before buying!', toastOptions)
-        return;
-      }
-      if (!paymentMethod) {
-        toast.error('Choose a payment method!', toastOptions)
-        return;
-      }
-      if (!location) {
-        toast.error('Enter your delivery location!', toastOptions)
-        return;
-      }
-      closePopup(); 
+    const handleConfirmPayment = async () => {
+        const { paymentMethod, location } = checkoutDetails;
+        if (!persistedCustomer) {
+            toast.error('Sign in first before buying!', toastOptions)
+            return;
+        }
+        if (!paymentMethod) {
+            toast.error('Choose a payment method!', toastOptions)
+            return;
+        }
+        if (!location) {
+            toast.error('Enter your delivery location!', toastOptions)
+            return;
+        }
+
+        const finalPaymentMethod = paymentMethod === 'Cash on Delivery' ? 'Cash' : paymentMethod;
+ 
+        const orderData = {
+            customer_id: persistedCustomer.customer_id,
+            cart: cart.map(item => ({
+                item_id: item.item_id,
+                item_description: item.item_description,
+                order_quantity: item.quantity,
+                unit_price: item.unit_price,
+            })),
+            total_amount: totalPrice,
+            order_delivery: 'yes',
+            payment_mode: finalPaymentMethod,
+            account_id: 1,
+            shipping_address: location
+        };
+
+        try {
+            const response = await axios.post('http://localhost:5001/api/e-orders', orderData);
+            if (response.status === 200) {
+                setCart([]);
+                closePopup(); 
+            } else {
+                alert(response.data.message);
+            }
+        } catch (error) {
+            if (error.response) {
+                alert(error.response.data.message);
+            } else {
+                alert('Failed to create order. Please try again.');
+            }
+        }
     };
   
     const handleKeyPress = useCallback((e) => {
@@ -161,10 +198,13 @@ function CartPage() {
             {showPopup && (
                 <div className="popup-overlay">
                     <div className="popup-inner">
-                        <h2>Checkout</h2>
-                        <button className="close-popup" onClick={closePopup}>×</button>
-
-                        <div className="cart-summary">
+                        <div className="popup-container" style={{ position: 'relative' }}>
+                            <button className="close-popup" onClick={closePopup} style={{ position: 'absolute', right: '10px' }}>
+                                <i className="bi bi-x-circle"></i>
+                            </button>
+                            <h2>Checkout</h2>
+                        </div>
+                        <div className="cart-summary mt-2">
                         <h3>Order Summary</h3>
                         {cart.map((item) => (
                             <div key={item.item_id} className="summary-item">
@@ -186,7 +226,7 @@ function CartPage() {
                         </div>
                         </div>
 
-                        <div className="payment-methods">
+                        <div className="payment-methods mt-3">
                             <h3>Payment Method</h3>
                             <div className="payment-buttons">
                                 {["Cash on Delivery" , "GCash", "PayMaya", "Card"].map((method) => (

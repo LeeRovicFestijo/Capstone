@@ -6,6 +6,7 @@ import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 import { usePOS } from '../api/POSProvider';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faUsers, faReceipt, faSignOutAlt, faBars } from '@fortawesome/free-solid-svg-icons';
+import { toast, Flip } from 'react-toastify';
 import './pos-style.css';
 
 function SidebarPOS({children}) {
@@ -24,7 +25,19 @@ function SidebarPOS({children}) {
         account_password: persistedUser?.account_password || '',
         account_profile: persistedUser?.account_profile || null
     });
-    const [menuOpen, setMenuOpen] = useState(false); // State for mobile menu
+    const [menuOpen, setMenuOpen] = useState(false);
+
+    const toastOptions = {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Flip,
+    }
 
     const fetchUser = async () => {
         const account_id = formData.account_id;
@@ -87,7 +100,6 @@ function SidebarPOS({children}) {
     };
 
     const handleSubmit = async () => {
-        console.log(formData);
         const { account_id, employee_id, account_username, account_email, account_password } = formData;
         const errors = [];
 
@@ -96,7 +108,6 @@ function SidebarPOS({children}) {
         }
 
         if (errors.length > 0) {
-            // Handle errors (you can show these errors in the UI if needed)
             console.error(errors);
             return;
         }
@@ -120,8 +131,8 @@ function SidebarPOS({children}) {
             });
 
             if (response.status === 200) {
-
-                handleCloseModal(); // Close the modal after success
+                toast.success('Account updated successfully!', toastOptions);
+                handleCloseModal(); 
             }
         } catch (error) {
             console.error('Error updating account:', error);

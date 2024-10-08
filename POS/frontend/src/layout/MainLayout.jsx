@@ -1,6 +1,7 @@
 import React from 'react'
 import { ToastContainer, Flip } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import "../components/main-layout-style.css";
 
 function MainLayout({children}) {
   return (

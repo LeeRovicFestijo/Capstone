@@ -26,10 +26,14 @@ function LoginPage() {
         });
 
         if (response.status === 200) {
-          const customer = response.data.user;
+          const customer = response.data.customer;
           console.log(customer);
           setPersistedCustomer(customer);
           navigate('/main', { replace: true });
+        }
+
+        if (response.status === 404) {
+          setErrorMessage('Login failed. Account not found.');
         }
       } catch (error) {
         // Handle login failure

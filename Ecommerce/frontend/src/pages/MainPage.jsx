@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom"; 
 import 'swiper/swiper-bundle.css'
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from 'swiper/modules'; 
@@ -14,12 +13,11 @@ import "../style/new-arrival-style.css";
 import "../style/wrapper-style.css";
 
 function MainPage() {
-    const { cart, setCart, totalAmount, setTotalAmount, selectedCustomer, setSelectedCustomer, selectedCustomerLocal, setIsCustomerAdded, persistedUser, payment, customerName, setCustomerName, placeholderImage } = useEcommerce();
+    const { cart, setCart, placeholderImage } = useEcommerce();
     const [newArrivals, setNewArrivals] = useState([]);
     const [shopItems, setShopItems] = useState([]);
     const [displayedItems, setDisplayedItems] = useState([]); 
     const [itemsToShow, setItemsToShow] = useState(20);
-    const [isLoading, setIsLoading] = useState(false);
 
     const data = [
         {
@@ -55,41 +53,23 @@ function MainPage() {
         theme: "light",
         transition: Flip,
     }
-    
-    // const [isProfileOpen, setIsProfileOpen] = useState(false); 
-
-    // useEffect(() => {
-    //   const handleScroll = () => {
-    //     const search = document.querySelector(".search");
-    //     search.classList.toggle("active", window.scrollY > 100);
-    //   };
-  
-    //   window.addEventListener("scroll", handleScroll);
-    //   return () => window.removeEventListener("scroll", handleScroll);
-    // }, []);
 
     const fetchNewArrivals = async () => {
-        setIsLoading(true);
         try {
         const result = await axios.get('http://localhost:5001/api/new-arrivals'); 
         setNewArrivals(result.data);
         } catch (error) {
         console.error('Error fetching products:', error);
-        } finally {
-        setIsLoading(false);
         }
     };
 
     const fetchShopItems = async () => {
-        setIsLoading(true);
         try {
         const result = await axios.get('http://localhost:5001/api/shop-items'); 
         setShopItems(result.data);
         setDisplayedItems(result.data.slice(0, itemsToShow));
         } catch (error) {
         console.error('Error fetching products:', error);
-        } finally {
-        setIsLoading(false);
         }
     };
 
