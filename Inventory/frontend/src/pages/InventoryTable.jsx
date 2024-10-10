@@ -3,14 +3,17 @@ import '../components/InventoryTable.css';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrash, faSearch, faEdit, faUserCircle } from '@fortawesome/free-solid-svg-icons';
-import { Modal, Button, Dropdown } from 'react-bootstrap';
+import { faPlus, faTrash, faSearch, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { Table, TableBody, TableCell, TableHead, TableRow, Paper } from '@mui/material';
+import { Modal, Button } from 'react-bootstrap';
 import { debounce } from 'lodash';
 import { toast, Flip } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import MainLayout from '../layout/MainLayout';
+import { useInventory } from '../api/InventoryProvider';
 
 const InventoryTable = () => {
-    const [inventoryData, setInventoryData] = useState([]);
+    const { inventoryData, setInventoryData } = useInventory();
     const [formData, setFormData] = useState({ itemDescription: '', unitPrice: '', qualityStocks: '', unitMeasurement: '' });
     const [formFile, setFormFile] = useState(null); // File state for image upload
     const [editId, setEditId] = useState(null);
@@ -25,19 +28,6 @@ const InventoryTable = () => {
     const [totalItems, setTotalItems] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
-
-    // New user profile state
-    const [user, setUser] = useState({
-        name: 'John Doe', // Placeholder name
-        email: 'johndoe@gmail.com',
-        password: '********',
-        avatar: '', // Add avatar URL if available, otherwise show icon
-    });
-
-    const [showProfileModal, setShowProfileModal] = useState(false); // State for controlling the profile modal
-
-    // Update user profile state for edit form
-    const [editUser, setEditUser] = useState({ ...user });
 
     const fetchInventory = async () => {
         setIsLoading(true);
@@ -68,23 +58,6 @@ const InventoryTable = () => {
         theme: "light",
         transition: Flip,
     }
-
-    const handleProfileClick = () => {
-        setEditUser({ ...user }); // Reset the edit form with the current user info
-        setShowProfileModal(true); // Show the profile modal
-    };
-
-    const handleProfileInputChange = (e) => {
-        const { name, value } = e.target;
-        setEditUser({ ...editUser, [name]: value });
-    };
-
-    const handleProfileSave = () => {
-        // Simulate saving data (API call can be made here)
-        setUser({ ...editUser });
-        setShowProfileModal(false);
-        toast.success('Profile updated successfully!', toastOptions);
-    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -241,272 +214,213 @@ const InventoryTable = () => {
         if (currentPage > 1) setCurrentPage(currentPage - 1);
     };
 
-    return (
-        <div className="inventory-table-container poppins-font">
-            <div className="d-flex justify-content-between align-items-center mt-4">
-                <h1>Inventory</h1>
-                <div className="d-flex position-relative">
-                    <input
-                        type="text"
-                        placeholder="Search inventory..."
-                        defaultValue={searchTerm}
-                        onChange={(e) => handleSearchChange(e.target.value)}
-                        className="search-bar form-control mx-2"
-                        style={{ paddingRight: '2.5rem' }}
-                    />
-                    <FontAwesomeIcon
-                        icon={faSearch}
-                        className="position-absolute"
-                        style={{ right: '1.5rem', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }}
-                    />
-                </div>
-
-                {/* User Profile */}
-            <Dropdown>
-                <Dropdown.Toggle variant="light" className="profile-dropdown d-flex align-items-center" id="dropdown-basic">
-                    {/* Show user avatar or icon */}
-                    {user.avatar ? (
-                        <img src={user.avatar} alt="user avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
-                    ) : (
-                        <FontAwesomeIcon icon={faUserCircle} style={{ fontSize: '2rem', color: '#aaa' }} />
-                    )}
-                    <span className="ms-2">{user.name}</span>
-                </Dropdown.Toggle>
-
-                <Dropdown.Menu>
-                    <Dropdown.Item onClick={handleProfileClick}>Profile</Dropdown.Item>
-                    <Dropdown.Item href="#/logout">Logout</Dropdown.Item>
-                </Dropdown.Menu>
-            </Dropdown>
-
-            {/* Profile Modal */}
-            <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>User Profile</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <div className="form-group">
-                        <label htmlFor="name">Username</label>
-                        <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            value={editUser.name}
-                            onChange={handleProfileInputChange}
-                            className="form-control"
-                        />
+    return ( 
+        <MainLayout>
+            <div className='row'>
+                <div className="inventory-table-container p-3 poppins-font">
+                    <div className="d-flex justify-content-between align-items-center">
+                        <h2>Inventory</h2>
+                        <div className="d-flex position-relative">
+                            <input
+                                type="text"
+                                placeholder="Search inventory..."
+                                defaultValue={searchTerm}
+                                onChange={(e) => handleSearchChange(e.target.value)}
+                                className="search-bar form-control mx-2"
+                                style={{ paddingRight: '2.5rem' }}
+                            />
+                            <FontAwesomeIcon
+                                icon={faSearch}
+                                className="position-absolute"
+                                style={{ right: '1.5rem', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }}
+                            />
+                        </div>
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={editUser.email}
-                            onChange={handleProfileInputChange}
-                            className="form-control"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={editUser.password}
-                            onChange={handleProfileInputChange}
-                            className="form-control"
-                        />
-                    </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowProfileModal(false)}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleProfileSave}>
-                        Save Changes
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-            </div>
-            <hr />
+                    <hr />
 
-            <div className="d-flex my-2">
-                <button onClick={() => { resetForm(); setShowModal(true); }} className="btn btn-primary">
-                    <FontAwesomeIcon icon={faPlus} className="me-2" />
-                    Add Inventory
-                </button>
-                {selectedItems.length > 0 && (
-                    <button className="btn btn-danger mx-2" onClick={confirmDeleteSelected}>
-                        <FontAwesomeIcon icon={faTrash} className="me-2" />
-                        Delete Selected
-                    </button>
-                )}
-            </div>
+                    <div className="d-flex my-2">
+                        <button onClick={() => { resetForm(); setShowModal(true); }} className="btn btn-primary">
+                            <FontAwesomeIcon icon={faPlus} className="me-2" />
+                            Add Inventory
+                        </button>
+                        {selectedItems.length > 0 && (
+                            <button className="btn btn-danger mx-2" onClick={confirmDeleteSelected}>
+                                <FontAwesomeIcon icon={faTrash} className="me-2" />
+                                Delete Selected
+                            </button>
+                        )}
+                    </div>
 
-            <table className="table table-bordered table-striped mt-3">
-                <thead>
-                    <tr>
-                        <th>
+                    <Paper>
+                        <Table>
+                        <TableHead>
+                            <TableRow>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>
                             <input
                                 type="checkbox"
                                 checked={selectedItems.length === filteredData.length && filteredData.length > 0}
                                 onChange={handleSelectAll}
                             />
-                        </th>
-                        <th>Item Description</th>
-                        <th>Unit Price</th>
-                        <th>Quality Stocks</th>
-                        <th>Unit Measurement</th>
-                        <th>Image</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentItems.map(inventory => (
-                        <tr key={inventory.item_id}>
-                            <td>
+                            </TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Item Description</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Unit Price</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Quality Stocks</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Unit Measurement</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Image</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Actions</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {currentItems.map((inventory) => (
+                            <TableRow 
+                                key={inventory.item_id} 
+                                style={{cursor:'pointer'}} 
+                            >
+                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedItems.includes(inventory.item_id)}
+                                        onChange={() => handleSelectItem(inventory.item_id)}
+                                    />
+                                </TableCell>
+                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.item_description}</TableCell>
+                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.unit_price}</TableCell>
+                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.quality_stocks}</TableCell>
+                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.unit_measurement}</TableCell>
+                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>
+                                    {inventory.item_image ? (
+                                        <img src={inventory.item_image} alt="item" style={{ width: '50px', height: '50px' }} />
+                                        ) : (
+                                        <span>No image</span>
+                                    )}
+                                </TableCell>
+                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>
+                                    <button className="edit-btn mx-1" onClick={() => handleEditInventory(inventory)}>
+                                        <FontAwesomeIcon icon={faEdit} />
+                                    </button>
+                                    <button className="delete-btn mx-1" onClick={() => confirmDeleteItem(inventory.item_id)}>
+                                        <FontAwesomeIcon icon={faTrash} />
+                                    </button>
+                                </TableCell>
+                            </TableRow>
+                            ))}
+                        </TableBody>
+                        </Table>
+                    </Paper>
+
+                    {isLoading && <p>Loading...</p>}
+                    {!isLoading && filteredData.length === 0 && <p>No inventory found.</p>}
+
+                    <div className="pagination">
+                        <button
+                            className="pagination-btn"
+                            onClick={handlePrevPage}
+                            disabled={currentPage === 1}
+                        >
+                            Previous
+                        </button>
+                        <span className="pagination-info">
+                            Page {currentPage} of {totalPages}
+                        </span>
+                        <button
+                            className="pagination-btn"
+                            onClick={handleNextPage}
+                            disabled={currentPage === totalPages}
+                        >
+                            Next
+                        </button>
+                    </div>
+
+                    <Modal show={showModal} onHide={() => setShowModal(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>{editId ? 'Edit Inventory' : 'Add Inventory'}</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div className="form-group">
+                                <label htmlFor="itemDescription">Item Description</label>
                                 <input
-                                    type="checkbox"
-                                    checked={selectedItems.includes(inventory.item_id)}
-                                    onChange={() => handleSelectItem(inventory.item_id)}
+                                    type="text"
+                                    id="itemDescription"
+                                    name="itemDescription"
+                                    value={formData.itemDescription}
+                                    onChange={handleInputChange}
+                                    className="form-control"
                                 />
-                            </td>
-                            <td>{inventory.item_description}</td>
-                            <td>{inventory.unit_price}</td>
-                            <td>{inventory.quality_stocks}</td>
-                            <td>{inventory.unit_measurement}</td>
-                            <td>
-                                {inventory.item_image ? (
-                                    <img src={inventory.item_image} alt="item" style={{ width: '50px', height: '50px' }} />
-                                    ) : (
-                                    <span>No image</span>
-                                )}
-                            </td>
-                            <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                <button className="edit-btn mx-1" onClick={() => handleEditInventory(inventory)}>
-                                    <FontAwesomeIcon icon={faEdit} />
-                                </button>
-                                <button className="delete-btn mx-1" onClick={() => confirmDeleteItem(inventory.item_id)}>
-                                    <FontAwesomeIcon icon={faTrash} />
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="unitPrice">Unit Price</label>
+                                <input
+                                    type="number"
+                                    id="unitPrice"
+                                    name="unitPrice"
+                                    value={formData.unitPrice}
+                                    onChange={handleInputChange}
+                                    className="form-control"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="qualityStocks">Quality Stocks</label>
+                                <input
+                                    type="number"
+                                    id="qualityStocks"
+                                    name="qualityStocks"
+                                    value={formData.qualityStocks}
+                                    onChange={handleInputChange}
+                                    className="form-control"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="unitMeasurement">Unit Measurement</label>
+                                <input
+                                    type="text"
+                                    id="unitMeasurement"
+                                    name="unitMeasurement"
+                                    value={formData.unitMeasurement}
+                                    onChange={handleInputChange}
+                                    className="form-control"
+                                />
+                                
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="item_image">Image</label>
+                                <input
+                                    type="file"
+                                    id="item_image"
+                                    name="item_image"
+                                    onChange={handleFileChange}
+                                    className="form-control"
+                                />
+                            </div>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={() => setShowModal(false)}>
+                                Close
+                            </Button>
+                            <Button variant="primary" onClick={handleAddInventory}>
+                                {editId ? 'Update Inventory' : 'Add Inventory'}
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
 
-            {isLoading && <p>Loading...</p>}
-            {!isLoading && filteredData.length === 0 && <p>No inventory found.</p>}
-
-            <div className="pagination">
-                <button
-                    className="pagination-btn"
-                    onClick={handlePrevPage}
-                    disabled={currentPage === 1}
-                >
-                    Previous
-                </button>
-                <span className="pagination-info">
-                    Page {currentPage} of {totalPages}
-                </span>
-                <button
-                    className="pagination-btn"
-                    onClick={handleNextPage}
-                    disabled={currentPage === totalPages}
-                >
-                    Next
-                </button>
+                    <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Confirm Delete</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            Are you sure you want to delete {deleteMode === 'single' ? 'this item' : 'the selected items'}?
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                                Cancel
+                            </Button>
+                            <Button variant="danger" onClick={handleConfirmDelete}>
+                                Confirm
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                </div>
             </div>
-
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>{editId ? 'Edit Inventory' : 'Add Inventory'}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <div className="form-group">
-                        <label htmlFor="itemDescription">Item Description</label>
-                        <input
-                            type="text"
-                            id="itemDescription"
-                            name="itemDescription"
-                            value={formData.itemDescription}
-                            onChange={handleInputChange}
-                            className="form-control"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="unitPrice">Unit Price</label>
-                        <input
-                            type="number"
-                            id="unitPrice"
-                            name="unitPrice"
-                            value={formData.unitPrice}
-                            onChange={handleInputChange}
-                            className="form-control"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="qualityStocks">Quality Stocks</label>
-                        <input
-                            type="number"
-                            id="qualityStocks"
-                            name="qualityStocks"
-                            value={formData.qualityStocks}
-                            onChange={handleInputChange}
-                            className="form-control"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="unitMeasurement">Unit Measurement</label>
-                        <input
-                            type="text"
-                            id="unitMeasurement"
-                            name="unitMeasurement"
-                            value={formData.unitMeasurement}
-                            onChange={handleInputChange}
-                            className="form-control"
-                        />
-                        
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="item_image">Image</label>
-                        <input
-                            type="file"
-                            id="item_image"
-                            name="item_image"
-                            onChange={handleFileChange}
-                            className="form-control"
-                        />
-                    </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleAddInventory}>
-                        {editId ? 'Update Inventory' : 'Add Inventory'}
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Confirm Delete</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    Are you sure you want to delete {deleteMode === 'single' ? 'this item' : 'the selected items'}?
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                        Cancel
-                    </Button>
-                    <Button variant="danger" onClick={handleConfirmDelete}>
-                        Confirm
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </div>
+    </MainLayout>
     );
 };
 

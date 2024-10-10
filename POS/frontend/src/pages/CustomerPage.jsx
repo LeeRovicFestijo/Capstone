@@ -5,6 +5,7 @@ import SidebarPOS from '../components/SidebarPOS';
 import { usePOS } from '../api/POSProvider';
 import '../components/customer-style.css'; 
 import CustomerModal from '../components/CustomerModal';
+import MainLayout from '../layout/MainLayout';
 
 function CustomerPage() {
   const { selectedCustomer, setSelectedCustomer, isCustomerAdded, setIsCustomerAdded, selectedCustomerLocal, setSelectedCustomerLocal } = usePOS();
@@ -148,9 +149,9 @@ function CustomerPage() {
 
   return (
     <>
-      <SidebarPOS>
-        <div className='row' style={{height: '97vh'}}>
-          <div className="customer-page-container p-3 border bordery-gray rounded-right">
+      <MainLayout>
+        <div className='row'>
+          <div className="customer-page-container p-3">
             <header className="customer-page-header">
               <input 
                 type="text" 
@@ -167,11 +168,11 @@ function CustomerPage() {
             <div className="customer-details">
               {selectedCustomerLocal ? (
                 <div className="customer-info">
-                  {selectedCustomerLocal.profilePicture ? (
+                  {selectedCustomerLocal.customer_profile ? (
                       <img 
-                          src={selectedCustomerLocal.profilePicture} 
+                          src={selectedCustomerLocal.customer_profile} 
                           alt="Customer" 
-                          style={{ width: '200px', height: '200px', borderRadius: '50%', objectFit: 'cover' }}
+                          style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover' }}
                       />
                   ) : (
                       <i className="bi bi-person-circle"></i>
@@ -191,7 +192,6 @@ function CustomerPage() {
                       )}
                       <div className="edit-delete-buttons">
                         <button className="edit-btn" onClick={() => handleOpenEditModal(selectedCustomerLocal)}><i className='bi bi-pencil-square'/> Edit</button>
-                        <button className="delete-btn" onClick={handleDeleteCustomer}><i className='bi bi-trash'/> Delete</button>
                       </div>                   
                     </div>
                   </div>
@@ -234,7 +234,7 @@ function CustomerPage() {
             </div>
           </div>
         </div>
-      </SidebarPOS>
+      </MainLayout>
 
       <CustomerModal
         isOpen={isCustomerModalOpen}

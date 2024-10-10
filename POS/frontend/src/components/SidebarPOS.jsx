@@ -8,8 +8,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faUsers, faReceipt, faSignOutAlt, faBars } from '@fortawesome/free-solid-svg-icons';
 import { toast, Flip } from 'react-toastify';
 import './pos-style.css';
+import './sidebar-style.css';
 
-function SidebarPOS({children}) {
+function SidebarPOS() {
     const location = useLocation();
     const navigate = useNavigate();
     const { persistedUser, setPersistedUser, logout } = usePOS();
@@ -160,9 +161,9 @@ function SidebarPOS({children}) {
     };
 
     return (
-        <MainLayout>
-            <div className="row" style={{ height: '97vh', margin: 0 }}>
-                <div className={`col-lg-1 p-3 d-flex flex-column border bordery-gray rounded-left sidebar ${menuOpen || window.innerWidth > 992 ? 'open' : 'closed'}`}>
+        <div className="layout-container">
+            <div className={`d-flex flex-column sidebar-content ${menuOpen || window.innerWidth > 992 ? 'open' : 'closed'}`}>
+                <div className='container'>
                     <button className="btn btn-link d-lg-none" onClick={toggleMenu}>
                         <FontAwesomeIcon icon={faBars} />
                     </button>
@@ -176,114 +177,10 @@ function SidebarPOS({children}) {
                         <Link to="/transactions" className={`nav-link-side ${isActive('/transactions') ? 'active' : ''}`}>
                             <FontAwesomeIcon icon={faReceipt} /> Transactions
                         </Link>
-                        <Link to="/shipment" className={`nav-link-side ${isActive('/shipment') ? 'active' : ''}`}>
-                            <FontAwesomeIcon icon={faReceipt} /> Shipment
-                        </Link>
                     </nav>
-                    <div className="mt-auto d-flex flex-column align-items-center">
-                        <div className='d-flex flex-column align-items-center' onClick={handleShowModal} style={{ cursor: 'pointer' }}>
-                            {persistedUser && <p className='user-name'>{persistedUser.account_username}</p>}
-                            {persistedUser.account_profile ? (
-                                <img src={persistedUser.account_profile} alt="Profile" style={{ width: '50px', height: '50px', borderRadius: '50%' }} className='mt-2 mb-1'/>
-                            ) : (
-                                <i className="bi bi-person-circle" style={{ fontSize: '50px', color: 'gray' }} />
-                            )}
-                        </div>
-                        <Link to="#" className="nav-link-logout logout" onClick={handleLogout}>
-                            <FontAwesomeIcon icon={faSignOutAlt} /> Logout
-                        </Link>
-                    </div>
-                </div>
-                <div className="col-lg-11">
-                    {children}
                 </div>
             </div>
-            <Modal show={showModal} onHide={handleCloseModal} centered className='custom-user-modal'>
-                <Modal.Header closeButton>
-                    <Modal.Title className="text-center w-100">Account Details</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form onSubmit={handleSubmit} className="p-3">
-                        <Row>
-                            <Col md={12}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Username</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="account_username"
-                                        value={formData.account_username}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-
-                            <Col md={12}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Email</Form.Label>
-                                    <Form.Control
-                                        type="email"
-                                        name="account_email"
-                                        value={formData.account_email}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-
-                            <Col md={12}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Password</Form.Label>
-                                    <Form.Control
-                                        type="password"
-                                        name="account_password"
-                                        value={formData.account_password}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-
-                            <Col md={12}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Profile Picture</Form.Label>
-                                    <Form.Control
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleFilePreview}
-                                    />
-                                    {previewImage && (
-                                        <img src={previewImage} alt="Preview" className="mt-2" style={{ width: '30%', height: 'auto', display: 'block', margin: '0 auto' }} />
-                                    )}
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                        <div className="d-flex justify-content-center">
-                            <Button type="button" className="btn btn-secondary me-2" onClick={handleCloseModal}>Close</Button>
-                            <Button type="submit" className="btn btn-primary">Save Changes</Button>
-                        </div>
-                    </Form>
-                </Modal.Body>
-            </Modal>
-
-            <Modal show={showLogoutModal} onHide={() => setShowLogoutModal(false)} centered size="sm" className='custom-modal'>
-                <Modal.Header closeButton>
-                    <Modal.Title>Confirm Logout</Modal.Title>
-                </Modal.Header>
-                <Modal.Body style={{maxHeight: '200px'}}>
-                    <h5>Are you sure you want to log out?</h5>
-                    <p>Changes may not be saved.</p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowLogoutModal(false)}>
-                        Cancel
-                    </Button>
-                    <Button variant="danger" onClick={confirmLogout}>
-                        Logout
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </MainLayout>
+        </div>
     );
 }
 

@@ -256,11 +256,6 @@ input[type='number'] {
     font-weight: bold;
 }
 
-.sidebar {
-    transition: transform 0.3s ease;
-    position: relative;
-}
-
 .nav {
     display: flex;
     flex-direction: column;

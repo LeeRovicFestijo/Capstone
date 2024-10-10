@@ -1,80 +1,70 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ToastContainer, toast, Flip } from 'react-toastify';
-import { TextField, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { Button, Dropdown } from 'react-bootstrap';
+import { toast, Flip } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
-import 'react-toastify/dist/ReactToastify.css';
-import "../components/main-layout-style.css";
+import { Button, Dropdown } from 'react-bootstrap';
+import { TextField, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import "../components/header-style.css";
-import SidebarPOS from '../components/SidebarPOS';
-import { usePOS } from '../api/POSProvider';
+import "../components/main-layout.css";
+import { useInventory } from '../api/InventoryProvider';
+import Sidebar from '../Sidebar';
 
 function MainLayout({children}) {
-    const { persistedUser, setPersistedUser, logout } = usePOS();
+    const { persistedAdmin, setPersistedAdmin  } = useInventory();
     const [showProfileModal, setShowProfileModal] = useState(false);
-    const [openChangePasswordModal, setOpenChangePasswordModal] = useState(false);
     const [openProfileDetailsModal, setOpenProfileDetailsModal] = useState(false);
+    const [openChangePasswordModal, setOpenChangePasswordModal] = useState(false);
     const navigate = useNavigate();
 
-    const toastOptions = {
-      position: "top-right",
-      autoClose: 1000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Flip,
-    };
+    const [adminDetails, setAdminDetails] = useState({
+        account_username: persistedAdmin?.account_username || '',
+        account_email: persistedAdmin?.account_email || '',
+        account_profile: persistedAdmin?.account_profile || null,
+      });
+  
 
-    const fetchUser = async () => {
-      const account_id = persistedUser.account_id;
-      try {
-          const response = await axios.get(`http://localhost:5001/api/user_profile?account_id=${account_id}`);
-          if (response.status === 200) {
-              setPersistedUser(response.data);
-              return response.data;
-          }
-      } catch (error) {
-          console.error('Error fetching admin:', error);
-      }
-    };
-
-    useEffect(() => {
-        fetchUser();
-    }, []);
-
-    useEffect(() => {
-        if (persistedUser) {
-            setUserDetails({
-                account_username: persistedUser.account_username,
-                account_email: persistedUser.account_email,
-                account_profile: persistedUser.account_profile,
-            });
-        }
-    }, [persistedUser]);
-
-    const [userDetails, setUserDetails] = useState({
-      account_username: persistedUser?.account_username || '',
-      account_email: persistedUser?.account_email || '',
-      account_profile: persistedUser?.account_profile || null,
-    });
-
-    const [userPassword, setUserPassword] = useState({
+    const [adminPassword, setAdminPassword] = useState({
         old_password: '',
         new_password: '',
         confirm_password: '',
     });
 
+    const toastOptions = {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Flip,
+    };
+
     useEffect(() => {
-        if (!persistedUser) {
+        if (!persistedAdmin) {
             navigate('/');
         }
-    }, [persistedUser, navigate]);
+    }, [persistedAdmin, navigate]);
+
+    const fetchAdmin = async () => {
+        const account_id = persistedAdmin.account_id;
+        try {
+            const response = await axios.get(`http://localhost:5001/api/admin_profile?account_id=${account_id}`);
+            if (response.status === 200) {
+                setPersistedAdmin(response.data);
+                return response.data;
+            }
+        } catch (error) {
+            console.error('Error fetching admin:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchAdmin();
+    }, []);
 
     const handleOpenProfileModal = () => {
         setShowProfileModal(true);
@@ -85,7 +75,7 @@ function MainLayout({children}) {
     };
 
     const handleOpenPasswordModal = () => {
-        setUserPassword({
+        setAdminPassword({
             old_password: '',
             new_password: '',
             confirm_password: '',
@@ -98,12 +88,12 @@ function MainLayout({children}) {
     };
 
     const handleOpenProfileDetailsModal = () => {
-      setUserDetails({
-          account_username: persistedUser.account_username,
-          account_email: persistedUser.account_email,
-          account_profile: persistedUser.account_profile,
-      });
-      setOpenProfileDetailsModal(true);
+        setAdminDetails({
+            account_username: persistedAdmin.account_username,
+            account_email: persistedAdmin.account_email,
+            account_profile: persistedAdmin.account_profile,
+        });
+        setOpenProfileDetailsModal(true);
     };
 
     const handleCloseProfileDetailsModal = () => {
@@ -112,14 +102,14 @@ function MainLayout({children}) {
 
     const handleInputPasswordChange = (e) => {
         const { name, value } = e.target;
-        setUserPassword({ ...userPassword, [name]: value });
+        setAdminPassword({ ...adminPassword, [name]: value });
     };
 
     const handleProfileChange = (event) => {
         const file = event.target.files[0];
         if (file) {
             const imageUrl = URL.createObjectURL(file); 
-            setUserDetails((prevDetails) => ({
+            setAdminDetails((prevDetails) => ({
                 ...prevDetails,
                 account_profile: imageUrl 
             }));
@@ -127,14 +117,55 @@ function MainLayout({children}) {
     };
 
     const handleInputChange = (e) => {
-      const { name, value } = e.target;
-      setUserDetails({ ...userDetails, [name]: value });
+        const { name, value } = e.target;
+        setAdminDetails({ ...adminDetails, [name]: value });
     };
 
+    const handleSaveChanges = async () => {
+        const { account_username, account_email } = adminDetails;
+        const account_id = persistedAdmin.account_id;
+        const employee_id = persistedAdmin.employee_id;
+        const errors = [];
+  
+        if (!account_username || !account_email) {
+            errors.push("All fields are required.");
+        }
+  
+        if (errors.length > 0) {
+            // Handle errors (you can show these errors in the UI if needed)
+            console.error(errors);
+            return;
+        }
+  
+        try {
+            const formDataToSend = new FormData();
+            formDataToSend.append('account_id', account_id);
+            formDataToSend.append('employee_id', employee_id);
+            formDataToSend.append('account_username', account_username);
+            formDataToSend.append('account_email', account_email);
+  
+            if (adminDetails.account_profile) {
+                formDataToSend.append('account_profile', adminDetails.account_profile);
+            }
+  
+            const response = await axios.post('http://localhost:5001/api/update-admin-account', formDataToSend, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+  
+            if (response.status === 200) {
+                toast.success('Account updated successfully!', toastOptions);
+                handleCloseProfileDetailsModal();
+            }
+        } catch (error) {
+            console.error('Error updating account:', error);
+        }
+    };
 
     const handleSavePassword = async () => {
-        const { old_password, new_password, confirm_password } = userPassword;
-        const account_id = persistedUser.account_id;
+        const { old_password, new_password, confirm_password } = adminPassword;
+        const account_id = persistedAdmin.account_id;
         const errors = [];
 
         if (!old_password || !new_password || !confirm_password) {
@@ -157,7 +188,7 @@ function MainLayout({children}) {
             formDataToSend.append('new_password', new_password);
             formDataToSend.append('confirm_password', confirm_password);
 
-            const response = await axios.post('http://localhost:5001/api/change-user-password', formDataToSend, {
+            const response = await axios.post('http://localhost:5001/api/change-admin-password', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -172,55 +203,14 @@ function MainLayout({children}) {
         }
     };
 
-    const handleSaveChanges = async () => {
-      const { account_username, account_email } = userDetails;
-      const account_id = persistedUser.account_id;
-      const employee_id = persistedUser.employee_id;
-      const errors = [];
-
-      if (!account_username || !account_email) {
-          errors.push("All fields are required.");
-      }
-
-      if (errors.length > 0) {
-          // Handle errors (you can show these errors in the UI if needed)
-          console.error(errors);
-          return;
-      }
-
-      try {
-          const formDataToSend = new FormData();
-          formDataToSend.append('account_id', account_id);
-          formDataToSend.append('employee_id', employee_id);
-          formDataToSend.append('account_username', account_username);
-          formDataToSend.append('account_email', account_email);
-
-          if (userDetails.account_profile) {
-              formDataToSend.append('account_profile', userDetails.account_profile);
-          }
-
-          const response = await axios.post('http://localhost:5001/api/update-user-account', formDataToSend, {
-              headers: {
-                  'Content-Type': 'multipart/form-data'
-              }
-          });
-
-          if (response.status === 200) {
-              toast.success('Account updated successfully!', toastOptions);
-              fetchUser();
-              handleCloseProfileDetailsModal();
-          }
-      } catch (error) {
-          console.error('Error updating account:', error);
-      }
-    };
 
     const handleLogoutClick = () => {
-        logout();
+        setPersistedAdmin('')
+        navigate('/');
     }
 
   return (
-    <div className='layout'>
+   <div className='layout'>
         <header>
             <div className='web-header'>
                 <div className='row'>
@@ -232,12 +222,12 @@ function MainLayout({children}) {
 
                         <Dropdown className='custom-dropdown'>
                             <Dropdown.Toggle variant="light" className="profile-dropdown d-flex align-items-center" id="dropdown-basic">
-                                {persistedUser.account_profile ? (
-                                    <img src={persistedUser.account_profile} alt="user avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                                {persistedAdmin.account_profile ? (
+                                    <img src={persistedAdmin.account_profile} alt="user avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
                                 ) : (
                                     <FontAwesomeIcon icon={faUserCircle} style={{ fontSize: '2rem', color: '#aaa' }} />
                                 )}
-                                <span className="ms-2">{persistedUser.account_username}</span>
+                                <span className="ms-2">{persistedAdmin.account_username}</span>
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu className='custom-dropdown-menu'>
@@ -252,17 +242,17 @@ function MainLayout({children}) {
                             <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>User Profile</DialogTitle>
                             <DialogContent>
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-                                    {persistedUser.account_profile ? (
-                                        <img src={persistedUser.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} className='mt-2 mb-1'/>
+                                    {persistedAdmin.account_profile ? (
+                                        <img src={persistedAdmin.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} className='mt-2 mb-1'/>
                                     ) : (
                                         <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
                                     )}
                                     <p><strong>Username:</strong></p>
-                                    <p>{persistedUser.account_username}</p>
+                                    <p>{persistedAdmin.account_username}</p>
                                     <p><strong>Email:</strong></p>
-                                    <p>{persistedUser.account_email}</p>
+                                    <p>{persistedAdmin.account_email}</p>
                                     <p><strong>Role:</strong></p>
-                                    <p>{persistedUser.account_role}</p>
+                                    <p>{persistedAdmin.account_role}</p>
                                 </div>
                             </DialogContent>
                             <DialogActions>
@@ -276,8 +266,8 @@ function MainLayout({children}) {
                           <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>Change Account Details</DialogTitle>
                           <DialogContent>
                               <div style={{ textAlign: 'center' }}>
-                              {userDetails.account_profile ? (
-                                  <img src={userDetails.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+                              {adminDetails.account_profile ? (
+                                  <img src={adminDetails.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
                               ) : (
                                   <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
                               )}
@@ -308,7 +298,7 @@ function MainLayout({children}) {
                               type="text"
                               fullWidth
                               name="account_username"
-                              value={userDetails.account_username}
+                              value={adminDetails.account_username}
                               onChange={handleInputChange}
                               />
                               <TextField
@@ -317,7 +307,7 @@ function MainLayout({children}) {
                               type="email"
                               fullWidth
                               name="account_email"
-                              value={userDetails.account_email}
+                              value={adminDetails.account_email}
                               onChange={handleInputChange}
                               />
                           </DialogContent>
@@ -335,8 +325,8 @@ function MainLayout({children}) {
                             <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>Change Password</DialogTitle>
                             <DialogContent>
                                 <div style={{ textAlign: 'center' }}>
-                                {persistedUser.account_profile ? (
-                                    <img src={persistedUser.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+                                {persistedAdmin.account_profile ? (
+                                    <img src={persistedAdmin.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
                                 ) : (
                                     <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
                                 )}
@@ -347,7 +337,7 @@ function MainLayout({children}) {
                                 type="text"
                                 fullWidth
                                 name="old_password"
-                                value={userPassword.old_password}
+                                value={adminPassword.old_password}
                                 onChange={handleInputPasswordChange}
                                 />
                                 <TextField
@@ -356,7 +346,7 @@ function MainLayout({children}) {
                                 type="password"
                                 fullWidth
                                 name="new_password"
-                                value={userPassword.new_password}
+                                value={adminPassword.new_password}
                                 onChange={handleInputPasswordChange}
                                 />
                                 <TextField
@@ -365,7 +355,7 @@ function MainLayout({children}) {
                                 type="password"
                                 fullWidth
                                 name="confirm_password"
-                                value={userPassword.confirm_password}
+                                value={adminPassword.confirm_password}
                                 onChange={handleInputPasswordChange}
                                 />
                             </DialogContent>
@@ -385,25 +375,12 @@ function MainLayout({children}) {
 
         <div className="layout-container-header">
             <aside className="sidebar">
-                <SidebarPOS />
+                <Sidebar />
             </aside>
             
             <main className="layout-content">
                 {children}
             </main>
-            <ToastContainer
-                position="top-right"
-                autoClose={1000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-                transition={Flip}
-            />
         </div>
    </div>
   )

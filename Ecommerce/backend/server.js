@@ -299,14 +299,28 @@ app.post('/api/e-orders', async (req, res) => {
     const { customer_id, cart, total_amount, order_delivery, payment_mode, account_id, shipping_address } = req.body;
   
     try {
+        const itemsOutOfStock = [];
+
         // Check inventory stock
         for (let item of cart) {
-            const { item_id, order_quantity } = item;
+            const { item_id, order_quantity, item_description } = item;
             const stockCheck = await pool.query('SELECT quality_stocks FROM inventory WHERE item_id = $1', [item_id]);
-  
+
             if (stockCheck.rows[0].quality_stocks < order_quantity) {
-                return res.status(400).json({ message: `Not enough stock for item: ${item_description}` });
+                // Add item to the itemsOutOfStock array with relevant details
+                itemsOutOfStock.push({
+                    item_description: item_description,
+                    requested_quantity: order_quantity,
+                    available_quantity: stockCheck.rows[0].quality_stocks
+                });
             }
+        }
+
+        if (itemsOutOfStock.length > 0) {
+            return res.status(400).json({
+                message: 'Some items do not have enough stock',
+                items_out_of_stock: itemsOutOfStock
+            });
         }
   
         // Insert into Orders table
@@ -344,6 +358,65 @@ app.post('/api/e-orders', async (req, res) => {
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.get('/api/order-history-customer', async (req, res) => {
+    const { customer_id } = req.query;
+    try {
+        // SQL query to retrieve order history with shipment status
+        const query = `
+            SELECT 
+            o.order_id, 
+            o.order_date, 
+            o.total_amount, 
+            s.shipping_status
+            FROM 
+            orders o
+            JOIN 
+            shipment s ON o.order_id = s.order_id
+            WHERE 
+            o.customer_id = $1
+            ORDER BY o.order_date DESC;
+        `;
+        
+        // Execute the query
+        const result = await pool.query(query, [customer_id]);
+
+        // Send back the order history data as JSON
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching order history:', error);
+        res.status(500).json({ error: 'An error occurred while fetching order history' });
+    }
+});
+  
+app.get('/api/order-details-customer', async (req, res) => {
+    const { order_id } = req.query;
+  
+    const query = `
+      SELECT 
+        t.order_id, 
+        t.item_id, 
+        t.order_quantity, 
+        i.item_description, 
+        i.unit_price, 
+        i.unit_measurement, 
+        (t.order_quantity * i.unit_price) AS total_amount
+      FROM 
+        transactions t
+      JOIN 
+        inventory i ON t.item_id = i.item_id
+      JOIN 
+        orders o ON t.order_id = o.order_id
+      WHERE t.order_id = $1
+    `;
+  
+    try {
+      const result = await pool.query(query, [order_id]);
+      res.status(200).json(result.rows);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching order details', error: error.message });
     }
 });
 

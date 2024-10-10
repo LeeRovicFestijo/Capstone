@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useEcommerce } from "../Api/EcommerceApi";
+import "../style/login-signup-style.css";
 
 function LoginPage() {
   const [email, setEmail] = useState(''); 
@@ -27,7 +28,6 @@ function LoginPage() {
 
         if (response.status === 200) {
           const customer = response.data.customer;
-          console.log(customer);
           setPersistedCustomer(customer);
           navigate('/main', { replace: true });
         }
@@ -49,7 +49,7 @@ function LoginPage() {
           <div className="col-md-6 text-white d-flex justify-content-center align-items-center flex-column p-4" style={{backgroundColor: '#1B305B'}}>
             <h1 className="mb-4">SIG BUILDERS</h1>
             <h2 className="mb-4">CONSTRUCTION SUPPLY</h2>
-            <p>&copy; All rights reserved 1976.</p>
+            <p>&copy; All rights reserved 2001.</p>
           </div>
           <div className="col-md-6 bg-light p-4 d-flex flex-column justify-content-center">
             <h1 className="mb-4">WELCOME!</h1>

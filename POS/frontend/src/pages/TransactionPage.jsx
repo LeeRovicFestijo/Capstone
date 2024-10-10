@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from "axios";
-import SidebarPOS from '../components/SidebarPOS';
 import { toast, Flip } from 'react-toastify';
 import ReactDatePicker from "react-datepicker";
 import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, Button, TablePagination, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import "react-datepicker/dist/react-datepicker.css";
 import '../components/transaction-style.css'; 
+import MainLayout from '../layout/MainLayout';
 
 function TransactionPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -117,21 +117,21 @@ function TransactionPage() {
   // Handle sort option click
   const handleSortOptionClick = (option) => {
     if (["Cash", "GCash", "PayMaya", "Card"].includes(option)) {
-      setSelectedPayment(option); // Set selected payment filter
+      setSelectedPayment(option); 
     } else {
-      setSortOrder(option); // If it's not a payment option, handle sorting
+      setSortOrder(option);
     }
-    setAnchorEl(null); // Close the dropdown
+    setAnchorEl(null); 
   };
 
   const handleCloseDropdown = () => {
-    setAnchorEl(null); // Close the dropdown when clicking outside
+    setAnchorEl(null); 
   };
 
   return (
-    <SidebarPOS>
-      <div className='row' style={{ height: '97vh' }}>
-        <div className="bg-light p-3 border border-gray rounded-right">
+    <MainLayout>
+      <div className='row'>
+        <div className="p-3">
           <header className="order-page-header d-flex justify-content-between">
             <div className='header-filter'>
               <input 
@@ -161,28 +161,33 @@ function TransactionPage() {
             ) : (
               <div className='row'>
                 <div className="order-history">
-                  <Paper>
+                  <Paper sx={{ maxWidth: '100%', overflowX: 'auto' }}>
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>Order ID</TableCell>
-                          <TableCell>Customer Name</TableCell>
-                          <TableCell>Date</TableCell>
-                          <TableCell>Total Amount</TableCell>
-                          <TableCell>Ship</TableCell>
-                          <TableCell>Payment</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Order ID</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Customer Name</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Date</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Total Amount</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Ship</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Payment</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
                         {filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
                           <TableRow key={order.order_id} style={{cursor:'pointer'}} onClick={() => handleOrderDetails(order.order_id)}>
-                            <TableCell>{order.order_id}</TableCell>
-                            <TableCell>{order.customer_name}</TableCell>
-                            <TableCell>{formatDate(order.order_date)}</TableCell>
-                            <TableCell>{order.total_amount}</TableCell>
-                            <TableCell>{order.order_deliver}</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.order_id}</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.customer_name}</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{formatDate(order.order_date)}</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.total_amount}</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.order_deliver}</TableCell>
                             <TableCell>
-                              <Button variant="outlined" style={{ borderColor: getButtonColor(order.payment_mode) }}>
+                              <Button 
+                                variant="outlined" 
+                                style={{ 
+                                  borderColor: getButtonColor(order.payment_mode), 
+                                  fontFamily: 'Poppins, sans-serif' 
+                                }}>
                                 {order.payment_mode}
                               </Button>
                             </TableCell>
@@ -192,7 +197,7 @@ function TransactionPage() {
                     </Table>
                   </Paper>
                   <TablePagination
-                    rowsPerPageOptions={[5, 10]}
+                    rowsPerPageOptions={[5, 10, 25]}
                     component="div"
                     count={filteredOrders.length}
                     rowsPerPage={rowsPerPage}
@@ -233,21 +238,21 @@ function TransactionPage() {
                   <Table>
                     <TableHead>
                       <TableRow>
-                        <TableCell>Product Name</TableCell>
-                        <TableCell>Quantity</TableCell>
-                        <TableCell>Measurement</TableCell>
-                        <TableCell>Price</TableCell>
-                        <TableCell>Total Price</TableCell>
+                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Product Name</TableCell>
+                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Quantity</TableCell>
+                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Measurement</TableCell>
+                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Price</TableCell>
+                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Total Price</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {orderDetails.map((product, index) => ( // Loop through the array of products
                         <TableRow key={index}>
-                          <TableCell>{product.item_description}</TableCell>
-                          <TableCell>{product.order_quantity}</TableCell>
-                          <TableCell>{product.unit_measurement}</TableCell>
-                          <TableCell>{product.unit_price}</TableCell>
-                          <TableCell>{product.total_amount}</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.item_description}</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.order_quantity}</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.unit_measurement}</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.unit_price}</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.total_amount}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -263,7 +268,7 @@ function TransactionPage() {
           </Dialog>
         </div>
       </div>
-    </SidebarPOS>
+    </MainLayout>
   );
 }
 

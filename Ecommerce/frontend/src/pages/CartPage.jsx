@@ -67,14 +67,27 @@ function CartPage() {
         try {
             const response = await axios.post('http://localhost:5001/api/e-orders', orderData);
             if (response.status === 200) {
-                setCart([]);
+                setCart([]); 
                 closePopup(); 
-            } else {
-                alert(response.data.message);
-            }
+            } 
+            
         } catch (error) {
             if (error.response) {
-                alert(error.response.data.message);
+                if (error.response.data.items_out_of_stock && error.response.data.items_out_of_stock.length > 0) {
+                toast.error(
+                    <div>
+                        <p>The following items do not have sufficient stock:</p>
+                        {error.response.data.items_out_of_stock.map((item, index) => (
+                            <p key={index}>
+                                <strong>{item.item_description}</strong> (requested: {item.requested_quantity}, available: {item.available_quantity})
+                            </p>
+                        ))}
+                    </div>, 
+                    toastOptions
+                );
+                } else {
+                    toast.error('Some items have insufficient stocks.')
+                }
             } else {
                 alert('Failed to create order. Please try again.');
             }
@@ -97,8 +110,6 @@ function CartPage() {
     const updateQuantity = (productId, newQuantity) => {
         const newCart = cart.map(cartItem => {
             if (cartItem.item_id === productId) {
-                const newTotalAmount = cartItem.unit_price * newQuantity;
-                console.log(`Updated Total Amount: ${newTotalAmount}`);
                 return {
                     ...cartItem,
                     quantity: newQuantity,
@@ -131,9 +142,9 @@ function CartPage() {
     <MainLayout>
         <section className="cart-items">
             <div>
-                <h2>Your Cart</h2>
-                <hr />
+                <h2 style={{ fontWeight: 'bold' }}>Your Cart</h2>
             </div>
+            <hr />
             <div className="containercart d_flex">
                 <div className="cart-details">
                 {cart.length === 0 ? (
@@ -150,10 +161,11 @@ function CartPage() {
                         </div>
                         <div className="cart-info">
                         <h3>{item.item_description}</h3>
+                        <div className="mb-1">Available Quantity: {item.quality_stocks}</div>
                             <div className="cart-items-function">
                                 <div className="cartControl d_flex">
                                     <button 
-                                        className="desCart"
+                                        className="qty-btn"
                                         onClick={() => updateQuantity(item.item_id, item.quantity - 1)}
                                         disabled={item.quantity <= 1 || isNaN(item.quantity)}
                                     >
@@ -161,7 +173,7 @@ function CartPage() {
                                     </button>
                                     <span className="item-qty">{item.quantity}</span>
                                     <button 
-                                        className="incCart"
+                                        className="qty-btn"
                                         onClick={() => {
                                             const newQuantity = isNaN(item.quantity) ? 1 : item.quantity + 1;
                                             updateQuantity(item.item_id, newQuantity);
@@ -170,7 +182,7 @@ function CartPage() {
                                         <i className="fa fa-add"></i>
                                     </button>
                                 </div>
-                                <div className="price">₱{(item.totalAmount).toFixed(2)}</div>
+                                <div className="price mt-1"><strong>₱{(item.totalAmount).toFixed(2)}</strong></div>
                             </div>
                         </div>
                         <button 

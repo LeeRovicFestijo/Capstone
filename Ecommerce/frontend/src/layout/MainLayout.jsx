@@ -104,7 +104,6 @@ function MainLayout({children}) {
     };
 
     const handleOpenProfileModal = () => {
-        console.log(persistedCustomer);
         setOpenProfileModal(true);
     };
 
@@ -245,7 +244,7 @@ function MainLayout({children}) {
             formDataToSend.append('new_password', new_password);
             formDataToSend.append('confirm_password', confirm_password);
 
-            const response = await axios.post('http://localhost:5001/api/change-customer-password', formDataToSend, {
+            const response = await axios.post('http://localhost:5001/api/change-admin-password', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -352,6 +351,11 @@ function MainLayout({children}) {
                     <div className="cart">
                         <Link to="/cart" aria-label="Shopping Cart">
                             <i className="fa fa-shopping-bag icon-circle"></i>
+                        </Link>
+                    </div>
+                    <div className="order-history">
+                        <Link to="/order-history" aria-label="History">
+                            <i className="fa fa-history icon-circle"></i>
                         </Link>
                     </div>
                     <i

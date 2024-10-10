@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import "../style/login-signup-style.css";
 
 function SignupPage() {
   const [fullName, setFullName] = useState('');
@@ -18,25 +19,30 @@ function SignupPage() {
     e.preventDefault();
 
     if (isFormValid) {
-      try {
-        const response = await axios.post('http://localhost:5001/api/signup', {
-          fullName,
-          address,
-          number,
-          email,
-          password,
-        });
-
-        if (response.status === 201) {
-          setSuccessMessage('Signup successful! Redirecting to login...');
-          setTimeout(() => {
-            navigate('/');
-          }, 2000);
-        } else if (response.status === 400) {
-            setSuccessMessage('Email already in use!');
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (email && !emailPattern.test(email)) {
+        setErrorMessage('Please provide a proper email address!');
+      } else {
+        try {
+          const response = await axios.post('http://localhost:5001/api/signup', {
+            fullName,
+            address,
+            number,
+            email,
+            password,
+          });
+  
+          if (response.status === 201) {
+            setSuccessMessage('Signup successful! Redirecting to login...');
+            setTimeout(() => {
+              navigate('/');
+            }, 2000);
+          } else if (response.status === 400) {
+              setErrorMessage('Email already in use!');
+          }
+        } catch (error) {
+          setErrorMessage(error.response?.data?.message || 'Signup failed. Please try again.');
         }
-      } catch (error) {
-        setErrorMessage(error.response?.data?.message || 'Signup failed. Please try again.');
       }
     }
   };
@@ -48,7 +54,7 @@ function SignupPage() {
           <div className="col-md-6 text-white d-flex justify-content-center align-items-center flex-column p-4" style={{backgroundColor: '#1B305B'}}>
             <h1 className="mb-4">SIG BUILDERS</h1>
             <h2 className="mb-4">CONSTRUCTION SUPPLY</h2>
-            <p>&copy; All rights reserved 1976.</p>
+            <p>&copy; All rights reserved 2001.</p>
           </div>
           <div className="col-md-6 bg-light p-4 d-flex flex-column justify-content-center">
             <h1 className="mb-4">Sign Up</h1>

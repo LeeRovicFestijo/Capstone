@@ -9,7 +9,6 @@ import POSPage from './pages/POSPage';
 import CustomerPage from './pages/CustomerPage';
 import TransactionPage from './pages/TransactionPage';
 import { POSProvider } from './api/POSProvider';
-import Shipment from './pages/Shipment';
 
 function App() {
   return (
@@ -20,7 +19,6 @@ function App() {
           <Route path="/pos" element={<POSPage/>} />
           <Route path="/customers" element={<CustomerPage/>} />
           <Route path="/transactions" element={<TransactionPage/>} />
-          <Route path="/shipment" element={<Shipment/>} />
         </Routes>
       </Router>
     </POSProvider>

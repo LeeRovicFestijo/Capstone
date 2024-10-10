@@ -68,8 +68,8 @@ app.get('/api/user_profile', async (req, res) => {
   }
 });
 
-app.post('/api/update-account', upload.single('account_profile'), async (req, res) => {
-  const { account_id, employee_id, account_username, account_email, account_password } = req.body;
+app.post('/api/update-user-account', upload.single('account_profile'), async (req, res) => {
+  const { account_id, employee_id, account_username, account_email } = req.body;
   const account_profile = req.file ? req.file.buffer : null;
 
   if (req.file && req.file.mimetype.startsWith('image/') || !req.file) {
@@ -78,18 +78,17 @@ app.post('/api/update-account', upload.single('account_profile'), async (req, re
           const updates = [
               account_username, 
               account_email, 
-              account_password,
-              account_id
           ];
-          let query = 'UPDATE employee_account SET account_username = $1, account_email = $2, account_password = $3';
+          let query = 'UPDATE employee_account SET account_username = $1, account_email = $2';
           
           // Only add account_profile to the query if it exists
           if (account_profile) {
-              query += ', account_profile = $4';
-              updates.splice(3, 0, account_profile); // Insert account_profile into the array
+              query += ', account_profile = $3';
+              updates.push(account_profile); // Insert account_profile into the array
           }
 
-          query += ' WHERE account_id = $' + (updates.length) + ' RETURNING *';
+          query += ` WHERE account_id = $${updates.length + 1} RETURNING *;`;
+          updates.push(account_id);
 
           const accountUpdateResult = await pool.query(query, updates);
 
@@ -108,6 +107,49 @@ app.post('/api/update-account', upload.single('account_profile'), async (req, re
       }
   } else {
       return res.status(400).json({ message: 'Invalid file type. Only images are allowed.' });
+  }
+});
+
+app.post('/api/change-user-password', upload.none(), async (req, res) => {
+  const { account_id, old_password, new_password, confirm_password } = req.body;
+
+  // Validate input
+  if (!account_id || !old_password || !new_password || !confirm_password) {
+      return res.status(400).json({ message: 'All fields are required.' });
+  }
+
+  if (new_password !== confirm_password) {
+      return res.status(400).json({ message: 'New and confirm password do not match.' });
+  }
+
+  try {
+      // Fetch the current password from the database
+      const result = await pool.query(
+          'SELECT account_password FROM employee_account WHERE account_id = $1',
+          [account_id]
+      );
+
+      if (result.rows.length === 0) {
+          return res.status(404).json({ message: 'Admin not found.' });
+      }
+
+      const account = result.rows[0];
+
+      // Compare old password with the stored hash
+      if (old_password !== account.account_password) {
+        return res.status(401).json({ message: 'Old password is incorrect.' });
+      } 
+
+      // Update the password in the database
+      await pool.query(
+          'UPDATE employee_account SET account_password = $1 WHERE account_id = $2',
+          [new_password, account_id]
+      );
+
+      res.status(200).json({ message: 'Password changed successfully!' });
+  } catch (error) {
+      console.error('Error changing password:', error);
+      res.status(500).json({ message: 'Error changing password', error: error.message });
   }
 });
 
@@ -142,9 +184,21 @@ app.get('/api/products', async (req, res) => {
 
 app.get('/api/customer', async (req, res) => {
   try {
-      const result = await pool.query('SELECT * FROM customer');
-      console.log('Fetched customers:', result.rows);
-      res.status(200).json(result.rows);
+      // Use LEFT JOIN to get all customers, even those without an account
+      const result = await pool.query(`SELECT * FROM customer`);
+      
+      // Map through the customers and convert any binary profile image to base64
+      const customers = result.rows.map(customer => {
+          if (customer.customer_profile) {
+              // Convert Buffer to base64 string
+              const base64Image = customer.customer_profile.toString('base64');
+              // Attach the base64 image string to the item object with proper MIME type
+              customer.customer_profile = `data:image/jpeg;base64,${base64Image}`; // Adjust MIME type if necessary
+          }
+          return customer;
+      });
+
+      res.status(200).json(customers);
   } catch (error) {
       res.status(500).json({ message: 'Error fetching customers', error: error.message });
   }
@@ -152,12 +206,24 @@ app.get('/api/customer', async (req, res) => {
 
 app.delete('/api/customer/:id', async (req, res) => {
   const { id } = req.params;
+  
+  const client = await pool.connect();
   try {
-    await pool.query('DELETE FROM customer WHERE customer_id = $1', [id]);
+    await client.query('BEGIN');
+    
+    const account = await client.query('DELETE FROM customer_account WHERE customer_id = $1', [id]);
+    
+    const customer = await client.query('DELETE FROM customer WHERE customer_id = $1', [id]);
+    
+    await client.query('COMMIT');
+    
     res.status(200).send('Customer deleted successfully');
   } catch (err) {
+    await client.query('ROLLBACK'); 
     console.error(err);
     res.status(500).send('Error deleting customer');
+  } finally {
+    client.release(); 
   }
 });
 
@@ -206,10 +272,8 @@ app.put('/api/customer/:id', async (req, res) => {
 });
 
 // Endpoint to add a new customer
-app.post('/api/customer', async (req, res) => {
+app.post('/api/add-customer', async (req, res) => {
   const { customer_name, customer_number, customer_email, customer_address, customer_date } = req.body;
-  console.log('Received credentials adding:', req.body);
-  console.log('Received credentials adding:', customer_name);
 
   try {
       // Check if the email already exists
@@ -239,7 +303,6 @@ app.post('/api/customer', async (req, res) => {
 
 app.post('/api/orders', async (req, res) => {
   const { customer_id, cart, total_amount, order_delivery, payment_mode, account_id, shipping_address } = req.body;
-  console.log('Received credentials payment:', req.body);
 
   try {
       // Check inventory stock

@@ -6,8 +6,8 @@ import { usePOS } from '../api/POSProvider';
 import '../components/pos-style.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUndo, faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import SidebarPOS from '../components/SidebarPOS'; 
 import ProceedModal from '../components/ProceedModal';
+import MainLayout from '../layout/MainLayout';
 
 function POSPage() {
 
@@ -191,9 +191,9 @@ function POSPage() {
 
     return (
         <>
-            <SidebarPOS>
-                <div className='row' style={{ height: '97vh' }}>
-                    <div className="col-lg-8 bg-light p-3 border border-gray">
+            <MainLayout>
+                <div className='row'>
+                    <div className="col-lg-8 p-3">
                         <input
                             type="text"
                             className="form-control mb-3" style={{ height: '48px' }}
@@ -238,14 +238,14 @@ function POSPage() {
                             )}
                         </div>
                     </div>
-                    <div className="col-lg-4 border border-gray rounded-right p-3 d-flex flex-column">
+                    <div className="col-lg-4 border border-gray p-3 d-flex flex-column">
                         <div className='col-lg-12'>
                             <div className="d-flex justify-content-between">
                                 {selectedCustomer ? (
                                         <div className="customer-profile d-flex align-items-center" onClick={handleRemoveCustomer}>
-                                        {selectedCustomer.profilePicture ? (
+                                        {selectedCustomer.customer_profile ? (
                                             <img 
-                                                src={selectedCustomer.profilePicture} 
+                                                src={selectedCustomer.customer_profile} 
                                                 alt="Customer" 
                                                 style={{ width: '35px', height: '35px', borderRadius: '50%', objectFit: 'cover' }}
                                             />
@@ -359,7 +359,7 @@ function POSPage() {
                         </div>
                     </div>
                 </div>
-            </SidebarPOS>
+            </MainLayout>
 
             <ProceedModal
                 isOpen={isProceedModalOpen}

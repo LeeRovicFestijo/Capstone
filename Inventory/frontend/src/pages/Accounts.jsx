@@ -2,21 +2,23 @@ import React, { useEffect, useState } from 'react'
 import axios from "axios";
 import { Table, TableBody, TableCell, TableHead, TableRow, Paper, Button, Menu, MenuItem, Dialog, DialogTitle, 
   DialogContent, DialogActions, TextField, Select, FormControl, InputLabel, } from '@mui/material';
+  import { Dropdown } from 'react-bootstrap';
 import '../components/account-style.css'; 
 import { toast, Flip } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import MainLayout from '../layout/MainLayout';
 
 const Accounts = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [accounts, setAccounts] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [rowsPerPage] = useState(9); 
-  const [anchorEl, setAnchorEl] = useState(null); 
+  const [rowsPerPage] = useState(10); 
   const [anchorElFilter, setanchorElFilter] = useState(null); 
   const [currentView, setCurrentView] = useState("Accounts");
   const [filterStatus, setFilterStatus] = useState("All");
   const [sortStatus, setSortStatus] = useState("Oldest");
+  const [filterRole, setFilterRole] = useState("All");
   const [openModal, setOpenModal] = useState(false);
   const [modalType, setModalType] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -72,19 +74,22 @@ const Accounts = () => {
       const isMatchingSearchTerm =
         item.account_username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.employee_name?.toLowerCase().includes(searchTerm.toLowerCase());
-  
+
       const isMatchingStatus =
         filterStatus === "All" ||
         item.account_status === filterStatus ||
         item.employee_status === filterStatus;
-  
-      return isMatchingSearchTerm && isMatchingStatus;
+
+      const isMatchingRole =
+        filterRole === "All" || 
+        item.account_role === filterRole;
+
+      return isMatchingSearchTerm && isMatchingStatus && isMatchingRole;
     });
 
     if (currentView === "Employee") {
       if (sortStatus === "Oldest") {
         const sortedData = filteredData.sort((a, b) => a.employee_id - b.employee_id);
-        console.log("Sorted Oldest:", sortedData);
         return sortedData;
       } else if (sortStatus === "Newest") {
         const sortedData = filteredData.sort((a, b) => b.employee_id - a.employee_id);
@@ -97,19 +102,10 @@ const Accounts = () => {
 
   const filteredData = getFilteredData();
 
-  const handleAccountClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
   const handleSortOptionClick = (option) => {
     setCurrentView(option);
     setFilterStatus("All")
     setSortStatus("Oldest")
-    setAnchorEl(null); // Close the dropdown
-  };
-
-  const handleCloseDropdown = () => {
-    setAnchorEl(null); // Close the dropdown when clicking outside
   };
 
   const handleFilterClick = (event) => {
@@ -117,11 +113,20 @@ const Accounts = () => {
   };
 
   const handleCloseFilter = () => {
-    setanchorElFilter(null); // Close the dropdown when clicking outside
+    setanchorElFilter(null); 
   };
 
   const handleFilterChange = (status) => {
-    setFilterStatus(status); // Set filter status (Active, Inactive, All)
+    if (status === 'All') {
+      setFilterRole('All')
+    }
+    setFilterStatus(status);
+    setanchorElFilter(null); 
+  };
+
+  const handleFilterRole = (role) => {
+    setFilterRole(role);
+    setanchorElFilter(null); 
   };
 
   const handleSortChange = (status) => {
@@ -155,10 +160,10 @@ const Accounts = () => {
     const errors = [];
 
     if (modalType === "Account") {
-      const { account_username, account_email, account_password, account_confirmPassword, account_role, account_status } = formData;
+      const { account_username, account_email, account_role, account_status } = formData;
 
       if (isEditing) {
-        if (!account_username || !account_email || !account_password || !account_confirmPassword || !account_role || !account_status) {
+        if (!account_username || !account_email || !account_role || !account_status) {
           errors.push("All fields are required.");
         }
   
@@ -166,11 +171,6 @@ const Accounts = () => {
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (account_email && !emailPattern.test(account_email)) {
           errors.push("Please enter a valid email address.");
-        }
-  
-        // Password confirmation validation
-        if (account_password !== account_confirmPassword) {
-          errors.push("Passwords do not match.");
         }
   
         // If there are errors, show them
@@ -193,6 +193,8 @@ const Accounts = () => {
         }
       } else {
         // Add new account
+        const { account_username, account_email, account_password, account_confirmPassword, account_role, account_status } = formData;
+
         if (!account_username || !account_email || !account_password || !account_confirmPassword || !account_role || !account_status) {
           errors.push("All fields are required.");
         }
@@ -222,6 +224,16 @@ const Accounts = () => {
             fetchAccounts();
             handleCloseModal();
             toast.success('Account added!', toastOptions)
+          }
+
+          if (response.status === 400) {
+            handleCloseModal();
+            toast.error('Email is already used by another account!', toastOptions);
+          }
+
+          if (response.status === 404) {
+            handleCloseModal();
+            toast.error('Employee not found', toastOptions);
           }
         } catch (error) {
           console.error('Error adding account:', error);
@@ -292,7 +304,7 @@ const Accounts = () => {
   };
 
   const indexOfLastItem = currentPage * rowsPerPage;
-  const indexOfFirstItem = indexOfLastItem - rowsPerPage; // Use 'rowsPerPage' here
+  const indexOfFirstItem = indexOfLastItem - rowsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
@@ -305,8 +317,9 @@ const Accounts = () => {
   };
 
   return (
+    <MainLayout>
       <div className='row'>
-        <div className="p-1">
+        <div className="p-3 mt-1">
           <header className="account-page-header d-flex justify-content-between">
             <div className='header-filter'>
               <input 
@@ -325,7 +338,16 @@ const Accounts = () => {
 
           <div className='account-list'>
             <div className='header-account d-flex justify-content-between'>
-              <button className='btn-primary' onClick={handleAccountClick}>{currentView} <i className='bi bi-chevron-down'></i></button>
+              <Dropdown className='custom-dropdown-account'>
+                  <Dropdown.Toggle variant="light" className="profile-dropdown-account d-flex align-items-center" id="dropdown-basic">
+                      <span>{currentView}</span>
+                  </Dropdown.Toggle>
+
+                  <Dropdown.Menu className='custom-dropdown-menu'>
+                      <Dropdown.Item onClick={() => handleSortOptionClick("Accounts")}>Accounts</Dropdown.Item>
+                      <Dropdown.Item onClick={() => handleSortOptionClick("Employee")}>Employee</Dropdown.Item>
+                  </Dropdown.Menu>
+              </Dropdown>
               <button className='filter-btn' onClick={handleFilterClick}>
                 <i className='bi bi-funnel'/> Filter
               </button>
@@ -341,20 +363,20 @@ const Accounts = () => {
                         <TableRow>
                           {currentView === "Accounts" ? (
                             <>
-                              <TableCell>Name</TableCell>
-                              <TableCell>Role</TableCell>
-                              <TableCell>Email Address</TableCell>
-                              <TableCell>Status</TableCell>
-                              <TableCell>Action</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Name</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Role</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Email Address</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Status</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Action</TableCell>
                             </>
                           ) : (
                             <>
-                              <TableCell>Name</TableCell>
-                              <TableCell>Age</TableCell>
-                              <TableCell>Address</TableCell>
-                              <TableCell>Phone Number</TableCell>
-                              <TableCell>Email Address</TableCell>
-                              <TableCell>Action</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Name</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Age</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Address</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Phone Number</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Email Address</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Action</TableCell>
                             </>
                           )}
                         </TableRow>
@@ -365,9 +387,9 @@ const Accounts = () => {
                             <TableCell>{item.account_username || item.employee_name}</TableCell>
                             {currentView === "Accounts" ? (
                               <>
-                                <TableCell>{item.account_role}</TableCell>
-                                <TableCell>{item.account_email}</TableCell>
-                                <TableCell>
+                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{item.account_role}</TableCell>
+                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{item.account_email}</TableCell>
+                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>
                                   <Button variant="outlined" color={getButtonColor(item.account_status)}>
                                     {item.account_status}
                                   </Button>
@@ -375,13 +397,13 @@ const Accounts = () => {
                               </>
                             ) : (
                               <>
-                                <TableCell>{item.employee_age}</TableCell>
-                                <TableCell>{item.employee_address}</TableCell>
-                                <TableCell>{item.employee_number}</TableCell>
-                                <TableCell>{item.employee_email}</TableCell>
+                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{item.employee_age}</TableCell>
+                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{item.employee_address}</TableCell>
+                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{item.employee_number}</TableCell>
+                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{item.employee_email}</TableCell>
                               </>
                             )}
-                            <TableCell><button className='btn-primary' onClick={() => handleOpenModal(currentView === "Accounts" ? "Account" : "Employee", item)}>Edit</button></TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}><button className='btn-primary' onClick={() => handleOpenModal(currentView === "Accounts" ? "Account" : "Employee", item)}>Edit</button></TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -433,24 +455,28 @@ const Accounts = () => {
                     onChange={handleInputChange}
                   />
 
-                  <TextField
-                    margin="dense"
-                    name="account_password"
-                    label="Password"
-                    type="password"
-                    fullWidth
-                    value={formData.account_password || ""}
-                    onChange={handleInputChange}
-                  />
-                  <TextField
-                    margin="dense"
-                    name="account_confirmPassword"
-                    label="Confirm Password"
-                    type="password"
-                    fullWidth
-                    value={formData.account_confirmPassword || ""}
-                    onChange={handleInputChange}
-                  />
+                  {!isEditing && (
+                    <>
+                      <TextField
+                        margin="dense"
+                        name="account_password"
+                        label="Password"
+                        type="password"
+                        fullWidth
+                        value={formData.account_password || ""}
+                        onChange={handleInputChange}
+                      />
+                      <TextField
+                        margin="dense"
+                        name="account_confirmPassword"
+                        label="Confirm Password"
+                        type="password"
+                        fullWidth
+                        value={formData.account_confirmPassword || ""}
+                        onChange={handleInputChange}
+                      />
+                    </>
+                  )}
 
                   <TextField
                     margin="dense"
@@ -535,7 +561,9 @@ const Accounts = () => {
               [
                 <MenuItem onClick={() => handleFilterChange("All")}>All</MenuItem>,
                 <MenuItem onClick={() => handleFilterChange("Active")}>Active</MenuItem>,
-                <MenuItem onClick={() => handleFilterChange("Inactive")}>Inactive</MenuItem>
+                <MenuItem onClick={() => handleFilterChange("Inactive")}>Inactive</MenuItem>,
+                <MenuItem onClick={() => handleFilterRole("Admin")}>Admin</MenuItem>,
+                <MenuItem onClick={() => handleFilterRole("Cashier")}>Cashier</MenuItem>
               ]
             ) : (
               [
@@ -544,16 +572,9 @@ const Accounts = () => {
               ]
             )}
           </Menu>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleCloseDropdown}
-          >
-            <MenuItem onClick={() => handleSortOptionClick("Accounts")}>Accounts</MenuItem>
-            <MenuItem onClick={() => handleSortOptionClick("Employee")}>Employee</MenuItem>
-          </Menu>
         </div>
       </div>
+    </MainLayout>
   )
 };
 

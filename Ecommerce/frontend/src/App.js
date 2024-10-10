@@ -7,6 +7,7 @@ import SignupPage from './pages/SignupPage';
 import MainPage from './pages/MainPage';
 import ProductDetails from './pages/ProductDetails';
 import { EcommerceApi } from './Api/EcommerceApi';
+import OrderHistoryPage from './pages/OrderHistoryPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path='/main' element={<MainPage/>} />
         <Route path='/product-details' element={<ProductDetails/>} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/order-history" element={<OrderHistoryPage />} />
         <Route path="/signup" element={<SignupPage />} />
       </Routes>
     </EcommerceApi>
