@@ -16,20 +16,6 @@
   box-shadow: 0 0 0 0.2rem #b4d8ff;
   outline: none;
 }
-
-  
-.add-customer-btn {
-  background-color: #007bff;
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.add-customer-btn:hover {
-  background-color: #0672e6;
-}
   
 .customer-details {
   display: flex;
@@ -72,6 +58,11 @@
   gap: 30px;
 }
 
+.customer-profile {
+  height: 150px;
+  width: 150px;
+}
+
 .recent-customers {
   margin-top: 30px;
 }
@@ -91,7 +82,7 @@
 
 .recent-customers-scrollable {
   overflow-y: auto;
-  max-height: calc(100vh - 485px);
+  max-height: calc(100vh - 577px);
   overflow-x: hidden;
 
   ::-webkit-scrollbar {
@@ -115,13 +106,12 @@
   }
 
   -ms-overflow-style: none; 
-  scrollbar-width: none; 
 }
 
 .recent-customers-scrollable-selected {
   overflow-y: auto;
-  max-height: calc(100vh - 300px);
-  overflow-x: hidden;
+  max-height: calc(100vh - 422px);
+  overflow-x: auto;
 
   ::-webkit-scrollbar {
       width: 12px;
@@ -144,7 +134,6 @@
   }
 
   -ms-overflow-style: none; 
-  scrollbar-width: none; 
 }
 
 @media (max-width: 768px) {
@@ -158,9 +147,14 @@
     align-items: stretch;
   }
 
-  .add-customer-btn {
+  .add-customer {
     width: 100%;
     margin: 0.5rem 0;
+  }
+
+  .customer-info, .customer-header {
+    width: 100%;
+    font-size: 0.8rem;
   }
 
   .customer-info {
@@ -190,6 +184,15 @@
   .bi-person-circle {
     font-size: 100px;
   }
+
+  .customer-profile {
+    height: 100px;
+    width: 100px;
+  }
+
+  .recent-customer-item {
+    font-size: 0.6rem;
+  }
 }
 
 .rounded-right {
@@ -212,11 +215,6 @@
   color: #888;
 }
 
-.edit-delete-buttons {
-  display: flex;
-  gap: 10px;
-}
-
 .edit-btn,
 .delete-btn {
   padding: 8px 16px;
@@ -231,11 +229,6 @@
   color: white;
 }
 
-.delete-btn {
-  background-color: #dc3545;
-  color: white;
-}
-
 .add-btn, .remove-btn {
   border: 2px solid #007bff;
   color: #007bff;
@@ -243,16 +236,24 @@
   font-weight: bold;
   display: inline-flex;
   border-radius: 4px;
-  width: 140px;
+  width: 120px;
   align-items: center;
   justify-content: center;
 }
 
-.add-btn:hover, .remove-btn:hover {
+.add-btn:hover {
   background-color: #007bff;
   color: white;
-  border-radius: 4px;
-  width: 140px;
+}
+
+.remove-btn {
+  border: 2px solid rgb(245, 46, 46);
+  color: rgb(245, 46, 46);
+}
+
+.remove-btn:hover {
+  background-color: rgb(245, 46, 46);
+  color: white;
 }
 
 .edit-btn:hover {

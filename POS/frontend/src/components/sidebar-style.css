@@ -1,72 +1,94 @@
-.main-content {
-    flex-grow: 1; 
-    overflow-x: hidden;
-}
-
-.link-container {
-    margin-top: 20px;
-    margin-left: 10px;
-}
-
-.sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.sidebar ul li {
-    margin-bottom: 20px; 
-}
-
-.sidebar ul li a {
-    color: white;
+.nav-link-side {
     text-decoration: none;
+    font-size: medium;
+    color: #6c757d;
+    text-align: center;
+    padding: 10px 10px;
+    margin-bottom: 15px;
+    width: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    font-size: 18px; 
-    padding: 10px 0; 
-    font-family: 'Poppins', sans-serif; 
+    transition: color 0.3s ease, background-color 0.3s ease;
 }
 
-.sidebar ul li a .icon {
-    margin-right: 12px; 
-    font-size: 20px; 
+.nav-link-side:hover {
+    background-color: white;
+    color: #ddbb68;
 }
 
-.sidebar ul li a:hover {
-    font-size: 19px; 
-}
-
-/* Remove bold effect from active links */
-.sidebar ul li a.active {
-    font-weight: normal; /* Change bold to normal for all active links */
-}
-
-.logout-button {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-}
-
-.logout-button a {
+.nav-link-side.active {
+    background-color: #ddbb68; 
     color: white;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    font-size: 18px; /* Adjust font size for logout */
+    border-radius: 15px;
 }
 
-.logout-button a .icon {
-    margin-right: 8px;
-    font-size: 20px; /* Adjust icon size for logout */
+.nav-link-side svg {
+    font-size: 25px;
+    margin-bottom: 5px;
 }
 
-.logout-button a:hover {
-    text-decoration: underline;
+.nav {
+    /* display: flex; */
+    flex-direction: column;
+    width: 100%; 
 }
 
-@media (min-width: 768px) {
-    .sidebar {
-        width: 20%;
+.nav-btn {
+	padding: 5px;
+	cursor: pointer;
+	background: transparent;
+	border: none;
+	outline: none;
+	color: white;
+	visibility: hidden;
+	opacity: 0;
+	font-size: 1.8rem;
+}
+
+.layout-container {
+    width: 200px;
+}
+
+@media only screen and (max-width: 1024px) {
+	.nav-btn {
+		visibility: visible;
+		opacity: 1;
+	}
+
+    .btn-visible {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+		z-index: 1000;
     }
+
+	.sidebar-content nav {
+		position: fixed;
+		top: -100vh;
+		left: 0;
+		height: 100%;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: 1.5rem;
+		background-color: rgb(20, 48, 36);
+		transition: 1s;
+        z-index: 1500;
+	}
+
+    .responsive_nav {
+		transform: translateY(100vh);
+	}
+
+	.nav-close-btn {
+		position: absolute;
+		top: 2rem;
+		right: 2rem;
+	}
+
+	nav a {
+		font-size: 1.5rem;
+	}
 }

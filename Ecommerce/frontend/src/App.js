@@ -13,8 +13,8 @@ function App() {
   return (
     <EcommerceApi>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path='/main' element={<MainPage/>} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path='/' element={<MainPage/>} />
         <Route path='/product-details' element={<ProductDetails/>} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/order-history" element={<OrderHistoryPage />} />

@@ -15,6 +15,7 @@ import "../style/wrapper-style.css";
 function MainPage() {
     const { cart, setCart, placeholderImage } = useEcommerce();
     const [newArrivals, setNewArrivals] = useState([]);
+    const [topItems, setTopItems] = useState([]);
     const [shopItems, setShopItems] = useState([]);
     const [displayedItems, setDisplayedItems] = useState([]); 
     const [itemsToShow, setItemsToShow] = useState(20);
@@ -63,6 +64,15 @@ function MainPage() {
         }
     };
 
+    const fetcTopItems = async () => {
+        try {
+        const result = await axios.get('http://localhost:5001/api/top-items-ecommerce'); 
+        setTopItems(result.data);
+        } catch (error) {
+        console.error('Error fetching products:', error);
+        }
+    };
+
     const fetchShopItems = async () => {
         try {
         const result = await axios.get('http://localhost:5001/api/shop-items'); 
@@ -76,9 +86,10 @@ function MainPage() {
     useEffect(() => {
         fetchNewArrivals();
         fetchShopItems();
+        fetcTopItems();
       }, []);
 
-    const chunkArray = (arr, chunkSize) => {
+    const chunkArrayArrivals = (arr, chunkSize) => {
         const chunks = [];
         for (let i = 0; i < arr.length; i += chunkSize) {
           chunks.push(arr.slice(i, i + chunkSize));
@@ -86,7 +97,17 @@ function MainPage() {
         return chunks;
     };
       
-    const chunkedArrivals = chunkArray(newArrivals, 5);
+    const chunkedArrivals = chunkArrayArrivals(newArrivals, 5);
+
+    const chunkTopItems = (arr, chunkSize) => {
+        const chunks = [];
+        for (let i = 0; i < arr.length; i += chunkSize) {
+          chunks.push(arr.slice(i, i + chunkSize));
+        }
+        return chunks;
+    };
+      
+    const chunkedTopItems = chunkTopItems(topItems, 5);
 
     const handleLoadClick = () => {
         const newItemsToShow = itemsToShow + 20;
@@ -173,6 +194,50 @@ function MainPage() {
                         className="swiper-container"
                     >
                         {chunkedArrivals.map((chunk, index) => (
+                            <SwiperSlide key={index}>
+                                <div className="card-container">
+                                    {chunk.map((val, idx) => (
+                                        <div className="box product-box" key={idx}>
+                                            <div className="card" onClick={() => addProduct(val)}>
+                                            <div className='img'>
+                                                <img 
+                                                    src={val.item_image ? val.item_image : placeholderImage} 
+                                                    alt='' 
+                                                    className='product-image' 
+                                                />
+                                            </div>
+                                            <h6 className="card-title text-truncate mt-2">{val.item_description}</h6>
+                                            <p>Qty: {val.quality_stocks !== 0 ? val.quality_stocks : 'Out of Stock'}</p>
+                                            <p><strong>₱{val.unit_price}</strong></p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+                </div>
+            </div>
+        </section>
+
+        <section className='NewArrivals mt-4'>
+            <div className='container'>
+                <div className='d-flex justify-content-between align-items-center'>
+                    <div className='heading-left'>
+                        <h2>Top Items</h2>
+                    </div>
+                </div>
+                <div className='content product'>
+                    <Swiper
+                        modules={[Autoplay, Navigation, Pagination]} 
+                        spaceBetween={30}
+                        slidesPerView={1}
+                        autoplay={{ delay: 3000, disableOnInteraction: false }} 
+                        pagination={{ clickable: true }}
+                        navigation={false}
+                        className="swiper-container"
+                    >
+                        {chunkedTopItems.map((chunk, index) => (
                             <SwiperSlide key={index}>
                                 <div className="card-container">
                                     {chunk.map((val, idx) => (

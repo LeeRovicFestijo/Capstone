@@ -6,13 +6,11 @@ const EcommerceContext = createContext();
 export function EcommerceApi({ children }) {
   const [cart, setCart] = usePersistState('cart', []);
   const [totalAmount, setTotalAmount] = useState(0);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [selectedCustomerLocal, setSelectedCustomerLocal] = useState(null);
   const [isCustomerAdded, setIsCustomerAdded] = useState(false);
   const [persistedCustomer, setPersistedCustomer] = usePersistState('customer', null)
   const [persistedUser, setPersistedUser] = usePersistState('user', null);
   const [customerName, setCustomerName] = useState(selectedCustomer?.customer_name || '');
-  const placeholderImage = "https://via.placeholder.com/150";
+  const placeholderImage = "https://placehold.co/600x400?text=No+Image";
 
   const logout = () => {
     setCart([]);

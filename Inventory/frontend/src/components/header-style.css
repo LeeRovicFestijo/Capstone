@@ -1,6 +1,6 @@
 /* Header.css */
 .web-header {
-    background-color: #1B305B; 
+    background-color: rgb(20, 48, 36); 
     padding: 19px 20px; 
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
     position: sticky; 
@@ -21,7 +21,6 @@
   align-items: center;
   text-align: center; 
   font-weight: bold;
-  color: white;
 }
 
 .logo a {
@@ -39,7 +38,7 @@
 
 .sub-icon-text {
   font-size: 0.9rem;
-  color: white;
+  color: #ddbb68;
   @media (max-width: 768px) {
       font-size: 0.7rem; 
   }
@@ -117,8 +116,8 @@
     height: calc(100vh - 12vh);
     display: flex;
     width: 290px;
-    background-color: #1B305B;
-    color: white;
+    background-color: rgb(20, 48, 36);
+    color: #ddbb68;
     padding: 20px;
     font-family: 'Poppins', sans-serif; 
 }
@@ -126,6 +125,10 @@
 @media (max-width: 768px) {
     .header-container {
         padding: 0.5rem;
+    }
+
+    .sidebar {
+        width: 0%;
     }
 }
 

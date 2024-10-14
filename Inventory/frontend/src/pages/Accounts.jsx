@@ -331,7 +331,7 @@ const Accounts = () => {
               />
             </div>
             <div className="add-account-container">
-              <button className='add-btn' onClick={() => handleOpenModal(currentView === "Accounts" ? "Account" : "Employee")}>+ Add {currentView}</button>
+              <button className='btn btn-success' onClick={() => handleOpenModal(currentView === "Accounts" ? "Account" : "Employee")}>+ Add {currentView}</button>
             </div>
           </header>
           <hr />
@@ -348,7 +348,7 @@ const Accounts = () => {
                       <Dropdown.Item onClick={() => handleSortOptionClick("Employee")}>Employee</Dropdown.Item>
                   </Dropdown.Menu>
               </Dropdown>
-              <button className='filter-btn' onClick={handleFilterClick}>
+              <button className='btn btn-success' onClick={handleFilterClick}>
                 <i className='bi bi-funnel'/> Filter
               </button>
             </div>
@@ -357,7 +357,7 @@ const Accounts = () => {
             ) : (
               <div className='row'>
                 <div className="account-history">
-                  <Paper>
+                  <Paper className="table-responsive">
                     <Table>
                       <TableHead>
                         <TableRow>
@@ -403,31 +403,31 @@ const Accounts = () => {
                                 <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{item.employee_email}</TableCell>
                               </>
                             )}
-                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}><button className='btn-primary' onClick={() => handleOpenModal(currentView === "Accounts" ? "Account" : "Employee", item)}>Edit</button></TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}><button className='btn btn-success' onClick={() => handleOpenModal(currentView === "Accounts" ? "Account" : "Employee", item)}>Edit</button></TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
                     </Table>
                   </Paper>
-                  <div className="pagination">
-                    <button
-                        className="pagination-btn"
-                        onClick={handlePrevPage}
-                        disabled={currentPage === 1}
-                    >
-                        Previous
-                    </button>
-                    <span className="pagination-info">
-                        Page {currentPage} of {totalPages}
-                    </span>
-                    <button
-                        className="pagination-btn"
-                        onClick={handleNextPage}
-                        disabled={currentPage === totalPages}
-                    >
-                        Next
-                    </button>
-                  </div>
+                  <div className="pagination d-flex flex-column flex-sm-row justify-content-between align-items-center">
+                        <button
+                            className="pagination-btn mb-2 mb-sm-0"
+                            onClick={handlePrevPage}
+                            disabled={currentPage === 1}
+                        >
+                            Previous
+                        </button>
+                        <div className="pagination-info mb-2 mb-sm-0">
+                            Page {currentPage} of {totalPages}
+                        </div>
+                        <button
+                            className="pagination-btn"
+                            onClick={handleNextPage}
+                            disabled={currentPage === totalPages}
+                        >
+                            Next
+                        </button>
+                    </div>
                 </div>
               </div>
             )}

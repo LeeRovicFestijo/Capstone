@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';  // Import Router components
 import InventoryTable from './pages/InventoryTable';  // Your InventoryTable component
 import Dashboard from './pages/Dashboard';  // Assuming Dashboard.jsx is in /pages directory

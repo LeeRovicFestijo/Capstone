@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { toast, Flip } from 'react-toastify';
+import { ToastContainer, toast, Flip } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { Button, Dropdown } from 'react-bootstrap';
@@ -22,6 +22,7 @@ function MainLayout({children}) {
         account_username: persistedAdmin?.account_username || '',
         account_email: persistedAdmin?.account_email || '',
         account_profile: persistedAdmin?.account_profile || null,
+        account_preview_profile: null,
       });
   
 
@@ -92,6 +93,7 @@ function MainLayout({children}) {
             account_username: persistedAdmin.account_username,
             account_email: persistedAdmin.account_email,
             account_profile: persistedAdmin.account_profile,
+            account_preview_profile: null,
         });
         setOpenProfileDetailsModal(true);
     };
@@ -111,7 +113,8 @@ function MainLayout({children}) {
             const imageUrl = URL.createObjectURL(file); 
             setAdminDetails((prevDetails) => ({
                 ...prevDetails,
-                account_profile: imageUrl 
+                account_profile: file,
+                account_profile_preview: imageUrl,
             }));
         }
     };
@@ -156,6 +159,7 @@ function MainLayout({children}) {
   
             if (response.status === 200) {
                 toast.success('Account updated successfully!', toastOptions);
+                fetchAdmin();
                 handleCloseProfileDetailsModal();
             }
         } catch (error) {
@@ -167,13 +171,16 @@ function MainLayout({children}) {
         const { old_password, new_password, confirm_password } = adminPassword;
         const account_id = persistedAdmin.account_id;
         const errors = [];
+        
 
         if (!old_password || !new_password || !confirm_password) {
             toast.error("All fields required!", toastOptions);
+            return;
         }
 
         if (new_password !== confirm_password) {
             toast.error("New and confirm password do not match.", toastOptions);
+            return;
         }
 
         if (errors.length > 0) {
@@ -199,7 +206,13 @@ function MainLayout({children}) {
                 handleClosePasswordModal();
             }
         } catch (error) {
-            console.error('Error changing password:', error);
+            if (error.response && error.response.status === 401) {
+                // Display the message from the backend
+                toast.error(error.response.data.message, toastOptions);
+            } else {
+                console.error('Error changing password:', error);
+                toast.error('An error occurred while changing the password.', toastOptions);
+            }
         }
     };
 
@@ -207,7 +220,7 @@ function MainLayout({children}) {
     const handleLogoutClick = () => {
         setPersistedAdmin('')
         navigate('/');
-    }
+    } 
 
   return (
    <div className='layout'>
@@ -267,7 +280,7 @@ function MainLayout({children}) {
                           <DialogContent>
                               <div style={{ textAlign: 'center' }}>
                               {adminDetails.account_profile ? (
-                                  <img src={adminDetails.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+                                  <img src={adminDetails.account_profile_preview ? adminDetails.account_profile_preview : adminDetails.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
                               ) : (
                                   <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
                               )}
@@ -381,6 +394,19 @@ function MainLayout({children}) {
             <main className="layout-content">
                 {children}
             </main>
+            <ToastContainer
+                position="top-right"
+                autoClose={1000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                transition={Flip}
+            />
         </div>
    </div>
   )

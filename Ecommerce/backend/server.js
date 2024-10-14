@@ -47,6 +47,67 @@ app.get('/api/new-arrivals', async (req, res) => {
     }
 });
 
+app.get('/api/top-items-ecommerce', async (req, res) => {
+    try {
+        // First query to get top items of the month
+        const topItemsResult = await pool.query(`
+            SELECT 
+                i.item_id, 
+                i.item_description,
+                i.unit_price,
+                i.quality_stocks,
+                i.unit_measurement,
+                i.item_image,
+                SUM(t.order_quantity) AS total_sales 
+            FROM transactions t
+            JOIN inventory i ON t.item_id = i.item_id
+            JOIN orders o ON o.order_id = t.order_id
+            WHERE 
+                o.order_date >= DATE_TRUNC('month', CURRENT_DATE) -- Get transactions from the start of the current month
+                AND o.order_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month' -- Until the start of the next month
+            GROUP BY i.item_id
+            ORDER BY total_sales DESC
+            LIMIT 15
+        `);
+
+        // If there are no top items, get a random 15 items from the inventory
+        let items;
+        if (topItemsResult.rows.length < 15) {
+            const randomItemsResult = await pool.query(`
+                SELECT 
+                    i.item_id, 
+                    i.item_description,
+                    i.unit_price,
+                    i.quality_stocks,
+                    i.unit_measurement,
+                    i.item_image 
+                FROM inventory i
+                ORDER BY RANDOM()
+                LIMIT 15
+            `);
+            items = randomItemsResult.rows;
+        } else {
+            items = topItemsResult.rows;
+        }
+
+        // Convert item_image to base64 if present
+        items = items.map(item => {
+            if (item.item_image) {
+                // Convert Buffer to base64 string
+                const base64Image = item.item_image.toString('base64');
+                // Attach the base64 image string to the item object with proper MIME type
+                item.item_image = `data:image/jpeg;base64,${base64Image}`; // Adjust MIME type if necessary
+            }
+            return item;
+        });
+
+        res.status(200).json(items);
+    } catch (error) {
+        console.error('Error fetching top items:', error);
+        res.status(500).json({ message: 'Error fetching top items' });
+    }
+});
+
 app.get('/api/shop-items', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM inventory ORDER BY item_id');

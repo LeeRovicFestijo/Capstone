@@ -24,7 +24,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // Endpoint to validate user credentials
-app.post('/api/login', async (req, res) => {
+app.post('/api/login-pos', async (req, res) => {
   const { email, password } = req.body; // Change id to username
 
   try {
@@ -92,9 +92,18 @@ app.post('/api/update-user-account', upload.single('account_profile'), async (re
 
           const accountUpdateResult = await pool.query(query, updates);
 
-          const employeeUpdateResult = await pool.query(
-              'UPDATE employee SET employee_email = $1 WHERE employee_id = $2 RETURNING *',
+          const existingEmailCheck = await pool.query(
+              'SELECT * FROM employee WHERE employee_email = $1 AND employee_id != $2',
               [account_email, employee_id]
+          );
+
+          if (existingEmailCheck.rows.length === 0) {
+            
+          }
+
+          const employeeUpdateResult = await pool.query(
+            'UPDATE employee SET employee_email = $1 WHERE employee_id = $2 RETURNING *',
+            [account_email, employee_id]
           );
 
           res.status(200).json({
@@ -204,29 +213,6 @@ app.get('/api/customer', async (req, res) => {
   }
 });
 
-app.delete('/api/customer/:id', async (req, res) => {
-  const { id } = req.params;
-  
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-    
-    const account = await client.query('DELETE FROM customer_account WHERE customer_id = $1', [id]);
-    
-    const customer = await client.query('DELETE FROM customer WHERE customer_id = $1', [id]);
-    
-    await client.query('COMMIT');
-    
-    res.status(200).send('Customer deleted successfully');
-  } catch (err) {
-    await client.query('ROLLBACK'); 
-    console.error(err);
-    res.status(500).send('Error deleting customer');
-  } finally {
-    client.release(); 
-  }
-});
-
 app.get('/api/customer/email/:email', async (req, res) => {
   const { email } = req.params;
   const query = 'SELECT COUNT(*) FROM customer WHERE customer_email = $1';
@@ -255,6 +241,11 @@ app.put('/api/customer/:id', async (req, res) => {
       return res.status(400).json({ message: 'Email is already used by another customer' });
     }
 
+    const accountCheck = await pool.query(
+      'SELECT * FROM customer_account WHERE customer_id = $1',
+      [id]
+    );
+
     // Proceed with the update if email is unique
     const result = await pool.query(
       'UPDATE customer SET customer_name = $1, customer_number = $2, customer_email = $3, customer_address = $4, customer_date = $5 WHERE customer_id = $6 RETURNING *',
@@ -262,6 +253,12 @@ app.put('/api/customer/:id', async (req, res) => {
     );
 
     if (result.rows.length > 0) {
+      if (accountCheck.rows.length > 0) {
+        await pool.query(
+          'UPDATE customer_account SET customer_email = $1 WHERE customer_id = $2',
+          [customer_email, id]
+        );
+      }
       res.status(200).json(result.rows[0]); // Return the updated customer
     } else {
       res.status(404).json({ message: 'Customer not found' });

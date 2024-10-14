@@ -130,142 +130,145 @@ function TransactionPage() {
 
   return (
     <MainLayout>
-      <div className='row'>
-        <div className="p-3">
-          <header className="order-page-header d-flex justify-content-between">
-            <div className='header-filter'>
-              <input 
-                type="text" 
-                className="search-bar" 
-                placeholder="Search Customers..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <button className='filter-btn btn-primary' onClick={handleFilterClick}>
-                <i className='bi bi-funnel'/> Filter
-              </button>
+      <div className='container-fluid'>
+        <div className='row'>
+          <div className='col-12 p-3'>
+            <div className='order-page-header d-flex flex-column flex-md-row justify-content-between align-items-center align-items-md-center'>
+              <div className='header-filter d-flex flex-column flex-md-row align-items-center mb-3 mb-md-0'>
+                <input 
+                  type="text" 
+                  className="search-bar form-control me-2" 
+                  placeholder="Search Customers..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <button className='filter-btn btn btn-success' onClick={handleFilterClick}>
+                  <span className='bi bi-funnel'> Filter</span>
+                </button>
+              </div>
+              <div className="date-picker-container">
+                <ReactDatePicker
+                  selected={selectedDate}
+                  onChange={handleDateChange}
+                  dateFormat="dd MMM, yyyy"
+                  className='form-control'
+                />
+              </div>
             </div>
-            <div className="date-picker-container">
-              <ReactDatePicker
-                selected={selectedDate}
-                onChange={handleDateChange}
-                dateFormat="dd MMM, yyyy"
-              />
-            </div>
-          </header>
-          <hr />
+            <hr />
 
-          <div className='order-list'>
-            {isLoading ? (
-              'Loading'
-            ) : (
-              <div className='row'>
-                <div className="order-history">
-                  <Paper sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+            <div className='order-list'>
+              {isLoading ? (
+                'Loading'
+              ) : (
+                <div className='row'>
+                  <div className='order-history col-12'>
+                    <Paper sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Order ID</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Customer Name</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Date</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Total Amount</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Ship</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Payment</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
+                            <TableRow key={order.order_id} style={{ cursor: 'pointer' }} onClick={() => handleOrderDetails(order.order_id)}>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.order_id}</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.customer_name}</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{formatDate(order.order_date)}</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.total_amount}</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.order_deliver}</TableCell>
+                              <TableCell>
+                                <Button 
+                                  variant="outlined" 
+                                  style={{ 
+                                    borderColor: getButtonColor(order.payment_mode), 
+                                    fontFamily: 'Poppins, sans-serif' 
+                                  }}>
+                                  {order.payment_mode}
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </Paper>
+                    <TablePagination
+                      rowsPerPageOptions={[5, 10, 25]}
+                      component="div"
+                      count={filteredOrders.length}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      onPageChange={handleChangePage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleCloseDropdown}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+            >
+              <MenuItem onClick={handleAllButtonClick}>All</MenuItem>
+              <MenuItem onClick={() => handleSortOptionClick("Oldest")}>Oldest</MenuItem>
+              <MenuItem onClick={() => handleSortOptionClick("Newest")}>Newest</MenuItem>
+              <MenuItem onClick={() => handleSortOptionClick("Cash")}>Cash</MenuItem>
+              <MenuItem onClick={() => handleSortOptionClick("GCash")}>GCash</MenuItem>
+              <MenuItem onClick={() => handleSortOptionClick("PayMaya")}>PayMaya</MenuItem>
+              <MenuItem onClick={() => handleSortOptionClick("Card")}>Card</MenuItem>
+            </Menu>
+            <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+              <DialogTitle>Order Details</DialogTitle>
+              <DialogContent>
+                {orderDetails && orderDetails.length > 0 ? (
+                  <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Order ID</TableCell>
-                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Customer Name</TableCell>
-                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Date</TableCell>
-                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Total Amount</TableCell>
-                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Ship</TableCell>
-                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Payment</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Product Name</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Quantity</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Measurement</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Price</TableCell>
+                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Total Price</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
-                          <TableRow key={order.order_id} style={{cursor:'pointer'}} onClick={() => handleOrderDetails(order.order_id)}>
-                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.order_id}</TableCell>
-                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.customer_name}</TableCell>
-                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{formatDate(order.order_date)}</TableCell>
-                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.total_amount}</TableCell>
-                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.order_deliver}</TableCell>
-                            <TableCell>
-                              <Button 
-                                variant="outlined" 
-                                style={{ 
-                                  borderColor: getButtonColor(order.payment_mode), 
-                                  fontFamily: 'Poppins, sans-serif' 
-                                }}>
-                                {order.payment_mode}
-                              </Button>
-                            </TableCell>
+                        {orderDetails.map((product, index) => (
+                          <TableRow key={index}>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.item_description}</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.order_quantity}</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.unit_measurement}</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.unit_price}</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.total_amount}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
                     </Table>
-                  </Paper>
-                  <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    component="div"
-                    count={filteredOrders.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                  />
-                </div>
-              </div>
-            )}
+                  </TableContainer>
+                ) : (
+                  <p>No order details available.</p>
+                )}
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setIsModalOpen(false)} color="primary">Close</Button>
+              </DialogActions>
+            </Dialog>
           </div>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleCloseDropdown}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-          >
-            <MenuItem onClick={handleAllButtonClick}>All</MenuItem>
-            <MenuItem onClick={() => handleSortOptionClick("Oldest")}>Oldest</MenuItem>
-            <MenuItem onClick={() => handleSortOptionClick("Newest")}>Newest</MenuItem>
-            <MenuItem onClick={() => handleSortOptionClick("Cash")}>Cash</MenuItem>
-            <MenuItem onClick={() => handleSortOptionClick("GCash")}>GCash</MenuItem>
-            <MenuItem onClick={() => handleSortOptionClick("PayMaya")}>PayMaya</MenuItem>
-            <MenuItem onClick={() => handleSortOptionClick("Card")}>Card</MenuItem>
-          </Menu>
-          <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-            <DialogTitle>Order Details</DialogTitle>
-            <DialogContent>
-              {orderDetails && orderDetails.length > 0 ? ( // Check if shipmentDetails is an array and has elements
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Product Name</TableCell>
-                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Quantity</TableCell>
-                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Measurement</TableCell>
-                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Price</TableCell>
-                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Total Price</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {orderDetails.map((product, index) => ( // Loop through the array of products
-                        <TableRow key={index}>
-                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.item_description}</TableCell>
-                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.order_quantity}</TableCell>
-                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.unit_measurement}</TableCell>
-                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.unit_price}</TableCell>
-                          <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{product.total_amount}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              ) : (
-                <p>No order details available.</p> // Handle case where no data is available
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setIsModalOpen(false)} color="primary">Close</Button>
-            </DialogActions>
-          </Dialog>
         </div>
       </div>
     </MainLayout>

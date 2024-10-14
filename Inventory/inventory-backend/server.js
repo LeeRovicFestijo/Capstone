@@ -9,7 +9,14 @@ const app = express();
 app.use(express.json());
 
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({
+  fileFilter(req, file, cb) {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('File must be an image'));
+    }
+    cb(null, true);
+  }
+});
 
 app.use(cors({ origin: 'http://localhost:3000' })); // Allow requests from React
 
@@ -43,7 +50,12 @@ app.post('/api/login-admin', async (req, res) => {
     const user = result.rows[0]; // Get the first matching user, if any
 
     if (user) {
-      // If a match is found, send success response
+      if (user.account_profile) {
+        // Convert Buffer to base64 string
+        const base64Image = user.account_profile.toString('base64');
+        user.account_profile = `data:image/jpeg;base64,${base64Image}`; // Adjust MIME type if necessary
+      }
+
       res.status(200).json({ message: 'Login successful', user });
     } else {
       // If no match, send an error response
@@ -415,10 +427,33 @@ app.get('/api/shipment-order', async (req, res) => {
 });
   
 app.put('/api/shipment-order/:id', async (req, res) => {
-    const order_id = req.params.id; // Get the order ID from the URL
-    const { shipping_status } = req.body; // Get the new status from the request body
+    const order_id = req.params.id; 
+    const { shipping_status } = req.body; 
   
     try {
+      if (shipping_status === 'Cancelled') {
+          const itemsQuery = `
+              SELECT 
+                  item_id, 
+                  order_quantity 
+              FROM 
+                  transactions 
+              WHERE 
+                  order_id = $1;
+          `;
+          const itemsResult = await pool.query(itemsQuery, [order_id]);
+
+          // Restore the stock for each item
+          for (const item of itemsResult.rows) {
+              const restoreQuery = `
+                  UPDATE inventory 
+                  SET quantity_stocks = quantity_stocks + $1 
+                  WHERE item_id = $2;
+              `;
+              await pool.query(restoreQuery, [item.order_quantity, item.item_id]);
+          }
+      }
+
       const result = await pool.query(
         'UPDATE shipment SET shipping_status = $1 WHERE order_id = $2 RETURNING *',
         [shipping_status, order_id]
@@ -465,21 +500,96 @@ app.get('/api/shipment-details', async (req, res) => {
 });
 
 app.get('/api/customer-report', async (req, res) => {
+  const { year, month } = req.query;
+
   try {
-      const result = await pool.query('SELECT * FROM customer');
-      console.log('Fetched customers:', result.rows);
-      res.status(200).json(result.rows);
+      // Start with a base query that selects all customers
+      let query = `SELECT * FROM customer WHERE 1=1`;
+
+      // Add filtering by year if it's provided and not 'All Year'
+      if (year && year !== 'All Year') {
+          query += ` AND EXTRACT(YEAR FROM customer_date) = ${year}`;
+      }
+
+      // Add filtering by month if it's provided and not 'All Month'
+      if (month && month !== 'All Month') {
+          query += ` AND EXTRACT(MONTH FROM customer_date) = ${new Date(Date.parse(month +" 1, 2023")).getMonth() + 1}`;
+      }
+
+      query += ` ORDER BY customer_id`;
+
+      const result = await pool.query(query);
+      res.json(result.rows);
   } catch (error) {
-      res.status(500).json({ message: 'Error fetching customers', error: error.message });
+      console.error('Error fetching customer report:', error);
+      res.status(500).send('Server error');
   }
 });
 
 app.get('/api/transaction-report', async (req, res) => {
+  const { year, month } = req.query;
+
   try {
-      const result = await pool.query('SELECT o.order_id, o.customer_id, o.total_amount, o.order_date, o.order_deliver, o.account_id, o.payment_mode, c.customer_name  FROM orders o LEFT JOIN customer c ON o.customer_id = c.customer_id ORDER BY o.order_id DESC');
-      res.status(200).json(result.rows);
+    let query = `
+      SELECT o.order_id, o.customer_id, o.total_amount, o.order_date, 
+             o.order_deliver, o.account_id, o.payment_mode, c.customer_name  
+      FROM orders o 
+      LEFT JOIN customer c ON o.customer_id = c.customer_id
+      LEFT JOIN shipment s ON o.order_id = s.order_id  -- Join with shipment to check shipping status
+      WHERE (s.shipping_status IS NULL OR s.shipping_status != 'Cancelled')`;
+
+    if (year && year !== 'All Year') {
+      query += ` AND EXTRACT(YEAR FROM o.order_date) = ${year}`;
+    }
+
+    if (month && month !== 'All Month') {
+      const monthNumber = new Date(Date.parse(`${month} 1, 2023`)).getMonth() + 1; 
+      query += ` AND EXTRACT(MONTH FROM o.order_date) = ${monthNumber}`;
+    }
+
+    query += ` ORDER BY o.order_id`;
+
+    const result = await pool.query(query);  
+    res.status(200).json(result.rows); 
   } catch (error) {
-      res.status(500).json({ message: 'Error fetching orders', error: error.message });
+    res.status(500).json({ message: 'Error fetching orders', error: error.message });
+  }
+});
+
+app.get('/api/inventory-performance', async (req, res) => {
+  const { year, month } = req.query;
+
+  try {
+    let query = `
+      SELECT 
+        i.item_id,
+        i.item_description, 
+        SUM(t.order_quantity * i.unit_price) AS total_sales, 
+        SUM(t.order_quantity) AS total_items_sold
+      FROM transactions t
+      JOIN inventory i ON t.item_id = i.item_id
+      JOIN orders o ON t.order_id = o.order_id
+      LEFT JOIN shipment s ON o.order_id = s.order_id  -- Include all orders with LEFT JOIN
+      WHERE (s.shipping_status IS NULL OR s.shipping_status != 'Cancelled')  -- Exclude cancelled orders, include orders not in shipment
+    `;
+
+    // Add year filter if selected
+    if (year && year !== 'All Year') {
+      query += ` AND EXTRACT(YEAR FROM o.order_date) = ${year}`;
+    }
+
+    // Add month filter if selected
+    if (month && month !== 'All Month') {
+      const monthNumber = new Date(Date.parse(`${month} 1, 2023`)).getMonth() + 1;
+      query += ` AND EXTRACT(MONTH FROM o.order_date) = ${monthNumber}`;
+    }
+
+    query += ` GROUP BY i.item_id, i.item_description ORDER BY total_sales DESC`;
+
+    const result = await pool.query(query);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching inventory performance', error: error.message });
   }
 });
 
@@ -552,6 +662,277 @@ app.post('/api/change-admin-password', upload.none(), async (req, res) => {
   } catch (error) {
       console.error('Error changing password:', error);
       res.status(500).json({ message: 'Error changing password', error: error.message });
+  }
+});
+
+app.get('/api/total-sales-dashboard', async (req, res) => {
+  try {
+      const result = await pool.query(`
+          SELECT 
+              SUM(t.order_quantity * i.unit_price) AS total_sales
+          FROM transactions t
+          JOIN inventory i ON t.item_id = i.item_id
+          JOIN orders o ON o.order_id = t.order_id
+          LEFT JOIN shipment s ON s.order_id = o.order_id
+          WHERE o.order_date >= DATE_TRUNC('year', CURRENT_DATE)
+            AND (s.shipping_status != 'Cancelled' OR s.shipping_status IS NULL);
+      `);
+      const totalSales = result.rows[0]?.total_sales || 0;
+      res.status(200).json({ total_sales: totalSales });
+  } catch (error) {
+      console.error('Error fetching sales data:', error);
+      res.status(500).json({ message: 'Error fetching sales data' });
+  }
+});
+
+app.get('/api/total-customer-dashboard', async (req, res) => {
+  try {
+      const result = await pool.query('SELECT COUNT(*) FROM customer');
+      const totalCustomers = result.rows[0].count;
+      res.status(200).json({ totalCustomers });
+  } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+  }
+});
+
+app.get('/api/active-shipments-dashboard', async (req, res) => {
+  try {
+      const result = await pool.query(
+          `SELECT COUNT(*) FROM shipment WHERE shipping_status NOT IN ('Delivered', 'Cancelled')`
+      );
+      const activeShipments = result.rows[0].count;
+      res.status(200).json({ activeShipments });
+  } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+  }
+});
+
+app.get('/api/sales-data', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+          TO_CHAR(DATE_TRUNC('month', o.order_date), 'Month') AS sales_month,
+          SUM(t.order_quantity * i.unit_price) AS total_sales
+      FROM transactions t
+      JOIN inventory i ON t.item_id = i.item_id
+      JOIN orders o ON o.order_id = t.order_id
+      LEFT JOIN shipment s ON s.order_id = o.order_id 
+      WHERE o.order_date >= NOW() - INTERVAL '1 year'
+        AND (s.shipping_status IS NULL OR s.shipping_status != 'Cancelled')  
+      GROUP BY sales_month
+      ORDER BY MIN(o.order_date);
+    `);
+
+    const formattedData = [
+      {
+        id: 'Sales',  
+        data: result.rows.map(row => ({
+          x: row.sales_month.trim(),  
+          y: parseFloat(row.total_sales)  
+        }))
+      }
+    ];
+
+    // Send the formatted data
+    res.status(200).json(formattedData);
+  } catch (error) {
+    console.error('Error fetching sales data:', error);
+    res.status(500).json({ message: 'Error fetching sales data' });
+  }
+});
+
+app.get('/api/top-items-dashboard', async (req, res) => {
+  try {
+      const result = await pool.query(`
+          SELECT 
+              i.item_id, 
+              i.item_description,
+              SUM(t.order_quantity) AS total_sales 
+          FROM transactions t
+          JOIN inventory i ON t.item_id = i.item_id
+          JOIN orders o ON o.order_id = t.order_id
+          LEFT JOIN shipment s ON s.order_id = o.order_id 
+          WHERE 
+              o.order_date >= DATE_TRUNC('month', CURRENT_DATE) 
+              AND o.order_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month' 
+              AND (s.shipping_status != 'Cancelled' OR s.shipping_status IS NULL) 
+          GROUP BY i.item_id
+          ORDER BY total_sales DESC
+          LIMIT 5;
+      `);
+      res.status(200).json(result.rows);
+  } catch (error) {
+      console.error('Error fetching top items:', error);
+      res.status(500).json({ message: 'Error fetching top items' });
+  }
+});
+
+app.get('/api/sales-by-payment-mode', async (req, res) => {
+  try {
+    const result = await pool.query(`
+        SELECT 
+            o.payment_mode, 
+            SUM(t.order_quantity * i.unit_price) AS total_sales
+        FROM orders o
+        JOIN transactions t ON o.order_id = t.order_id
+        JOIN inventory i ON t.item_id = i.item_id
+        LEFT JOIN shipment s ON s.order_id = o.order_id  
+        WHERE (s.shipping_status != 'Cancelled' OR s.shipping_status IS NULL)  
+        GROUP BY o.payment_mode;
+    `);
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching sales by payment mode:', error);
+    res.status(500).json({ message: 'Error fetching sales data' });
+  }
+});
+
+app.get('/api/recent-orders-dashboard', async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT * FROM orders ORDER BY order_id DESC LIMIT 10`);
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching sales by payment mode:', error);
+    res.status(500).json({ message: 'Error fetching sales data' });
+  }
+});
+
+app.get('/api/restock-dashboard', async (req, res) => {
+  try {
+
+    const query = ` 
+      -- Place the complete SQL query here
+      WITH OrderToSale AS (
+          SELECT 
+              t.item_id,
+              o.order_id,
+              o.order_date
+          FROM 
+              orders o
+          LEFT JOIN 
+              transactions t ON o.order_id = t.order_id
+      ),
+      InventoryValues AS (
+          SELECT 
+              i.item_id,
+              i.item_description,
+              i.quality_stocks, -- Current stock levels
+              COALESCE(SUM(t.order_quantity), 0) AS total_quantity_sold, -- Total quantity sold for each item
+              i.unit_price,
+              (i.unit_price * COALESCE(SUM(t.order_quantity), 0)) AS total_value, -- Total value of sales
+              7 AS lead_time, -- Lead time is fixed at 7 days
+              4000 AS ordering_cost
+          FROM 
+              inventory i
+          LEFT JOIN 
+              transactions t ON i.item_id = t.item_id
+          LEFT JOIN 
+              orders o ON t.order_id = o.order_id
+          WHERE 
+              o.order_date >= CURRENT_DATE - INTERVAL '2 years' -- Limit to the last 2 years based on order_date
+          GROUP BY 
+              i.item_id, i.unit_price, i.quality_stocks
+      ),
+      -- Step 2: Calculate EOQ, reorder point, and identify restock items
+      EOQAnalysis AS (
+          SELECT
+              item_id,
+              item_description,
+              quality_stocks, -- Current stock levels
+              total_quantity_sold,
+              FLOOR(SQRT((2 * total_quantity_sold * ordering_cost) / 25000)) AS eoq, -- EOQ calculation rounded to nearest integer
+              (total_quantity_sold / 365) * lead_time AS lead_time_demand, -- Demand during the fixed 7-day lead time
+              25 AS safety_stock, -- Fixed safety stock value
+              ((total_quantity_sold / 365) * lead_time) + 25 AS reorder_point -- ROP = lead time demand + safety stock
+          FROM 
+              InventoryValues
+      ),
+      -- Step 3: Perform ABC classification
+      RankedInventory AS (
+          SELECT
+              i.item_id,
+              i.item_description,
+              i.unit_price,
+              COALESCE(SUM(t.order_quantity), 0) AS total_quantity_sold,  -- Handle unsold items
+              COALESCE((i.unit_price * SUM(t.order_quantity)), 0) AS total_value -- Handle unsold items
+          FROM 
+              inventory i
+          LEFT JOIN 
+              transactions t ON i.item_id = t.item_id
+          LEFT JOIN 
+              orders o ON t.order_id = o.order_id
+          WHERE 
+              o.order_date >= CURRENT_DATE - INTERVAL '1 year' OR o.order_date IS NULL -- Include items with no orders
+          GROUP BY 
+              i.item_id, i.unit_price
+      ), RankedInventoryWithTotal AS (
+          SELECT
+              * ,
+              RANK() OVER (ORDER BY total_value DESC) AS rank_value,
+              SUM(total_value) OVER () AS total_inventory_value -- Total value of all items
+          FROM
+              RankedInventory
+      ),
+      ABCClassification AS (
+          SELECT
+              item_id,
+              item_description,
+              unit_price,
+              total_quantity_sold,
+              total_value,
+              total_value / total_inventory_value * 100 AS value_percentage,
+              CASE
+                  WHEN total_value / total_inventory_value * 100 >= 80 THEN 'A'
+                  WHEN total_value / total_inventory_value * 100 >= 50 THEN 'B'
+                  ELSE 'C'
+              END AS abc_classification
+          FROM
+              RankedInventoryWithTotal
+      ),
+      -- Step 4: Combine EOQ analysis with ABC classification and check for restocking
+      RestockItems AS (
+          SELECT
+              e.item_id,
+              e.item_description,
+              e.quality_stocks,
+              e.reorder_point,
+              e.eoq,
+              a.abc_classification,
+              CASE
+                  WHEN e.quality_stocks < e.reorder_point THEN 'Yes'
+                  ELSE 'No'
+              END AS needs_restock
+          FROM
+              EOQAnalysis e
+          LEFT JOIN 
+              ABCClassification a ON e.item_id = a.item_id
+      )
+      -- Final query: Return items that need restocking with ABC classification
+      SELECT
+          item_id,
+          item_description,
+          quality_stocks,
+          reorder_point,
+          eoq,
+          abc_classification,
+          needs_restock
+      FROM
+          RestockItems
+      WHERE 
+          needs_restock = 'Yes'
+      ORDER BY
+          abc_classification, reorder_point DESC;
+      `;
+      const result = await pool.query(query);
+
+      res.status(200).json(result.rows);
+  } catch (error) {
+      console.error('Error fetching inventory data:', error);
+      res.status(500).json({ message: 'Error fetching inventory data' });
   }
 });
 

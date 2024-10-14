@@ -1,11 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react';
-import Modal from 'react-modal';
-import axios from "axios"
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
+import axios from 'axios';
 import { useReactToPrint } from 'react-to-print';
 import { ComponentToPrint } from '../components/ComponentToPrint';
 import './modal-style.css';
 
-Modal.setAppElement('#root');
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+};
 
 const ProceedModal = ({ isOpen, onClose, cart, fetchProducts, totalAmount, customerName, customer, account, payment }) => {
     const [paymentMethod, setPaymentMethod] = useState('Cash');
@@ -58,13 +72,8 @@ const ProceedModal = ({ isOpen, onClose, cart, fetchProducts, totalAmount, custo
     }, [shippingMethod]);
 
     return (
-        <Modal 
-            isOpen={isOpen} 
-            onRequestClose={onClose}
-            className="modal-content"
-            overlayClassName="modal-overlay"
-        >
-            <div className="proceed-modal-body">
+        <Modal open={isOpen} onClose={onClose}>
+            <Box sx={style}>
                 <h2 className="modal-title">Proceed to Payment</h2>
                 {customer && customer.length > 0 && (
                     <div className="customer-info">
@@ -75,48 +84,45 @@ const ProceedModal = ({ isOpen, onClose, cart, fetchProducts, totalAmount, custo
                 
                 <div className="form-group">
                     <label>Payment Method:</label>
-                    <div class="select-wrapper">
-                        <select class="form-control" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
-                            <option value="Cash">Cash</option>
-                            <option value="Gcash">Gcash</option>
-                            <option value="PayMaya">PayMaya</option>
-                            <option value="Card">Card</option>
-                        </select>
-                        <i className="bi bi-chevron-down"></i>
-                    </div>
+                    <Select
+                        value={paymentMethod}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        fullWidth
+                    >
+                        <MenuItem value="Cash">Cash</MenuItem>
+                        <MenuItem value="GCash">Gcash</MenuItem>
+                        <MenuItem value="PayMaya">PayMaya</MenuItem>
+                        <MenuItem value="Card">Card</MenuItem>
+                    </Select>
                 </div>
                 
                 <div className="form-group">
                     <label>To Ship:</label>
-                    <div className='select-wrapper'>
-                        <select 
-                            className="form-control" 
-                            value={shippingMethod} 
-                            onChange={(e) => setShippingMethod(e.target.value)}
-                        >
-                            <option value="OnSite">No</option>
-                            <option value="Ship">Yes</option>
-                        </select>
-                        <i className="bi bi-chevron-down"></i>
-                    </div>
+                    <Select
+                        value={shippingMethod}
+                        onChange={(e) => setShippingMethod(e.target.value)}
+                        fullWidth
+                    >
+                        <MenuItem value="OnSite">No</MenuItem>
+                        <MenuItem value="Ship">Yes</MenuItem>
+                    </Select>
                 </div>
                 
                 {shippingMethod === "Ship" && (
                     <div className="form-group">
                         <label>Shipping Address:</label>
-                        <input 
-                            type="text" 
-                            className="form-control"
-                            value={shippingAddress} 
-                            onChange={(e) => setShippingAddress(e.target.value)} 
-                            placeholder="Enter shipping address" 
+                        <TextField
+                            fullWidth
+                            value={shippingAddress}
+                            onChange={(e) => setShippingAddress(e.target.value)}
+                            placeholder="Enter shipping address"
                         />
                     </div>
                 )}
                 
                 <div className="modal-buttons">
-                    <button className="btn btn-primary" onClick={handlePayment}>Pay</button>
-                    <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
+                    <Button variant="contained" color="success" onClick={handlePayment}>Pay</Button>
+                    <Button variant="outlined" color="primary" onClick={onClose}>Cancel</Button>
                 </div>
 
                 <div style={{ display: 'none' }}>
@@ -125,12 +131,11 @@ const ProceedModal = ({ isOpen, onClose, cart, fetchProducts, totalAmount, custo
                         cart={cart} 
                         totalAmount={totalAmount} 
                         customerName={customerName}
-                        customer={customer}
                         paymentMethod={paymentMethod}
                         shippingAddress={shippingAddress}
                     />
                 </div>
-            </div>
+            </Box>
         </Modal>
     );
 };

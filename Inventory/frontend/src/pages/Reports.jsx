@@ -3,58 +3,95 @@ import axios from 'axios';
 import { Button } from 'react-bootstrap'; 
 import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; 
-import { faChartLine, faBoxes, faUsers, faShoppingCart, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faChartLine, faBoxes, faUsers, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from '../layout/MainLayout';
-import { useInventory } from '../api/InventoryProvider';
+import { CSVLink } from 'react-csv';
 
 const Reports = () => {
-    const { inventoryData } = useInventory();
+    const [inventoryReport, setInventoryReport] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [customerData, setCustomerData] = useState([]);
+    const [inventoryPerformance, setInventoryPerformance] = useState([]);
     const [orderData, setOrderData] = useState([]);
     const [orderDetails, setOrderDetails] = useState([]);
-    // Dropdown states for year and month filters (default to "All Year" and "All Month")
     const [selectedYear, setSelectedYear] = useState('All Year');
     const [selectedMonth, setSelectedMonth] = useState('All Month');
-
-    // Inventory levels table visibility state
-    const [showSalesTable, setShowSalesTable] = useState(false);
+    const [showPerformanceTable, setShowPerformanceTable] = useState(true);
     const [showInventoryTable, setShowInventoryTable] = useState(false);
     const [showCustomerTable, setShowCustomerTable] = useState(false);
     const [showOrdersTable, setShowOrdersTable] = useState(false);
 
+    const fetchInventoryReport = async () => {
+        try {
+            const result = await axios.get('http://localhost:5001/api/inventory');
+            setInventoryReport(result.data);
+        } catch (error) {
+            console.error('Error fetching inventory:', error);
+        }
+    };
+
     const fetchCustomers = async () => {
         try {
-            const result = await axios.get('http://localhost:5001/api/customer-report');
+            const result = await axios.get('http://localhost:5001/api/customer-report', {
+                params: {
+                    year: selectedYear === 'All Year' ? null : selectedYear,
+                    month: selectedMonth === 'All Month' ? null : selectedMonth,
+                },
+            });
             setCustomerData(result.data);
         } catch (error) {
             console.error('Error fetching customers:', error);
         }
     };
-
+    
     const fetchOrders = async () => {
         try {
-          const result = await axios.get('http://localhost:5001/api/transaction-report'); 
-          setOrderData(result.data);
+            const result = await axios.get('http://localhost:5001/api/transaction-report', {
+                params: {
+                    year: selectedYear === 'All Year' ? null : selectedYear,
+                    month: selectedMonth === 'All Month' ? null : selectedMonth,
+                },
+            });
+            setOrderData(result.data);
         } catch (error) {
-          console.error('Error fetching orders:', error);
+            console.error('Error fetching orders:', error);
         }
     };
 
-    const handleOrderDetails = async (order_id) => {
+    const fetchPerformanceData = async () => {
         try {
-          const result = await axios.get('http://localhost:5001/api/order-details-report', {params: {order_id}}); 
-          setOrderDetails(result.data);
-          setIsModalOpen(true);
+          const response = await axios.get('http://localhost:5001/api/inventory-performance', {
+            params: {
+              year: selectedYear === 'All Year' ? null : selectedYear,
+              month: selectedMonth === 'All Month' ? null : selectedMonth,
+            },
+          });
+          if (response.status === 200) {
+            setInventoryPerformance(response.data); 
+          }
         } catch (error) {
-          console.error('Error fetching orders:', error);
+          console.error('Error fetching inventory performance:', error);
         }
-    }
+    };
 
     useEffect(() => {
+        fetchPerformanceData();
         fetchCustomers();
         fetchOrders();
+        fetchInventoryReport();
     }, []);
+
+    const handleFilterClick = () => {
+        console.log(inventoryPerformance);
+        fetchCustomers();
+        fetchOrders();
+        fetchPerformanceData();
+    };
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString();
+    };
 
     // Handle year and month filter changes
     const handleYearChange = (event) => {
@@ -67,147 +104,191 @@ const Reports = () => {
 
     // Toggle inventory table view
     const handleInventoryLevelsClick = () => {
-        setShowInventoryTable(!showInventoryTable); 
+        setShowInventoryTable(true); 
         setShowCustomerTable(false); 
-        setShowSalesTable(false);
+        setShowPerformanceTable(false);
         setShowOrdersTable(false);
     };
 
     const handleCustomersClick = () => {
-        setShowCustomerTable(!showCustomerTable); 
+        setShowCustomerTable(true); 
         setShowInventoryTable(false); 
-        setShowSalesTable(false);
+        setShowPerformanceTable(false);
         setShowOrdersTable(false);
     };
 
-    const handleSalesClick = () => {
-        setShowSalesTable(!showInventoryTable); 
+    const handlePerformanceClick = () => {
+        setShowPerformanceTable(true); 
         setShowCustomerTable(false);
         setShowInventoryTable(false);
         setShowOrdersTable(false);
     };
 
     const handleOrdersClick = () => {
-        setShowOrdersTable(!showCustomerTable); 
+        setShowOrdersTable(true); 
         setShowInventoryTable(false); 
         setShowCustomerTable(false); 
-        setShowSalesTable(false);
+        setShowPerformanceTable(false);
     };
 
-    // Download CSV for inventory
-    const downloadInventoryCSV = () => {
-        const csvContent = `data:text/csv;charset=utf-8,Description,Unit Price,Quantity,Unit Measurement\n` + 
-            inventoryData.map(item => `${item.item_description},${item.unit_price},${item.quantity_stocks},${item.unit_measurement}`).join('\n');
-        
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "inventory_levels.csv");
-        document.body.appendChild(link); // Required for Firefox
-        link.click();
+    const handleOrderDetails = async (order_id) => {
+        try {
+          const result = await axios.get('http://localhost:5001/api/order-details-report', {params: {order_id}}); 
+          setOrderDetails(result.data);
+          setIsModalOpen(true);
+        } catch (error) {
+          console.error('Error fetching orders:', error);
+        }
     };
 
-    // Download CSV for customers
-    const downloadCustomersCSV = () => {
-        const csvContent = `data:text/csv;charset=utf-8,Name,Address,Phone Number,Date\n` +
-            customerData.map(customer => `${customer.name},${customer.address},${customer.number},${customer.date}`).join('\n');
-        
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "customers.csv");
-        document.body.appendChild(link);
-        link.click();
-    };
+    const performanceHeaders = [
+        { label: "Item Description", key: "item_description" },
+        { label: "Total Sales", key: "total_sales" },
+        { label: "Total Items Sold", key: "total_items_sold" },
+    ];
+
+    const csvDataPerformance = inventoryPerformance.map(item => ({
+        item_description: item.item_description,
+        total_sales: item.total_sales,
+        total_items_sold: item.total_items_sold,
+    }));
+
+    const inventoryHeaders = [
+        { label: "Item Description", key: "item_description" },
+        { label: "Unit Price", key: "unit_price" },
+        { label: "Quality Stocks", key: "quality_stocks" },
+        { label: "Unit Measurement", key: "unit_measurement" },
+    ];
+
+    const csvDataInventory = inventoryReport.map(item => ({
+        item_description: item.item_description,
+        unit_price: item.unit_price,
+        quality_stocks: item.quality_stocks,
+        unit_measurement: item.unit_measurement,
+    }));
+
+    const customerHeaders = [
+        { label: "Customer Name", key: "customer_name" },
+        { label: "Address", key: "customer_address" },
+        { label: "Number", key: "customer_number" },
+        { label: "Email", key: "customer_email" },
+    ];
+
+    const csvDataCustomer = customerData.map(customer => ({
+        customer_name: customer.customer_name,
+        customer_address: customer.customer_address,
+        customer_number: customer.customer_number,
+        customer_email: customer.customer_email,
+    }));
+
+    const orderHeaders = [
+        { label: "Order ID", key: "order_id" },
+        { label: "Customer Name", key: "customer_name" },
+        { label: "Order Date", key: "order_date" },
+        { label: "Order Deliver", key: "order_deliver" },
+        { label: "Payment Method", key: "payment_mode" },
+    ];
+
+    const csvDataOrders = orderData.map(orders => ({
+        order_id: orders.order_id,
+        customer_name: orders.customer_name,
+        order_date: orders.order_date,
+        order_deliver: orders.order_deliver,
+        payment_mode: orders.payment_mode,
+    }));
 
     return (
         <MainLayout>
             <div className='row'>
                 <div className="reports-table-container p-3 poppins-font">
-                    <div className="d-flex justify-content-between align-items-center">
-                        <h2>Reports</h2>
-                        <div className="d-flex align-items-center">
-
-                            <div className="filter-section d-flex align-items-center">
-                                <select className="form-control" value={selectedYear} onChange={handleYearChange}>
-                                    <option value="All Year">All Year</option>
-                                    <option value="2023">2023</option>
-                                    <option value="2024">2024</option>
-                                    <option value="2025">2025</option>
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            <h2 style={{ fontWeight: '600' }}>Reports</h2>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <div className="d-flex flex-column flex-md-row align-items-center justify-content-md-end mt-3 mt-md-0">
+                            <div className="filter-section d-flex flex-column flex-md-row align-items-center w-100 w-md-auto">
+                                
+                                <select className="form-control mb-2 mb-md-0 mr-md-2 w-100 w-md-auto" value={selectedYear} onChange={handleYearChange}>
+                                <option value="All Year">All Year</option>
+                                <option value="2023">2023</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
                                 </select>
 
-                                <select className="form-control ml-2" value={selectedMonth} onChange={handleMonthChange}>
-                                    <option value="All Month">All Month</option>
-                                    <option value="January">January</option>
-                                    <option value="February">February</option>
-                                    <option value="March">March</option>
-                                    <option value="April">April</option>
-                                    <option value="May">May</option>
-                                    <option value="June">June</option>
-                                    <option value="July">July</option>
-                                    <option value="August">August</option>
-                                    <option value="September">September</option>
-                                    <option value="October">October</option>
-                                    <option value="November">November</option>
-                                    <option value="December">December</option>
+                                <select className="form-control mb-2 mb-md-0 mr-md-2 w-100 w-md-auto" value={selectedMonth} onChange={handleMonthChange}>
+                                <option value="All Month">All Month</option>
+                                <option value="January">January</option>
+                                <option value="February">February</option>
+                                <option value="March">March</option>
+                                <option value="April">April</option>
+                                <option value="May">May</option>
+                                <option value="June">June</option>
+                                <option value="July">July</option>
+                                <option value="August">August</option>
+                                <option value="September">September</option>
+                                <option value="October">October</option>
+                                <option value="November">November</option>
+                                <option value="December">December</option>
                                 </select>
 
-                                <button className="btn btn-primary ml-2">Filter</button>
+                                <button className="btn btn-success w-100 w-md-auto" onClick={handleFilterClick}>Filter</button>
+                            </div>
                             </div>
                         </div>
-                    </div>
+                        </div>
                     <hr />
 
                     <div className="reports-buttons mt-4">
-                        <button className="btn btn-transparent text-primary mr-3" onClick={handleSalesClick}>
+                        <button className="btn btn-transparent text-success mr-3" onClick={handlePerformanceClick}>
                             <FontAwesomeIcon icon={faChartLine} className="mr-2" />
-                            Sales
+                            Inventory Performance
                         </button>
-                        <button className="btn btn-transparent text-primary mr-3" onClick={handleInventoryLevelsClick}>
+                        <button className="btn btn-transparent text-success mr-3" onClick={handleInventoryLevelsClick}>
                             <FontAwesomeIcon icon={faBoxes} className="mr-2" />
                             Inventory Levels
                         </button>
-                        <button className="btn btn-transparent text-primary mr-3" onClick={handleCustomersClick}>
+                        <button className="btn btn-transparent text-success mr-3" onClick={handleCustomersClick}>
                             <FontAwesomeIcon icon={faUsers} className="mr-2" />
                             Customers
                         </button>
-                        <button className="btn btn-transparent text-primary" onClick={handleOrdersClick}>
+                        <button className="btn btn-transparent text-success" onClick={handleOrdersClick}>
                             <FontAwesomeIcon icon={faShoppingCart} className="mr-2" />
                             Purchase Orders
                         </button>
                     </div>
 
-                    {showSalesTable && (
+                    {showPerformanceTable && (
                         <div className="mt-4">
-                            {/* Wrap the heading and button in a flex container */}
                             <div className="d-flex justify-content-between align-items-center mb-3">
-                                <h3>Sales</h3>
-                                <Button onClick={downloadInventoryCSV} variant="success" className="mt-3">
-                                    <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                                <h3 style={{ fontWeight: '600' }}>Inventory Performance</h3>
+                                <CSVLink
+                                    data={csvDataPerformance}
+                                    headers={performanceHeaders}
+                                    filename="inventory_levels.csv"
+                                    target="_blank" 
+                                    className="btn btn-success mt-3"
+                                >
                                     Download CSV
-                                </Button>
+                                </CSVLink>
                             </div>
-                            <Paper>
+                            <Paper className="table-responsive">
                                 <Table>
                                     <TableHead>
                                         <TableRow>
-                                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Item ID</TableCell>
                                         <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Item Description</TableCell>
-                                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Unit Price</TableCell>
-                                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Quality Stocks</TableCell>
-                                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Unit Measurement</TableCell>
+                                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Total Sales</TableCell>
+                                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Total Items Sold</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {inventoryData.map((inventory) => (
+                                        {inventoryPerformance.map((inventory) => (
                                         <TableRow 
                                             key={inventory.item_id} 
                                         >
-                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.item_id}</TableCell>
                                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.item_description}</TableCell>
-                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.unit_price}</TableCell>
-                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.quality_stocks}</TableCell>
-                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.unit_measurement}</TableCell>
+                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.total_sales}</TableCell>
+                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.total_items_sold}</TableCell>
                                         </TableRow>
                                         ))}
                                     </TableBody>
@@ -219,15 +300,19 @@ const Reports = () => {
                     {/* Inventory Levels Table */}
                     {showInventoryTable && (
                         <div className="mt-4">
-                            {/* Wrap the heading and button in a flex container */}
                             <div className="d-flex justify-content-between align-items-center mb-3">
-                                <h3>Inventory Levels</h3>
-                                <Button onClick={downloadInventoryCSV} variant="success" className="mt-3">
-                                    <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                                <h3 style={{ fontWeight: '600' }}>Inventory Levels</h3>
+                                <CSVLink
+                                    data={csvDataInventory}
+                                    headers={inventoryHeaders}
+                                    filename="inventory_levels.csv"
+                                    target="_blank" 
+                                    className="btn btn-success mt-3"
+                                >
                                     Download CSV
-                                </Button>
+                                </CSVLink>
                             </div>
-                            <Paper>
+                            <Paper className="table-responsive">
                                 <Table>
                                     <TableHead>
                                         <TableRow>
@@ -238,7 +323,7 @@ const Reports = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {inventoryData.map((inventory) => (
+                                        {inventoryReport.map((inventory) => (
                                         <TableRow 
                                             key={inventory.item_id} 
                                         >
@@ -257,13 +342,18 @@ const Reports = () => {
                     {showCustomerTable && (
                         <div className="mt-4">
                             <div className="d-flex justify-content-between align-items-center mb-3">
-                                <h3>Customer Details</h3>
-                                <Button onClick={downloadCustomersCSV} variant="success" className="mt-3">
-                                    <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                                <h3 style={{ fontWeight: '600' }}>Customer Details</h3>
+                                <CSVLink
+                                    data={csvDataCustomer}
+                                    headers={customerHeaders}
+                                    filename="customers.csv"
+                                    target="_blank" 
+                                    className="btn btn-success"
+                                >
                                     Download CSV
-                                </Button>
+                                </CSVLink>
                             </div>
-                            <Paper>
+                            <Paper className="table-responsive">
                                 <Table>
                                     <TableHead>
                                         <TableRow>
@@ -294,13 +384,18 @@ const Reports = () => {
                         <div className="mt-4">
                             {/* Wrap the heading and button in a flex container */}
                             <div className="d-flex justify-content-between align-items-center mb-3">
-                                <h3>Purchase Orders</h3>
-                                <Button onClick={downloadInventoryCSV} variant="success" className="mt-3">
-                                    <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                                <h3 style={{ fontWeight: '600' }}>Purchase Orders</h3>
+                                <CSVLink
+                                    data={csvDataOrders}
+                                    headers={orderHeaders}
+                                    filename="purchase_orders.csv"
+                                    target="_blank" 
+                                    className="btn btn-success mt-3"
+                                >
                                     Download CSV
-                                </Button>
+                                </CSVLink>
                             </div>
-                            <Paper>
+                            <Paper className="table-responsive">
                                 <Table>
                                     <TableHead>
                                         <TableRow>
@@ -320,9 +415,9 @@ const Reports = () => {
                                         >
                                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.order_id}</TableCell>
                                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.customer_name}</TableCell>
-                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.order_date}</TableCell>
+                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{formatDate(order.order_date)}</TableCell>
                                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.order_deliver}</TableCell>
-                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.payment_method}</TableCell>
+                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.payment_mode}</TableCell>
                                         </TableRow>
                                         ))}
                                     </TableBody>

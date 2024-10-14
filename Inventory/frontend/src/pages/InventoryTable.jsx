@@ -3,8 +3,8 @@ import '../components/InventoryTable.css';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrash, faSearch, faEdit } from '@fortawesome/free-solid-svg-icons';
-import { Table, TableBody, TableCell, TableHead, TableRow, Paper } from '@mui/material';
+import { faPlus, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { Table, TableBody, TableCell, TableHead, TableRow, Paper, Menu, MenuItem } from '@mui/material';
 import { Modal, Button } from 'react-bootstrap';
 import { debounce } from 'lodash';
 import { toast, Flip } from 'react-toastify';
@@ -18,12 +18,14 @@ const InventoryTable = () => {
     const [formFile, setFormFile] = useState(null); // File state for image upload
     const [editId, setEditId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [filterOption, setFilterOption] = useState('');
     const [filteredData, setFilteredData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
     const [itemToDelete, setItemToDelete] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null); 
     const [deleteMode, setDeleteMode] = useState('');
     const [totalItems, setTotalItems] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
@@ -47,6 +49,11 @@ const InventoryTable = () => {
         fetchInventory();
     }, []);
 
+    useEffect(() => {
+        applyFilter();
+    }, [filterOption, searchTerm, inventoryData]);
+
+
     const toastOptions = {
         position: "top-right",
         autoClose: 1000,
@@ -65,7 +72,58 @@ const InventoryTable = () => {
     };
 
     const handleFileChange = (e) => {
-        setFormFile(e.target.files[0]); // Handle the image file selection
+        setFormFile(e.target.files[0]); 
+    };
+
+    const handleOpenClick = (event) => {
+        setAnchorEl(event.currentTarget); 
+    };
+
+    const handleFilterClick = (option) => {
+        setFilterOption(option); 
+    };
+
+    const applyFilter = () => {
+        let filtered = [...inventoryData];
+
+        // Apply search filter first
+        if (searchTerm) {
+            const lowercasedFilter = searchTerm.toLowerCase();
+            filtered = filtered.filter(item =>
+                item.item_description.toLowerCase().includes(lowercasedFilter)
+            );
+        }
+
+        // Apply filter based on selected option
+        switch (filterOption) {
+            case 'a-z':
+                filtered.sort((a, b) => a.item_description.localeCompare(b.item_description));
+                break;
+            case 'z-a':
+                filtered.sort((a, b) => b.item_description.localeCompare(a.item_description));
+                break;
+            case 'oldest':
+                filtered.sort((a, b) => a.item_id - b.item_id); 
+                break;
+            case 'newest':
+                filtered.sort((a, b) => b.item_id - a.item_id); 
+                break;
+            case 'bags':
+            case 'gals':
+            case 'pcs':
+            case 'pairs':
+            case 'roll':
+                filtered = filtered.filter(item => item.unit_measurement === filterOption);
+                break;
+            default:
+                break;
+        }
+
+        setFilteredData(filtered);
+    };
+
+    const handleCloseDropdown = () => {
+        setAnchorEl(null);
     };
 
     const handleAddInventory = () => {
@@ -80,9 +138,6 @@ const InventoryTable = () => {
             quality_stocks: parseInt(formData.qualityStocks, 10),
             unit_measurement: formData.unitMeasurement,
         };
-
-        console.log(editId);
-        console.log(formData);
 
         const requestUrl = editId ? `http://localhost:5001/api/inventory/${editId}` : 'http://localhost:5001/api/inventory';
         const method = editId ? 'PUT' : 'POST';
@@ -218,40 +273,43 @@ const InventoryTable = () => {
         <MainLayout>
             <div className='row'>
                 <div className="inventory-table-container p-3 poppins-font">
-                    <div className="d-flex justify-content-between align-items-center">
-                        <h2>Inventory</h2>
-                        <div className="d-flex position-relative">
-                            <input
-                                type="text"
-                                placeholder="Search inventory..."
-                                defaultValue={searchTerm}
-                                onChange={(e) => handleSearchChange(e.target.value)}
-                                className="search-bar form-control mx-2"
-                                style={{ paddingRight: '2.5rem' }}
-                            />
-                            <FontAwesomeIcon
-                                icon={faSearch}
-                                className="position-absolute"
-                                style={{ right: '1.5rem', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }}
-                            />
+                    <div className="row justify-content-between align-items-center">
+                        <div className="header-title col-md-6 col-sm-12">
+                            <h2 style={{ fontWeight: '600' }}>Inventory</h2>
+                        </div>
+                        <div className="header-search col-md-6 col-sm-12 d-flex justify-content-end">
+                            <div className="search-bar-container">
+                                <input
+                                    type="text"
+                                    placeholder="Search inventory..."
+                                    defaultValue={searchTerm}
+                                    onChange={(e) => handleSearchChange(e.target.value)}
+                                    className="search-bar form-control"
+                                />
+                            </div>
                         </div>
                     </div>
                     <hr />
 
-                    <div className="d-flex my-2">
-                        <button onClick={() => { resetForm(); setShowModal(true); }} className="btn btn-primary">
-                            <FontAwesomeIcon icon={faPlus} className="me-2" />
-                            Add Inventory
-                        </button>
-                        {selectedItems.length > 0 && (
-                            <button className="btn btn-danger mx-2" onClick={confirmDeleteSelected}>
-                                <FontAwesomeIcon icon={faTrash} className="me-2" />
-                                Delete Selected
+                    <div className="d-flex my-2 justify-content-between align-items-center flex-wrap">
+                        <div className="d-flex">
+                            <button onClick={() => { resetForm(); setShowModal(true); }} className="btn btn-success">
+                                <FontAwesomeIcon icon={faPlus} className="me-2" />
+                                Add Inventory
                             </button>
-                        )}
+                            {selectedItems.length > 0 && (
+                                <button className="btn btn-danger mx-2" onClick={confirmDeleteSelected}>
+                                    <FontAwesomeIcon icon={faTrash} className="me-2" />
+                                    Delete Selected
+                                </button>
+                            )}
+                        </div>
+                        <button className='btn btn-success ms-auto mt-2 mt-sm-0' onClick={handleOpenClick}>
+                            <i className='bi bi-funnel'/> Filter
+                        </button>
                     </div>
 
-                    <Paper>
+                    <Paper className="table-responsive">
                         <Table>
                         <TableHead>
                             <TableRow>
@@ -311,17 +369,17 @@ const InventoryTable = () => {
                     {isLoading && <p>Loading...</p>}
                     {!isLoading && filteredData.length === 0 && <p>No inventory found.</p>}
 
-                    <div className="pagination">
+                    <div className="pagination d-flex flex-column flex-sm-row justify-content-between align-items-center">
                         <button
-                            className="pagination-btn"
+                            className="pagination-btn mb-2 mb-sm-0"
                             onClick={handlePrevPage}
                             disabled={currentPage === 1}
                         >
                             Previous
                         </button>
-                        <span className="pagination-info">
+                        <div className="pagination-info mb-2 mb-sm-0 text-center">
                             Page {currentPage} of {totalPages}
-                        </span>
+                        </div>
                         <button
                             className="pagination-btn"
                             onClick={handleNextPage}
@@ -396,7 +454,7 @@ const InventoryTable = () => {
                             <Button variant="secondary" onClick={() => setShowModal(false)}>
                                 Close
                             </Button>
-                            <Button variant="primary" onClick={handleAddInventory}>
+                            <Button variant="success" onClick={handleAddInventory}>
                                 {editId ? 'Update Inventory' : 'Add Inventory'}
                             </Button>
                         </Modal.Footer>
@@ -418,6 +476,31 @@ const InventoryTable = () => {
                             </Button>
                         </Modal.Footer>
                     </Modal>
+
+                    <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={handleCloseDropdown}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'center',
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'center',
+                        }}
+                    >
+                        <MenuItem onClick={() => handleFilterClick("")}>All</MenuItem>
+                        <MenuItem onClick={() => handleFilterClick("a-z")}>A-Z</MenuItem>
+                        <MenuItem onClick={() => handleFilterClick("z-a")}>Z-A</MenuItem>
+                        <MenuItem onClick={() => handleFilterClick("oldest")}>Oldest</MenuItem>
+                        <MenuItem onClick={() => handleFilterClick("newest")}>Newest</MenuItem>
+                        <MenuItem onClick={() => handleFilterClick("bags")}>Bags</MenuItem>
+                        <MenuItem onClick={() => handleFilterClick("gals")}>Gals</MenuItem>
+                        <MenuItem onClick={() => handleFilterClick("pcs")}>Pcs</MenuItem>
+                        <MenuItem onClick={() => handleFilterClick("pairs")}>Pairs</MenuItem>
+                        <MenuItem onClick={() => handleFilterClick("roll")}>Roll</MenuItem>
+                    </Menu>
                 </div>
             </div>
     </MainLayout>

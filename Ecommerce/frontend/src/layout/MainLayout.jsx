@@ -154,7 +154,7 @@ function MainLayout({children}) {
 
     const handleSignIn = () => {
         setAnchorEl(null);
-        navigate('/');
+        navigate('/login');
     };
 
     const handleInputChange = (e) => {
@@ -279,7 +279,7 @@ function MainLayout({children}) {
             <div className="container">
               <section className="header-container">
                 <div className="logo">
-                    <Link to="/main" aria-label="Shopping Cart">
+                    <Link to="/" aria-label="Shopping Cart">
                         <p className="icon-text">SIG BUILDERS</p>
                         <p className="sub-icon-text">and Construction Supply Inc.</p>
                     </Link>
@@ -341,13 +341,22 @@ function MainLayout({children}) {
                 </div>
 
                 <div className="icon-container">
-                    <i
-                        className="fa fa-user icon-circle"
-                        role="button"
-                        aria-label="Open Profile"
-                        style={{ cursor: "pointer" }}
-                        onClick={handleOpenProfileModal}
-                    />
+                    {persistedCustomer === '' || persistedCustomer === null ?
+                        <i
+                            className="fa fa-user icon-circle"
+                            role="button"
+                            aria-label="Open Profile"
+                            style={{ cursor: "not-allowed" }}
+                        />
+                    :   
+                        <i
+                            className="fa fa-user icon-circle"
+                            role="button"
+                            aria-label="Open Profile"
+                            style={{ cursor: "pointer" }}
+                            onClick={handleOpenProfileModal}
+                        />
+                    } 
                     <div className="cart">
                         <Link to="/cart" aria-label="Shopping Cart">
                             <i className="fa fa-shopping-bag icon-circle"></i>

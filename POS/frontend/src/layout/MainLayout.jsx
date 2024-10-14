@@ -62,6 +62,7 @@ function MainLayout({children}) {
       account_username: persistedUser?.account_username || '',
       account_email: persistedUser?.account_email || '',
       account_profile: persistedUser?.account_profile || null,
+      account_preview_profile: null,
     });
 
     const [userPassword, setUserPassword] = useState({
@@ -102,6 +103,7 @@ function MainLayout({children}) {
           account_username: persistedUser.account_username,
           account_email: persistedUser.account_email,
           account_profile: persistedUser.account_profile,
+          account_preview_profile: null,
       });
       setOpenProfileDetailsModal(true);
     };
@@ -121,7 +123,8 @@ function MainLayout({children}) {
             const imageUrl = URL.createObjectURL(file); 
             setUserDetails((prevDetails) => ({
                 ...prevDetails,
-                account_profile: imageUrl 
+                account_profile: file,
+                account_preview_profile: imageUrl
             }));
         }
     };
@@ -139,10 +142,12 @@ function MainLayout({children}) {
 
         if (!old_password || !new_password || !confirm_password) {
             toast.error("All fields required!", toastOptions);
+            return;
         }
 
         if (new_password !== confirm_password) {
             toast.error("New and confirm password do not match.", toastOptions);
+            return;
         }
 
         if (errors.length > 0) {
@@ -194,6 +199,7 @@ function MainLayout({children}) {
           formDataToSend.append('employee_id', employee_id);
           formDataToSend.append('account_username', account_username);
           formDataToSend.append('account_email', account_email);
+          console.log(userDetails.account_profile);
 
           if (userDetails.account_profile) {
               formDataToSend.append('account_profile', userDetails.account_profile);
@@ -217,194 +223,381 @@ function MainLayout({children}) {
 
     const handleLogoutClick = () => {
         logout();
+        navigate('/')
     }
 
   return (
     <div className='layout'>
-        <header>
-            <div className='web-header'>
-                <div className='row'>
-                    <div className="header-container d-flex justify-content-between align-items-center">
-                        <div className="logo">
-                            <p className="icon-text">SIG BUILDERS</p>
-                            <p className="sub-icon-text">and Construction Supply Inc.</p>
-                        </div>
+        <div>
+            <header>
+                <div className='web-header'>
+                    <div className='row'>
+                        <div className="header-container d-flex justify-content-between align-items-center">
+                            <div className="logo">
+                                <p className="icon-text">SIG BUILDERS</p>
+                                <p className="sub-icon-text">and Construction Supply Inc.</p>
+                            </div>
 
-                        <Dropdown className='custom-dropdown'>
-                            <Dropdown.Toggle variant="light" className="profile-dropdown d-flex align-items-center" id="dropdown-basic">
-                                {persistedUser.account_profile ? (
-                                    <img src={persistedUser.account_profile} alt="user avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
-                                ) : (
-                                    <FontAwesomeIcon icon={faUserCircle} style={{ fontSize: '2rem', color: '#aaa' }} />
-                                )}
-                                <span className="ms-2">{persistedUser.account_username}</span>
-                            </Dropdown.Toggle>
-
-                            <Dropdown.Menu className='custom-dropdown-menu'>
-                                <Dropdown.Item onClick={handleOpenProfileModal}>Profile</Dropdown.Item>
-                                <Dropdown.Item onClick={handleOpenProfileDetailsModal}>Change Profile</Dropdown.Item>
-                                <Dropdown.Item onClick={handleOpenPasswordModal}>Change Password</Dropdown.Item>
-                                <Dropdown.Item onClick={handleLogoutClick}>Logout</Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
-
-                        <Dialog open={showProfileModal} onClose={handleCloseProfileModal}>
-                            <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>User Profile</DialogTitle>
-                            <DialogContent>
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                            <Dropdown className='custom-dropdown'>
+                                <Dropdown.Toggle variant="light" className="profile-dropdown d-flex align-items-center" id="dropdown-basic">
                                     {persistedUser.account_profile ? (
-                                        <img src={persistedUser.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} className='mt-2 mb-1'/>
+                                        <img src={persistedUser.account_profile} alt="user avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
                                     ) : (
-                                        <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
+                                        <FontAwesomeIcon icon={faUserCircle} style={{ fontSize: '2rem', color: '#aaa' }} />
                                     )}
-                                    <p><strong>Username:</strong></p>
-                                    <p>{persistedUser.account_username}</p>
-                                    <p><strong>Email:</strong></p>
-                                    <p>{persistedUser.account_email}</p>
-                                    <p><strong>Role:</strong></p>
-                                    <p>{persistedUser.account_role}</p>
-                                </div>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={handleCloseProfileModal} color="primary">
-                                Close
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
+                                    <span className="ms-2">{persistedUser.account_username}</span>
+                                </Dropdown.Toggle>
 
-                        <Dialog open={openProfileDetailsModal} onClose={handleCloseProfileDetailsModal}>
-                          <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>Change Account Details</DialogTitle>
-                          <DialogContent>
-                              <div style={{ textAlign: 'center' }}>
-                              {userDetails.account_profile ? (
-                                  <img src={userDetails.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
-                              ) : (
-                                  <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
-                              )}
-                              </div>
-                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', marginTop: '10px' }}>
-                                  <label style={{ cursor: 'pointer' }}>
-                                      <input 
-                                          type="file" 
-                                          accept="image/*" 
-                                          onChange={handleProfileChange} 
-                                          style={{ display: 'none' }}
-                                      />
-                                      <span style={{
-                                          display: 'inline-block', 
-                                          backgroundColor: '#1B305B', 
-                                          color: 'white', 
-                                          padding: '8px 15px', 
-                                          borderRadius: '5px', 
-                                          cursor: 'pointer'
-                                      }}>
-                                          Upload Profile Picture
-                                      </span>
-                                  </label>
-                              </div>
-                              <TextField
-                              margin="dense"
-                              label="Name"
-                              type="text"
-                              fullWidth
-                              name="account_username"
-                              value={userDetails.account_username}
-                              onChange={handleInputChange}
-                              />
-                              <TextField
-                              margin="dense"
-                              label="Email"
-                              type="email"
-                              fullWidth
-                              name="account_email"
-                              value={userDetails.account_email}
-                              onChange={handleInputChange}
-                              />
-                          </DialogContent>
-                          <DialogActions>
-                              <Button onClick={handleCloseProfileDetailsModal} color="primary">
-                                Cancel
-                              </Button>
-                              <Button onClick={handleSaveChanges} color="primary">
-                                Save
-                              </Button>
-                          </DialogActions>
-                        </Dialog>
+                                <Dropdown.Menu className='custom-dropdown-menu'>
+                                    <Dropdown.Item onClick={handleOpenProfileModal}>Profile</Dropdown.Item>
+                                    <Dropdown.Item onClick={handleOpenProfileDetailsModal}>Change Profile</Dropdown.Item>
+                                    <Dropdown.Item onClick={handleOpenPasswordModal}>Change Password</Dropdown.Item>
+                                    <Dropdown.Item onClick={handleLogoutClick}>Logout</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
 
-                        <Dialog open={openChangePasswordModal} onClose={handleClosePasswordModal}>
-                            <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>Change Password</DialogTitle>
+                            <Dialog open={showProfileModal} onClose={handleCloseProfileModal}>
+                                <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>User Profile</DialogTitle>
+                                <DialogContent>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                                        {persistedUser.account_profile ? (
+                                            <img src={persistedUser.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} className='mt-2 mb-1'/>
+                                        ) : (
+                                            <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
+                                        )}
+                                        <p><strong>Username:</strong></p>
+                                        <p>{persistedUser.account_username}</p>
+                                        <p><strong>Email:</strong></p>
+                                        <p>{persistedUser.account_email}</p>
+                                        <p><strong>Role:</strong></p>
+                                        <p>{persistedUser.account_role}</p>
+                                    </div>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleCloseProfileModal} color="primary">
+                                    Close
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
+
+                            <Dialog open={openProfileDetailsModal} onClose={handleCloseProfileDetailsModal}>
+                            <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>Change Account Details</DialogTitle>
                             <DialogContent>
                                 <div style={{ textAlign: 'center' }}>
-                                {persistedUser.account_profile ? (
-                                    <img src={persistedUser.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+                                {userDetails.account_profile ? (
+                                    <img src={userDetails.account_preview_profile ? userDetails.account_preview_profile : userDetails.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
                                 ) : (
                                     <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
                                 )}
                                 </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', marginTop: '10px' }}>
+                                    <label style={{ cursor: 'pointer' }}>
+                                        <input 
+                                            type="file" 
+                                            accept="image/*" 
+                                            onChange={handleProfileChange} 
+                                            style={{ display: 'none' }}
+                                        />
+                                        <span style={{
+                                            display: 'inline-block', 
+                                            backgroundColor: '#1B305B', 
+                                            color: 'white', 
+                                            padding: '8px 15px', 
+                                            borderRadius: '5px', 
+                                            cursor: 'pointer'
+                                        }}>
+                                            Upload Profile Picture
+                                        </span>
+                                    </label>
+                                </div>
                                 <TextField
                                 margin="dense"
-                                label="Old Password"
+                                label="Name"
                                 type="text"
                                 fullWidth
-                                name="old_password"
-                                value={userPassword.old_password}
-                                onChange={handleInputPasswordChange}
+                                name="account_username"
+                                value={userDetails.account_username}
+                                onChange={handleInputChange}
                                 />
                                 <TextField
                                 margin="dense"
-                                label="New Password"
-                                type="password"
+                                label="Email"
+                                type="email"
                                 fullWidth
-                                name="new_password"
-                                value={userPassword.new_password}
-                                onChange={handleInputPasswordChange}
-                                />
-                                <TextField
-                                margin="dense"
-                                label="Confirm Password"
-                                type="password"
-                                fullWidth
-                                name="confirm_password"
-                                value={userPassword.confirm_password}
-                                onChange={handleInputPasswordChange}
+                                name="account_email"
+                                value={userDetails.account_email}
+                                onChange={handleInputChange}
                                 />
                             </DialogContent>
                             <DialogActions>
-                                <Button onClick={handleClosePasswordModal} color="primary">
-                                Cancel
+                                <Button onClick={handleCloseProfileDetailsModal} color="primary">
+                                    Cancel
                                 </Button>
-                                <Button onClick={handleSavePassword} color="primary">
-                                Save
+                                <Button onClick={handleSaveChanges} color="primary">
+                                    Save
                                 </Button>
                             </DialogActions>
-                        </Dialog>
+                            </Dialog>
+
+                            <Dialog open={openChangePasswordModal} onClose={handleClosePasswordModal}>
+                                <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>Change Password</DialogTitle>
+                                <DialogContent>
+                                    <div style={{ textAlign: 'center' }}>
+                                    {persistedUser.account_profile ? (
+                                        <img src={persistedUser.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+                                    ) : (
+                                        <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
+                                    )}
+                                    </div>
+                                    <TextField
+                                    margin="dense"
+                                    label="Old Password"
+                                    type="text"
+                                    fullWidth
+                                    name="old_password"
+                                    value={userPassword.old_password}
+                                    onChange={handleInputPasswordChange}
+                                    />
+                                    <TextField
+                                    margin="dense"
+                                    label="New Password"
+                                    type="password"
+                                    fullWidth
+                                    name="new_password"
+                                    value={userPassword.new_password}
+                                    onChange={handleInputPasswordChange}
+                                    />
+                                    <TextField
+                                    margin="dense"
+                                    label="Confirm Password"
+                                    type="password"
+                                    fullWidth
+                                    name="confirm_password"
+                                    value={userPassword.confirm_password}
+                                    onChange={handleInputPasswordChange}
+                                    />
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleClosePasswordModal} color="primary">
+                                    Cancel
+                                    </Button>
+                                    <Button onClick={handleSavePassword} color="primary">
+                                    Save
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </header>
+            </header>
 
-        <div className="layout-container-header">
-            <aside className="sidebar">
-                <SidebarPOS />
-            </aside>
-            
-            <main className="layout-content">
-                {children}
-            </main>
-            <ToastContainer
-                position="top-right"
-                autoClose={1000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-                transition={Flip}
-            />
+            <div className="layout-container-header">
+                <aside className="sidebar">
+                    <SidebarPOS />
+                </aside>
+                
+                <main className="layout-content">
+                    {children}
+                </main>
+                <ToastContainer
+                    position="top-right"
+                    autoClose={1000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                    transition={Flip}
+                />
+            </div>
         </div>
+            {/* <header>
+                <div className='web-header'>
+                    <div className='row'>
+                        <div className="header-container d-flex justify-content-between align-items-center">
+                            <div className="logo">
+                                <p className="icon-text">SIG BUILDERS</p>
+                                <p className="sub-icon-text">and Construction Supply Inc.</p>
+                            </div>
+
+                            <Dropdown className='custom-dropdown'>
+                                <Dropdown.Toggle variant="light" className="profile-dropdown d-flex align-items-center" id="dropdown-basic">
+                                    {persistedUser.account_profile ? (
+                                        <img src={persistedUser.account_profile} alt="user avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                                    ) : (
+                                        <FontAwesomeIcon icon={faUserCircle} style={{ fontSize: '2rem', color: '#aaa' }} />
+                                    )}
+                                    <span className="ms-2">{persistedUser.account_username}</span>
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu className='custom-dropdown-menu'>
+                                    <Dropdown.Item onClick={handleOpenProfileModal}>Profile</Dropdown.Item>
+                                    <Dropdown.Item onClick={handleOpenProfileDetailsModal}>Change Profile</Dropdown.Item>
+                                    <Dropdown.Item onClick={handleOpenPasswordModal}>Change Password</Dropdown.Item>
+                                    <Dropdown.Item onClick={handleLogoutClick}>Logout</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+
+                            <Dialog open={showProfileModal} onClose={handleCloseProfileModal}>
+                                <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>User Profile</DialogTitle>
+                                <DialogContent>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                                        {persistedUser.account_profile ? (
+                                            <img src={persistedUser.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} className='mt-2 mb-1'/>
+                                        ) : (
+                                            <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
+                                        )}
+                                        <p><strong>Username:</strong></p>
+                                        <p>{persistedUser.account_username}</p>
+                                        <p><strong>Email:</strong></p>
+                                        <p>{persistedUser.account_email}</p>
+                                        <p><strong>Role:</strong></p>
+                                        <p>{persistedUser.account_role}</p>
+                                    </div>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleCloseProfileModal} color="primary">
+                                    Close
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
+
+                            <Dialog open={openProfileDetailsModal} onClose={handleCloseProfileDetailsModal}>
+                            <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>Change Account Details</DialogTitle>
+                            <DialogContent>
+                                <div style={{ textAlign: 'center' }}>
+                                {userDetails.account_profile ? (
+                                    <img src={userDetails.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+                                ) : (
+                                    <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
+                                )}
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', marginTop: '10px' }}>
+                                    <label style={{ cursor: 'pointer' }}>
+                                        <input 
+                                            type="file" 
+                                            accept="image/*" 
+                                            onChange={handleProfileChange} 
+                                            style={{ display: 'none' }}
+                                        />
+                                        <span style={{
+                                            display: 'inline-block', 
+                                            backgroundColor: '#1B305B', 
+                                            color: 'white', 
+                                            padding: '8px 15px', 
+                                            borderRadius: '5px', 
+                                            cursor: 'pointer'
+                                        }}>
+                                            Upload Profile Picture
+                                        </span>
+                                    </label>
+                                </div>
+                                <TextField
+                                margin="dense"
+                                label="Name"
+                                type="text"
+                                fullWidth
+                                name="account_username"
+                                value={userDetails.account_username}
+                                onChange={handleInputChange}
+                                />
+                                <TextField
+                                margin="dense"
+                                label="Email"
+                                type="email"
+                                fullWidth
+                                name="account_email"
+                                value={userDetails.account_email}
+                                onChange={handleInputChange}
+                                />
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleCloseProfileDetailsModal} color="primary">
+                                    Cancel
+                                </Button>
+                                <Button onClick={handleSaveChanges} color="primary">
+                                    Save
+                                </Button>
+                            </DialogActions>
+                            </Dialog>
+
+                            <Dialog open={openChangePasswordModal} onClose={handleClosePasswordModal}>
+                                <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>Change Password</DialogTitle>
+                                <DialogContent>
+                                    <div style={{ textAlign: 'center' }}>
+                                    {persistedUser.account_profile ? (
+                                        <img src={persistedUser.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+                                    ) : (
+                                        <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
+                                    )}
+                                    </div>
+                                    <TextField
+                                    margin="dense"
+                                    label="Old Password"
+                                    type="text"
+                                    fullWidth
+                                    name="old_password"
+                                    value={userPassword.old_password}
+                                    onChange={handleInputPasswordChange}
+                                    />
+                                    <TextField
+                                    margin="dense"
+                                    label="New Password"
+                                    type="password"
+                                    fullWidth
+                                    name="new_password"
+                                    value={userPassword.new_password}
+                                    onChange={handleInputPasswordChange}
+                                    />
+                                    <TextField
+                                    margin="dense"
+                                    label="Confirm Password"
+                                    type="password"
+                                    fullWidth
+                                    name="confirm_password"
+                                    value={userPassword.confirm_password}
+                                    onChange={handleInputPasswordChange}
+                                    />
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleClosePasswordModal} color="primary">
+                                    Cancel
+                                    </Button>
+                                    <Button onClick={handleSavePassword} color="primary">
+                                    Save
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div className="layout-container-header">
+                <aside className="sidebar">
+                    <SidebarPOS className={`sidebar ${sidebarOpen ? 'open' : ''}`} />
+                </aside>
+                
+                <main className="layout-content">
+                    {children}
+                </main>
+                <ToastContainer
+                    position="top-right"
+                    autoClose={1000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                    transition={Flip}
+                />
+            </div> */}
    </div>
   )
 }

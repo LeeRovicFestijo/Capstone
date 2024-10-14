@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios'; 
-import SidebarPOS from '../components/SidebarPOS';
 import { usePOS } from '../api/POSProvider';
 import '../components/customer-style.css'; 
 import CustomerModal from '../components/CustomerModal';
@@ -66,7 +65,6 @@ function CustomerPage() {
   };
 
   const handleSaveCustomer = async (customer) => {
-    console.log('Saving customer:', customer);
     try {
       let newCustomer;
 
@@ -75,7 +73,7 @@ function CustomerPage() {
         newCustomer = response.data;
         console.log(newCustomer);
       } else {
-        const response = await axios.post('http://localhost:5001/api/customer', customer);
+        const response = await axios.post('http://localhost:5001/api/add-customer', customer);
         newCustomer = response.data; 
         console.log(newCustomer); 
       }
@@ -99,27 +97,6 @@ function CustomerPage() {
       alert('Failed to save customer');
     }
   };  
-
-  const handleDeleteCustomer = async () => {
-    if (!selectedCustomerLocal) return;
-
-    const confirmDelete = window.confirm(`Are you sure you want to delete ${selectedCustomerLocal.customer_name}?`);
-    if (!confirmDelete) return;
-
-    try {
-      await axios.delete(`http://localhost:5001/api/customer/${selectedCustomerLocal.customer_id}`);
-      setRecentCustomers((prevCustomers) =>
-        prevCustomers.filter((customer) => customer.customer_id !== selectedCustomerLocal.customer_id)
-      );
-      setSelectedCustomerLocal(null); 
-      setSelectedCustomer(null);
-      setIsCustomerAdded(false);
-      alert('Customer deleted successfully');
-    } catch (error) {
-      console.error('Error deleting customer:', error);
-      alert('Failed to delete customer');
-    }
-  };
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -160,7 +137,7 @@ function CustomerPage() {
                 value={searchTerm}
                 onChange={handleSearch}
               />
-              <button className="add-customer-btn" onClick={handleOpenAddModal}>+ Add New Customer</button>
+              <button className="add-customer btn btn-success" onClick={handleOpenAddModal}>+ Add New Customer</button>
             </header>
 
             <hr />
@@ -170,9 +147,10 @@ function CustomerPage() {
                 <div className="customer-info">
                   {selectedCustomerLocal.customer_profile ? (
                       <img 
+                          className='customer-profile'
                           src={selectedCustomerLocal.customer_profile} 
                           alt="Customer" 
-                          style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover' }}
+                          style={{ borderRadius: '50%', objectFit: 'cover' }}
                       />
                   ) : (
                       <i className="bi bi-person-circle"></i>
@@ -190,9 +168,7 @@ function CustomerPage() {
                       ) : (
                         <button className="add-btn" onClick={handleAddCustomer}>Add</button>
                       )}
-                      <div className="edit-delete-buttons">
-                        <button className="edit-btn" onClick={() => handleOpenEditModal(selectedCustomerLocal)}><i className='bi bi-pencil-square'/> Edit</button>
-                      </div>                   
+                      <button className="btn btn-primary" onClick={() => handleOpenEditModal(selectedCustomerLocal)}><i className='bi bi-pencil-square'/> Edit</button>
                     </div>
                   </div>
                 </div>

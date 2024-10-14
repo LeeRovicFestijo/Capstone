@@ -18,6 +18,10 @@ body, table, button, input, .modal-content, .form-control, .modal-title {
     font-size: 25px;
 }
 
+.inventory-table-container {
+    overflow-x: auto; 
+  }
+
 /* Inventory form styles */
 .inventory-form {
     display: flex;
@@ -131,6 +135,14 @@ table td button {
     color: #999; /* Color of the icon */
 }
 
+.pagination {
+    flex-wrap: wrap; 
+}
+
+.pagination-info {
+    flex: 1; 
+}
+
 /* Responsive design for larger screens */
 @media (min-width: 768px) {
     .content {
@@ -150,5 +162,36 @@ table td button {
     .inventory-form button {
         flex: 0 0 100px;
         margin-left: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .inventory-table-container {
+      padding: 1rem;
+    }
+
+    .header-search {
+        margin: auto;
+        flex-direction: column;
+    }
+
+    .header-title {
+        text-align: center;
+    }
+  
+    .pagination-btn {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+  
+    .pagination-info {
+        text-align: center;
+        position: absolute;
+        top: 6rem;
+    }
+  
+    .responsive-modal {
+      width: 100% !important;
+      max-width: 100% !important;
     }
 }

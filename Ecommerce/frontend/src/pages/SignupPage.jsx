@@ -35,7 +35,7 @@ function SignupPage() {
           if (response.status === 201) {
             setSuccessMessage('Signup successful! Redirecting to login...');
             setTimeout(() => {
-              navigate('/');
+              navigate('/login');
             }, 2000);
           } else if (response.status === 400) {
               setErrorMessage('Email already in use!');

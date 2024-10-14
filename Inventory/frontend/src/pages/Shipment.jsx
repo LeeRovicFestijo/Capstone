@@ -25,14 +25,14 @@ const Shipment = () => {
 
     const fetchShipmentOrders = async () => {
         setIsLoading(true);
-    try {
-        const result = await axios.get('http://localhost:5001/api/shipment-order'); 
-        setShipmentOrder(result.data);
-    } catch (error) {
-        console.error('Error fetching orders:', error);
-    } finally {
-        setIsLoading(false);
-    }
+        try {
+            const result = await axios.get('http://localhost:5001/api/shipment-order'); 
+            setShipmentOrder(result.data);
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -66,11 +66,11 @@ const Shipment = () => {
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString(); // Change to your desired format
+        return date.toLocaleDateString();
     };
 
     const handleFilterClick = (event) => {
-        setAnchorEl(event.currentTarget); // Anchor to the clicked element
+        setAnchorEl(event.currentTarget); 
     };
 
     const handleStatusClick = (event, shipment) => {
@@ -81,7 +81,6 @@ const Shipment = () => {
 
     // Handle sort option click
     const handleSortOptionClick = (option) => {
-      console.log(selectedPayment);
       if (["Cash", "GCash", "PayMaya", "Card"].includes(option)) {
           setSelectedPayment(option); 
       } else if (["Pending", "Out For Delivery", "Delivered", "Cancelled"].includes(option)){
@@ -173,7 +172,7 @@ const Shipment = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <button className='filter-btn btn-primary' onClick={handleFilterClick}>
+                <button className='ml-1 btn btn-success' onClick={handleFilterClick}>
                   <i className='bi bi-funnel'/> Filter
                 </button>
               </div>
@@ -193,7 +192,7 @@ const Shipment = () => {
               ) : (
                 <div className='row'>
                   <div className="shipment-history">
-                    <Paper>
+                    <Paper className="table-responsive">
                       <Table>
                         <TableHead>
                           <TableRow>
@@ -220,7 +219,20 @@ const Shipment = () => {
                                 </Button>
                               </TableCell>
                               <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>
-                                <Button variant="outlined" color={getButtonColorStatus(shipment.shipping_status)} onClick={(event) => handleStatusClick(event, shipment.order_id)}>
+                                <Button 
+                                  variant="outlined" 
+                                  color={getButtonColorStatus(shipment.shipping_status)} 
+                                  onClick={(event) => handleStatusClick(event, shipment.order_id)}
+                                  disabled={shipment.shipping_status === 'Delivered' || shipment.shipping_status === 'Cancelled'}
+                                  sx={{
+                                    '&.Mui-disabled': {
+                                      color: shipment.shipping_status === 'Delivered' ? 'green' : 
+                                             shipment.shipping_status === 'Cancelled' ? 'red' : 'gray', // Set color based on status
+                                      borderColor: shipment.shipping_status === 'Delivered' ? 'green' : 
+                                                   shipment.shipping_status === 'Cancelled' ? 'red' : 'gray', // Set border color too
+                                    }
+                                  }}
+                                >
                                   {shipment.shipping_status}
                                 </Button>
                               </TableCell>
@@ -229,24 +241,24 @@ const Shipment = () => {
                         </TableBody>
                       </Table>
                     </Paper>
-                    <div className="pagination">
-                      <button
-                          className="pagination-btn"
-                          onClick={handlePrevPage}
-                          disabled={currentPage === 1}
-                      >
-                          Previous
-                      </button>
-                      <span className="pagination-info">
-                          Page {currentPage} of {totalPages}
-                      </span>
-                      <button
-                          className="pagination-btn"
-                          onClick={handleNextPage}
-                          disabled={currentPage === totalPages}
-                      >
-                          Next
-                      </button>
+                    <div className="pagination d-flex flex-column flex-sm-row justify-content-between align-items-center">
+                        <button
+                            className="pagination-btn mb-2 mb-sm-0"
+                            onClick={handlePrevPage}
+                            disabled={currentPage === 1}
+                        >
+                            Previous
+                        </button>
+                        <div className="pagination-info mb-2 mb-sm-0">
+                            Page {currentPage} of {totalPages}
+                        </div>
+                        <button
+                            className="pagination-btn"
+                            onClick={handleNextPage}
+                            disabled={currentPage === totalPages}
+                        >
+                            Next
+                        </button>
                     </div>
                   </div>
                 </div>

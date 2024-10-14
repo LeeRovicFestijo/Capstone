@@ -31,7 +31,7 @@ body {
 }
 
 .filter-btn, .add-btn {
-    background-color: #007bff; /* Primary color */
+    background-color: '#198754'; /* Primary color */
     color: white; /* Text color */
     border: none; /* No border */
     border-radius: 5px; /* Rounded corners */
@@ -65,7 +65,7 @@ body {
 }
 
 .profile-dropdown-account {
-    background-color: #007bff;
+    background-color: rgb(25, 135, 84);
     color: white;
 }
 
@@ -78,9 +78,9 @@ body {
 }
 
 .pagination-btn {
-    border: 2px solid #007bff;
+    border: 2px solid rgb(25, 135, 84);
     background: transparent;
-    color: #007bff;
+    color: rgb(25, 135, 84);
     padding: 8px 16px;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
@@ -88,7 +88,7 @@ body {
 }
 
 .pagination-btn:hover {
-    background-color: #007bff;
+    background-color: rgb(25, 135, 84);
     color: #fff;
 }
 
@@ -97,4 +97,12 @@ body {
     left: 50%;
     transform: translateX(-50%);
     font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .pagination-info {
+      text-align: center;
+      position: absolute;
+      top: 6rem;
+    }
 }

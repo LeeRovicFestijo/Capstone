@@ -1,10 +1,10 @@
 /* Header.css */
 .web-header {
-    background-color: #1B305B; 
+    background-color: rgb(20, 48, 36); 
     padding: 19px 20px; 
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
     position: sticky; 
-    top: 0; /* Stick to the top */
+    top: 0; 
     z-index: 1000;
 }
 
@@ -16,7 +16,6 @@
 }
 
 .logo {
-    margin-left: 30px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -40,7 +39,7 @@
 
 .sub-icon-text {
   font-size: 0.9rem;
-  color: white;
+  color: #ddbb68;
   @media (max-width: 768px) {
       font-size: 0.7rem; 
   }
@@ -92,40 +91,52 @@
     height: 100vh;
 }
 
-.layout-content {
-    flex-grow: 1;
-    padding: 20px;
-    overflow-y: auto;
-}
-
 .layout-container-header {
     display: flex;
-    flex-grow: 1;
-    height: 100%;
 }
 
 .layout-content {
-    padding: 0;
-    margin: 0;
     flex-grow: 1;
     padding: 20px;
     overflow-y: auto;
-    width: 100%;  
-    height: 88vh; 
     box-sizing: border-box;
 }
 
 .sidebar {
     justify-content: center;
-    width: 200px;
-    background-color: #1B305B;
+    width: 250px;
+    background-color: rgb(20, 48, 36);
     color: white;
     padding: 30px;
+    transition: width 0.3s ease;
+}
+
+.content {
+    flex: 1;
+    padding: 20px;
+    transition: margin-left 0.3s ease;
 }
 
 @media (max-width: 768px) {
     .header-container {
         padding: 0.5rem;
+    }
+
+    .sidebar {
+        width: 50px; 
+        /* overflow: hidden; */
+    }
+
+    .content {
+        margin-left: 0; /* No margin for content */
+    }
+
+    .sidebar.open {
+        width: 250px; /* Expanded width */
+    }
+
+    .content.open {
+        margin-left: 250px; /* Shift content when sidebar is open */
     }
 }
 

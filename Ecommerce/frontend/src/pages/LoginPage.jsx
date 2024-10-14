@@ -29,7 +29,7 @@ function LoginPage() {
         if (response.status === 200) {
           const customer = response.data.customer;
           setPersistedCustomer(customer);
-          navigate('/main', { replace: true });
+          navigate('/', { replace: true });
         }
 
         if (response.status === 404) {

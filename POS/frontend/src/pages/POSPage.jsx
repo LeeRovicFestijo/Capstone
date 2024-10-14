@@ -240,9 +240,9 @@ function POSPage() {
                     </div>
                     <div className="col-lg-4 border border-gray p-3 d-flex flex-column">
                         <div className='col-lg-12'>
-                            <div className="d-flex justify-content-between">
+                            <div className="orders-action d-flex justify-content-between">
                                 {selectedCustomer ? (
-                                        <div className="customer-profile d-flex align-items-center" onClick={handleRemoveCustomer}>
+                                    <div className="customer-profile-order d-flex align-items-center" onClick={handleRemoveCustomer}>
                                         {selectedCustomer.customer_profile ? (
                                             <img 
                                                 src={selectedCustomer.customer_profile} 
@@ -252,13 +252,13 @@ function POSPage() {
                                         ) : (
                                             <i className="bi bi-person-circle" style={{ fontSize: '30px' }}></i>
                                         )}
-                                        <span style={{ marginLeft: '10px' }}>{selectedCustomer.customer_name}</span>
-                                    </div>
-                                    ) : (
-                                        <button className="btn custom-btn-add-customer" onClick={handleAddCustomer}>
-                                            <i className='bi bi-plus-square'/> Add Customer
-                                        </button>
-                                    )}
+                                    <span style={{ marginLeft: '10px' }}>{selectedCustomer.customer_name}</span>
+                                </div>
+                                ) : (
+                                    <button className="btn custom-btn-add-customer" onClick={handleAddCustomer}>
+                                        <i className='bi bi-plus-square'/> Add Customer
+                                    </button>
+                                )}
                                 <button className="btn custom-btn-reset" onClick={() => setCart([])}>
                                     <FontAwesomeIcon icon={faUndo} /> Reset
                                 </button>

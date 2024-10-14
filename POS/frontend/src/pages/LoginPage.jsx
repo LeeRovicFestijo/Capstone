@@ -21,7 +21,7 @@ function LoginPage() {
 
     if (isFormValid) {
       try {
-        const response = await axios.post('http://localhost:5001/api/login', {
+        const response = await axios.post('http://localhost:5001/api/login-pos', {
           email, 
           password,
         });
@@ -46,10 +46,9 @@ function LoginPage() {
   return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: '91vh' }}>
         <div className="row w-100 mx-2">
-          <div className="col-md-6 text-white d-flex justify-content-center align-items-center flex-column p-4" style={{ backgroundColor: '#1B305B' }}>
-            <h1 className="mb-4">SIG BUILDERS</h1>
-            <h2 className="mb-4">CONSTRUCTION SUPPLY</h2>
-            <p>&copy; All rights reserved 1976.</p>
+          <div className="col-md-6 text-white d-flex justify-content-center align-items-center flex-column p-4"  style={{backgroundColor: 'rgb(20, 48, 36)'}}>
+            <h1 className="mb-2" style={{fontWeight: '600'}}>SIG BUILDERS</h1>
+            <h2 className="mb-4" style={{color: '#ddbb68', fontWeight: '600', textAlign: 'center'}}>AND CONSTRUCTION SUPPLY INC.</h2>
           </div>
           <div className="col-md-6 bg-light p-4 d-flex flex-column justify-content-center">
             <h1 className="mb-4">WELCOME!</h1>
@@ -99,7 +98,7 @@ function LoginPage() {
               )}
               <button
                 type="submit"
-                className="btn btn-primary w-100"
+                className="btn btn-success w-100"
                 disabled={!isFormValid && !formSubmitted}
               >
                 Login
