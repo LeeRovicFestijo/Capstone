@@ -8,6 +8,10 @@ import MainPage from './pages/MainPage';
 import ProductDetails from './pages/ProductDetails';
 import { EcommerceApi } from './Api/EcommerceApi';
 import OrderHistoryPage from './pages/OrderHistoryPage';
+import SuccessPage from './pages/SuccessPage';
+import CancelPage from './pages/CancelPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 function App() {
   return (
@@ -19,6 +23,10 @@ function App() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/order-history" element={<OrderHistoryPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path='/success' element={<SuccessPage />} />
+        <Route path='/cancel' element={<CancelPage />} />
+        <Route path='/forgot-password' element={<ForgotPasswordPage />} />
+        <Route path='/reset-password/:token' element={<ResetPasswordPage />} />
       </Routes>
     </EcommerceApi>
   );

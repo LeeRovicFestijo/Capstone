@@ -1,0 +1,51 @@
+.success-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 88vh;
+    background-color: #f4f4f4;
+  }
+  
+  .success-message {
+    text-align: center;
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .success-icon {
+    background-color: #28a745; 
+    border-radius: 50%;   
+    width: 100px;         
+    height: 100px;        
+    font-size: 50px;      
+    color: white;       
+    display: flex;         
+    align-items: center;   
+    justify-content: center; 
+    margin-bottom: 20px;    
+}
+  
+  h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .payment-message {
+    font-size: 18px;
+    margin-bottom: 30px;
+  }
+  
+  .success-button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .success-button:hover {
+    background-color: #218838;
+  }

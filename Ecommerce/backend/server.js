@@ -4,13 +4,38 @@ const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const multer = require('multer');
+const stripe = require('stripe')('sk_test_51QAOasDzyRvt3wJc5uwT06oFxBlteFkUika7Mh6GbDu1ESVZAwhisQQHbbeJwNXKADJ9vRjXs2fD6UuDuEETxjaj00jJaEs0Nq');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const User = require('./models/User');
+const sequelize = require('./config/database');
+const { Op } = require('sequelize');
 
 const app = express();
 const PORT = 5001;
 
+(async () => {
+    try {
+      await sequelize.sync();
+      console.log('Database & tables created!');
+    } catch (err) {
+      console.error('Error syncing the database:', err);
+    }
+})();
+
+const transporter = nodemailer.createTransport({
+    host: 'smtp.ethereal.email',
+    port: 587,
+    auth: {
+        user: 'margarett.morissette@ethereal.email',
+        pass: 'uwHZD9aZnc1DU65VXm'
+    }
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // PostgreSQL connection pool
 const pool = new Pool({
@@ -356,23 +381,37 @@ app.post('/api/change-customer-password', upload.none(), async (req, res) => {
     }
 });
 
-app.post('/api/e-orders', async (req, res) => {
-    const { customer_id, cart, total_amount, order_delivery, payment_mode, account_id, shipping_address } = req.body;
-  
+app.post('/api/check-stock', async (req, res) => {
+    const { cart } = req.body; // Assuming cart is an array of objects with item_id and order_quantity
+
     try {
+        // Extract item_ids and quantities from the cart
+        const itemIds = cart.map(item => item.item_id);
+        
+        // Fetch all stocks at once
+        const stockCheck = await pool.query(
+            'SELECT item_id, quality_stocks FROM inventory WHERE item_id = ANY($1::int[])',
+            [itemIds]
+        );
+
+        const stockMap = new Map();
+        stockCheck.rows.forEach(row => {
+            stockMap.set(row.item_id, row.quality_stocks);
+        });
+
         const itemsOutOfStock = [];
 
-        // Check inventory stock
+        // Check against the requested quantities
         for (let item of cart) {
             const { item_id, order_quantity, item_description } = item;
-            const stockCheck = await pool.query('SELECT quality_stocks FROM inventory WHERE item_id = $1', [item_id]);
+            const available_quantity = stockMap.get(item_id);
 
-            if (stockCheck.rows[0].quality_stocks < order_quantity) {
-                // Add item to the itemsOutOfStock array with relevant details
+            // Ensure the stock exists in the database and check quantities
+            if (available_quantity === undefined || available_quantity < order_quantity) {
                 itemsOutOfStock.push({
-                    item_description: item_description,
+                    item_description,
                     requested_quantity: order_quantity,
-                    available_quantity: stockCheck.rows[0].quality_stocks
+                    available_quantity: available_quantity || 0, // Default to 0 if undefined
                 });
             }
         }
@@ -380,10 +419,22 @@ app.post('/api/e-orders', async (req, res) => {
         if (itemsOutOfStock.length > 0) {
             return res.status(400).json({
                 message: 'Some items do not have enough stock',
-                items_out_of_stock: itemsOutOfStock
+                items_out_of_stock: itemsOutOfStock,
             });
         }
+
+        res.status(200).json({ message: 'All items in stock.' });
+    } catch (error) {
+        console.error('Error checking stock:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+app.post('/api/e-orders', async (req, res) => {
+    const { customer_id, cart, total_amount, order_delivery, payment_mode, account_id, shipping_address } = req.body;
   
+    try {
         // Insert into Orders table
         const orderResult = await pool.query(
             'INSERT INTO orders (customer_id, total_amount, order_date, order_deliver, payment_mode, account_id) VALUES ($1, $2, NOW(), $3, $4, $5) RETURNING order_id',
@@ -479,6 +530,88 @@ app.get('/api/order-details-customer', async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Error fetching order details', error: error.message });
     }
+});
+
+app.post('/api/create-checkout-session', async (req,res) => {
+    const { products } = req.body;
+
+    const lineItems = products.map((product) => {
+        const quantity = Number.isInteger(product.quantity) ? product.quantity : 1; 
+
+        return {
+            price_data: {
+                currency: 'php',
+                product_data: {
+                    name: product.item_description,
+                },
+                unit_amount: Math.round(product.unit_price * 100),
+            },
+            quantity: quantity 
+        };
+    });
+
+    const session = await stripe.checkout.sessions.create({
+        payment_method_types:['card'],
+        line_items: lineItems,
+        mode:'payment',
+        success_url:`http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: 'http://localhost:3000/cancel',
+    });
+
+    res.json({id:session.id});
+});
+
+app.post('/api/forgot-password', async (req, res) => {
+    const { email } = req.body;
+  
+    // Check if user exists
+    const user = await User.findOne({ where: { customer_email: email } });
+    if (!user) {
+      return res.status(404).send({ message: 'User not found' });
+    }
+  
+    // Generate token and expiration
+    const token = crypto.randomBytes(32).toString('hex');
+    user.reset_token = token;
+    user.reset_token_expiration = Date.now() + 3600000; // 1 hour
+    await user.save();
+  
+    // Send email
+    const resetUrl = `http://localhost:3000/reset-password/${token}`;
+    await transporter.sendMail({
+      to: email,
+      subject: 'Password Reset',
+      html: `<p>You requested a password reset</p><p>Click this <a href="${resetUrl}">link</a> to set a new password.</p>`,
+    });
+  
+    res.send({ message: 'Password reset link sent' });
+});
+
+app.post('/api/reset-password', async (req, res) => {
+    const { password, token } = req.body;
+  
+    // Find user by token and check expiration
+    const user = await User.findOne({
+      where: {
+        reset_token: token,
+        reset_token_expiration: { [Op.gt]: Date.now() }, // Use Op.gt for Sequelize
+      },
+    });
+  
+    if (!user) {
+      return res.status(400).send({ message: 'Token is invalid or expired' });
+    }
+  
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
+  
+    // Update password and clear token
+    user.customer_password = hashedPassword; // Save the hashed password
+    user.reset_token = undefined; // Clear the reset token
+    user.reset_token_expiration = undefined; // Clear the token expiration
+    await user.save(); // Save the updated user
+  
+    res.send({ message: 'Password has been reset' });
 });
 
 // Start server

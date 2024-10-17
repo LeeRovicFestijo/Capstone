@@ -9,7 +9,6 @@ export function POSProvider({ children }) {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [selectedCustomerLocal, setSelectedCustomerLocal] = useState(null);
   const [isCustomerAdded, setIsCustomerAdded] = useState(false);
-  const [user, setUser] = useState(null);
   const [persistedUser, setPersistedUser] = usePersistState('user', null);
   const [customerName, setCustomerName] = useState(selectedCustomer?.customer_name || '');
 
@@ -19,8 +18,7 @@ export function POSProvider({ children }) {
     setSelectedCustomer(null);
     setSelectedCustomerLocal(null)
     setIsCustomerAdded(false)
-    setUser(null);
-    setPersistedUser('');
+    setPersistedUser(null);
   };
 
   const payment = () => {
@@ -33,7 +31,7 @@ export function POSProvider({ children }) {
   };
 
   return (
-    <POSContext.Provider value={{ cart, setCart, totalAmount, setTotalAmount, selectedCustomer, setSelectedCustomer, selectedCustomerLocal, setSelectedCustomerLocal, isCustomerAdded, setIsCustomerAdded, user, setUser, logout, payment, customerName, setCustomerName, persistedUser, setPersistedUser }}>
+    <POSContext.Provider value={{ cart, setCart, totalAmount, setTotalAmount, selectedCustomer, setSelectedCustomer, selectedCustomerLocal, setSelectedCustomerLocal, isCustomerAdded, setIsCustomerAdded, logout, payment, customerName, setCustomerName, persistedUser, setPersistedUser }}>
       {children}
     </POSContext.Provider>
   );

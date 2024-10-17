@@ -80,7 +80,7 @@ const ProceedModal = ({ isOpen, onClose, cart, fetchProducts, totalAmount, custo
                         <h4>Customer Name: <span>{customer[0].customer_name}</span></h4>
                     </div>
                 )}
-                <h4>Total Amount: <span>₱{totalAmount.toFixed(2)}</span></h4>
+                <h5>Total Amount: <span>₱{totalAmount.toFixed(2)}</span></h5>
                 
                 <div className="form-group">
                     <label>Payment Method:</label>
@@ -93,6 +93,7 @@ const ProceedModal = ({ isOpen, onClose, cart, fetchProducts, totalAmount, custo
                         <MenuItem value="GCash">Gcash</MenuItem>
                         <MenuItem value="PayMaya">PayMaya</MenuItem>
                         <MenuItem value="Card">Card</MenuItem>
+                        <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
                     </Select>
                 </div>
                 

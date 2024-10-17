@@ -2,18 +2,14 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from 'axios';
 import { useEcommerce } from "../Api/EcommerceApi";
 import { toast, Flip } from 'react-toastify';
+import {loadStripe} from '@stripe/stripe-js';
 import MainLayout from '../layout/MainLayout'
 import "../style/cart-style.css";
 
 function CartPage() {
-    const { cart, setCart, persistedCustomer, placeholderImage } = useEcommerce();
+    const { cart, setCart, persistedCustomer, placeholderImage, checkoutDetails, setCheckoutDetails } = useEcommerce();
     const [showPopup, setShowPopup] = useState(false);
-    const [checkoutDetails, setCheckoutDetails] = useState({
-      location: "",
-      paymentMethod: "",
-    });
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(""); 
-  
     const totalPrice = cart.reduce((price, item) => price + item.quantity * item.unit_price, 0);
     const shippingCost = 98;
     const finalPrice = totalPrice + shippingCost; 
@@ -31,8 +27,9 @@ function CartPage() {
       setCheckoutDetails({ location: "", paymentMethod: "" }); 
       setSelectedPaymentMethod(""); 
     };
-  
-    const handleConfirmPayment = async () => {
+
+    const handlePaymentMode = async () => {
+        console.log(cart);
         const { paymentMethod, location } = checkoutDetails;
         if (!persistedCustomer) {
             toast.error('Sign in first before buying!', toastOptions)
@@ -47,6 +44,101 @@ function CartPage() {
             return;
         }
 
+        try {
+            const cartData = {
+                cart: cart.map(item => ({
+                    item_id: item.item_id,
+                    item_description: item.item_description,
+                    order_quantity: item.quantity,
+                    unit_price: item.unit_price,
+                })),
+            }
+            const response = await axios.post('http://localhost:5001/api/check-stock', cartData);
+        
+            // Proceed with payment if stock is sufficient
+            if (paymentMethod === 'Cash on Delivery') {
+                handleConfirmPayment();
+            } else if (paymentMethod === 'GCash') {
+                handleConfirmPayment();
+            } else if (paymentMethod === 'PayMaya') {
+                handleConfirmPayment();
+            } else if (paymentMethod === 'Card') {
+                makePaymentCard();
+            } else if (paymentMethod === 'Bank Transfer') {
+                handleConfirmPayment();
+            }
+        } catch (error) {
+            console.error('Error checking stock:', error);
+        
+            if (error.response) {
+                // Check if the server provided information about out-of-stock items
+                if (error.response.data.items_out_of_stock && error.response.data.items_out_of_stock.length > 0) {
+                    toast.error(
+                        <div>
+                            <p>The following items do not have sufficient stock:</p>
+                            {error.response.data.items_out_of_stock.map((item, index) => (
+                                <p key={index}>
+                                    <strong>{item.item_description}</strong> (requested: {item.requested_quantity}, available: {item.available_quantity})
+                                </p>
+                            ))}
+                        </div>, 
+                        toastOptions
+                    );
+                } else {
+                    toast.error('Some items have insufficient stocks.');
+                }
+            } else {
+                // Handle other errors
+                toast.error('Failed to create order. Please try again.', toastOptions);
+            }
+        }
+
+        // if (paymentMethod === 'Cash on Delivery') {
+        //     handleConfirmPayment();
+        // } else if (paymentMethod === 'GCash') {
+        //     handleConfirmPayment();
+        // } else if (paymentMethod === 'PayMaya') {
+        //     handleConfirmPayment();
+        // } else if (paymentMethod === 'Card') {
+        //     makePaymentCard();
+        //     // handleConfirmPayment();
+        // } else if (paymentMethod === 'Bank Transfer') {
+        //     handleConfirmPayment();
+        // }
+    }
+
+    const makePaymentCard = async () => {
+        const stripe = await loadStripe('pk_test_51QAOasDzyRvt3wJcIhB29xUkNErdVliAEWKpDxALWUKFuGCeZr24XKM97WCqWTCW4bIgffLLKd5SWUo7rgoAx4qL008xNlA773');
+    
+        // Create a body object containing the products in the cart
+        const body = {
+            products: cart
+        };
+    
+        // Define headers for the request
+        const headers = {
+            "Content-Type": "application/json"
+        };
+    
+        try {
+            const response = await axios.post('http://localhost:5001/api/create-checkout-session', body, { headers: headers });
+
+            const session = response.data;
+
+            const result = await stripe.redirectToCheckout({
+                sessionId: session.id
+            });
+
+            if (result.error) {
+                console.error(result.error);
+            }
+        } catch (error) {
+            console.error('Error creating checkout session:', error);
+        }
+    };
+  
+    const handleConfirmPayment = async () => {
+        const { paymentMethod, location } = checkoutDetails;
         const finalPaymentMethod = paymentMethod === 'Cash on Delivery' ? 'Cash' : paymentMethod;
  
         const orderData = {
@@ -68,29 +160,12 @@ function CartPage() {
             const response = await axios.post('http://localhost:5001/api/e-orders', orderData);
             if (response.status === 200) {
                 setCart([]); 
-                closePopup(); 
+                closePopup();
+                toast.success('Thank you for your order!')
             } 
             
         } catch (error) {
-            if (error.response) {
-                if (error.response.data.items_out_of_stock && error.response.data.items_out_of_stock.length > 0) {
-                toast.error(
-                    <div>
-                        <p>The following items do not have sufficient stock:</p>
-                        {error.response.data.items_out_of_stock.map((item, index) => (
-                            <p key={index}>
-                                <strong>{item.item_description}</strong> (requested: {item.requested_quantity}, available: {item.available_quantity})
-                            </p>
-                        ))}
-                    </div>, 
-                    toastOptions
-                );
-                } else {
-                    toast.error('Some items have insufficient stocks.')
-                }
-            } else {
-                alert('Failed to create order. Please try again.');
-            }
+            alert('Failed to create order. Please try again.');
         }
     };
   
@@ -241,7 +316,7 @@ function CartPage() {
                         <div className="payment-methods mt-3">
                             <h3>Payment Method</h3>
                             <div className="payment-buttons">
-                                {["Cash on Delivery" , "GCash", "PayMaya", "Card"].map((method) => (
+                                {["Cash on Delivery" , "GCash", "PayMaya", "Card", "Bank Transfer"].map((method) => (
                                 <button
                                     key={method}
                                     className={`payment-btn ${selectedPaymentMethod === method ? "active" : ""}`} 
@@ -269,7 +344,7 @@ function CartPage() {
                         </div>
 
                         <div className="button-container">
-                            <button className="confirm-payment" onClick={handleConfirmPayment}>
+                            <button className="confirm-payment" onClick={handlePaymentMode}>
                                 Confirm Payment
                             </button>
                         </div>

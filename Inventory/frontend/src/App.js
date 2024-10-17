@@ -7,6 +7,7 @@ import Shipment from './pages/Shipment';  // Shipment page
 import Accounts from './pages/Accounts';  // Accounts page
 import LoginPage from './pages/LoginPage';
 import { InventoryProvider } from './api/InventoryProvider';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 function App() {
     return (
@@ -18,7 +19,8 @@ function App() {
                     <Route path="/inventory" element={<InventoryTable />} />  
                     <Route path="/reports" element={<Reports />} /> 
                     <Route path="/shipment" element={<Shipment />} /> 
-                    <Route path="/accounts" element={<Accounts />} />  
+                    <Route path="/accounts" element={<Accounts />} />
+                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 </Routes>
             </Router>
         </InventoryProvider>

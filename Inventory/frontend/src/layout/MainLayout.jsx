@@ -51,7 +51,7 @@ function MainLayout({children}) {
     }, [persistedAdmin, navigate]);
 
     const fetchAdmin = async () => {
-        const account_id = persistedAdmin.account_id;
+        const account_id = persistedAdmin?.account_id;
         try {
             const response = await axios.get(`http://localhost:5001/api/admin_profile?account_id=${account_id}`);
             if (response.status === 200) {
@@ -218,7 +218,7 @@ function MainLayout({children}) {
 
 
     const handleLogoutClick = () => {
-        setPersistedAdmin('')
+        setPersistedAdmin(null);
         navigate('/');
     } 
 
@@ -235,12 +235,12 @@ function MainLayout({children}) {
 
                         <Dropdown className='custom-dropdown'>
                             <Dropdown.Toggle variant="light" className="profile-dropdown d-flex align-items-center" id="dropdown-basic">
-                                {persistedAdmin.account_profile ? (
+                                {persistedAdmin?.account_profile ? (
                                     <img src={persistedAdmin.account_profile} alt="user avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
                                 ) : (
                                     <FontAwesomeIcon icon={faUserCircle} style={{ fontSize: '2rem', color: '#aaa' }} />
                                 )}
-                                <span className="ms-2">{persistedAdmin.account_username}</span>
+                                <span className="ms-2">{persistedAdmin?.account_username}</span>
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu className='custom-dropdown-menu'>
@@ -255,17 +255,17 @@ function MainLayout({children}) {
                             <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>User Profile</DialogTitle>
                             <DialogContent>
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-                                    {persistedAdmin.account_profile ? (
+                                    {persistedAdmin?.account_profile ? (
                                         <img src={persistedAdmin.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} className='mt-2 mb-1'/>
                                     ) : (
                                         <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
                                     )}
                                     <p><strong>Username:</strong></p>
-                                    <p>{persistedAdmin.account_username}</p>
+                                    <p>{persistedAdmin?.account_username}</p>
                                     <p><strong>Email:</strong></p>
-                                    <p>{persistedAdmin.account_email}</p>
+                                    <p>{persistedAdmin?.account_email}</p>
                                     <p><strong>Role:</strong></p>
-                                    <p>{persistedAdmin.account_role}</p>
+                                    <p>{persistedAdmin?.account_role}</p>
                                 </div>
                             </DialogContent>
                             <DialogActions>
@@ -338,7 +338,7 @@ function MainLayout({children}) {
                             <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>Change Password</DialogTitle>
                             <DialogContent>
                                 <div style={{ textAlign: 'center' }}>
-                                {persistedAdmin.account_profile ? (
+                                {persistedAdmin?.account_profile ? (
                                     <img src={persistedAdmin.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
                                 ) : (
                                     <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />

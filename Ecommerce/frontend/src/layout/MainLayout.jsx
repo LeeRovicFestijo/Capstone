@@ -47,7 +47,7 @@ function MainLayout({children}) {
     }, []);
 
     const fetchCustomer = async () => {
-        const customer_id = persistedCustomer.customer_id;
+        const customer_id = persistedCustomer?.customer_id;
         try {
             const response = await axios.get(`http://localhost:5001/api/customer_profile?customer_id=${customer_id}`);
             if (response.status === 200) {
@@ -148,7 +148,7 @@ function MainLayout({children}) {
     };
 
     const handleLogout = () => {
-        setPersistedCustomer('');
+        setPersistedCustomer(null);
         setAnchorEl(null);
     };
 
@@ -385,15 +385,15 @@ function MainLayout({children}) {
                 <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>User Profile</DialogTitle>
                 <DialogContent>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-                        {persistedCustomer.customer_profile ? (
+                        {persistedCustomer?.customer_profile ? (
                             <img src={persistedCustomer.customer_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} className='mt-2 mb-1'/>
                         ) : (
                             <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
                         )}
                         <p><strong>Name:</strong></p>
-                        <p>{persistedCustomer.customer_name}</p>
+                        <p>{persistedCustomer?.customer_name}</p>
                         <p><strong>Email:</strong></p>
-                        <p>{persistedCustomer.customer_email}</p>
+                        <p>{persistedCustomer?.customer_email}</p>
                     </div>
                 </DialogContent>
                 <DialogActions>

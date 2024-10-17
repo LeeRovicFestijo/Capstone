@@ -32,7 +32,7 @@ function MainLayout({children}) {
     };
 
     const fetchUser = async () => {
-      const account_id = persistedUser.account_id;
+      const account_id = persistedUser?.account_id;
       try {
           const response = await axios.get(`http://localhost:5001/api/user_profile?account_id=${account_id}`);
           if (response.status === 200) {
@@ -51,9 +51,9 @@ function MainLayout({children}) {
     useEffect(() => {
         if (persistedUser) {
             setUserDetails({
-                account_username: persistedUser.account_username,
-                account_email: persistedUser.account_email,
-                account_profile: persistedUser.account_profile,
+                account_username: persistedUser?.account_username || '',
+                account_email: persistedUser?.account_email || '',
+                account_profile: persistedUser?.account_profile || null,
             });
         }
     }, [persistedUser]);
@@ -199,7 +199,6 @@ function MainLayout({children}) {
           formDataToSend.append('employee_id', employee_id);
           formDataToSend.append('account_username', account_username);
           formDataToSend.append('account_email', account_email);
-          console.log(userDetails.account_profile);
 
           if (userDetails.account_profile) {
               formDataToSend.append('account_profile', userDetails.account_profile);
@@ -240,12 +239,12 @@ function MainLayout({children}) {
 
                             <Dropdown className='custom-dropdown'>
                                 <Dropdown.Toggle variant="light" className="profile-dropdown d-flex align-items-center" id="dropdown-basic">
-                                    {persistedUser.account_profile ? (
+                                    {persistedUser?.account_profile ? (
                                         <img src={persistedUser.account_profile} alt="user avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
                                     ) : (
                                         <FontAwesomeIcon icon={faUserCircle} style={{ fontSize: '2rem', color: '#aaa' }} />
                                     )}
-                                    <span className="ms-2">{persistedUser.account_username}</span>
+                                    <span className="ms-2">{persistedUser?.account_username || ''}</span>
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu className='custom-dropdown-menu'>
@@ -260,17 +259,17 @@ function MainLayout({children}) {
                                 <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>User Profile</DialogTitle>
                                 <DialogContent>
                                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-                                        {persistedUser.account_profile ? (
+                                        {persistedUser?.account_profile ? (
                                             <img src={persistedUser.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} className='mt-2 mb-1'/>
                                         ) : (
                                             <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
                                         )}
                                         <p><strong>Username:</strong></p>
-                                        <p>{persistedUser.account_username}</p>
+                                        <p>{persistedUser?.account_username}</p>
                                         <p><strong>Email:</strong></p>
-                                        <p>{persistedUser.account_email}</p>
+                                        <p>{persistedUser?.account_email}</p>
                                         <p><strong>Role:</strong></p>
-                                        <p>{persistedUser.account_role}</p>
+                                        <p>{persistedUser?.account_role}</p>
                                     </div>
                                 </DialogContent>
                                 <DialogActions>
@@ -343,7 +342,7 @@ function MainLayout({children}) {
                                 <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>Change Password</DialogTitle>
                                 <DialogContent>
                                     <div style={{ textAlign: 'center' }}>
-                                    {persistedUser.account_profile ? (
+                                    {persistedUser?.account_profile ? (
                                         <img src={persistedUser.account_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
                                     ) : (
                                         <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />

@@ -8,8 +8,10 @@ export default function usePersistState(key, initialValue) {
   });
 
   useEffect(() => {
-    if (state !== null) {
-      localStorage.setItem(key, JSON.stringify(state));
+    if (state === null) {
+      localStorage.removeItem(key); 
+    } else {
+      localStorage.setItem(key, JSON.stringify(state)); 
     }
   }, [key, state]);
 
