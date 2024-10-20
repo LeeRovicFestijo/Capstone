@@ -57,22 +57,16 @@ function CartPage() {
             const response = await axios.post('http://localhost:5001/api/check-stock', cartData);
         
             // Proceed with payment if stock is sufficient
-            if (paymentMethod === 'Cash on Delivery') {
-                handleConfirmPayment();
-            } else if (paymentMethod === 'GCash') {
+            if (paymentMethod === 'GCash') {
                 setShowPopup(false);
                 setSelectedPaymentMethod("");
-                console.log(paymentMethod);
                 makePaymentGCash();
-            } else if (paymentMethod === 'PayMaya') {
-                handleConfirmPayment();
             } else if (paymentMethod === 'Card') {
                 setShowPopup(false);
                 setSelectedPaymentMethod("");
                 makePaymentCard();
-            } else if (paymentMethod === 'Bank Transfer') {
-                handleConfirmPayment();
             }
+
         } catch (error) {
             console.error('Error checking stock:', error);
         
@@ -111,13 +105,10 @@ function CartPage() {
         };
     
         try {
-            // Send a request to the backend to generate the payment link
             const response = await axios.post('http://localhost:5001/api/create-gcash-checkout-session', body);
-    
-            // Extract the payment link URL from the backend response
+
             const { url } = response.data;
-    
-            // Redirect the user to the PayMongo payment link
+
             window.location.href = url;
         } catch (error) {
             console.error('Error initiating payment:', error);
@@ -153,40 +144,7 @@ function CartPage() {
             console.error('Error creating checkout session:', error);
         }
     };
-  
-    const handleConfirmPayment = async () => {
-        const finalPaymentMethod = paymentMethod === 'Cash on Delivery' ? 'Cash' : paymentMethod;
- 
-        const orderData = {
-            customer_id: persistedCustomer.customer_id,
-            cart: cart.map(item => ({
-                item_id: item.item_id,
-                item_description: item.item_description,
-                order_quantity: item.quantity,
-                unit_price: item.unit_price,
-            })),
-            total_amount: totalPrice,
-            order_delivery: 'yes',
-            payment_mode: finalPaymentMethod,
-            account_id: 1,
-            shipping_address: locationAddress,
-        };
 
-        try {
-            const response = await axios.post('http://localhost:5001/api/e-orders', orderData);
-            if (response.status === 200) {
-                setCart([]); 
-                closePopup();
-                // setLocationAddress('');
-                // setPaymentMethod('');
-                toast.success('Thank you for your order!')
-            } 
-            
-        } catch (error) {
-            alert('Failed to create order. Please try again.');
-        }
-    };
-  
     const handleKeyPress = useCallback((e) => {
       if (e.key === "Escape" && showPopup) {
         closePopup();
@@ -334,7 +292,7 @@ function CartPage() {
                         <div className="payment-methods mt-3">
                             <h3>Payment Method</h3>
                             <div className="payment-buttons">
-                                {["Cash on Delivery" , "GCash", "PayMaya", "Card", "Bank Transfer"].map((method) => (
+                                {["GCash", "Card"].map((method) => (
                                 <button
                                     key={method}
                                     className={`payment-btn ${selectedPaymentMethod === method ? "active" : ""}`} 

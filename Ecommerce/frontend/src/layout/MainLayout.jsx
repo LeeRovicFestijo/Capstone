@@ -565,9 +565,9 @@ function MainLayout({children}) {
                 <div className="box">
                 <h1>Contact Us</h1>
                 <ul>
-                    <li>Poblacion 1, Sta. Teresita, Batangas</li>
-                    <li>Email: uilib.help@gmail.com</li>
-                    <li>Phone: +1 1123 456 780</li>
+                    <li>Location: Poblacion 1, Sta. Teresita, Batangas</li>
+                    <li>Email: simcetxen@yahoo.com</li>
+                    <li>Phone: 09192161595 / 09175942377</li>
                 </ul>
                 </div>
 
