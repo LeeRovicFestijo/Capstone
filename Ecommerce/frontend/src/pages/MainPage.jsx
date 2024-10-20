@@ -7,7 +7,7 @@ import "swiper/css";
 import { toast, Flip } from 'react-toastify';
 import MainLayout from '../layout/MainLayout'
 import { useEcommerce } from "../Api/EcommerceApi";
-import Sdata from "../components/MainPage/Sdata";
+import Sdata from "../components/Sdata";
 import "../style/slider-style.css";
 import "../style/new-arrival-style.css";
 import "../style/wrapper-style.css";
@@ -140,11 +140,9 @@ function MainPage() {
                 quantity: 1,
                 totalAmount: parseFloat(product.unit_price),
             };
-            console.log(addingProduct);
             setCart([...cart, addingProduct]);
             toast.success(`Added ${product.item_description} to cart`, toastOptions);
         }
-        console.log(cart);
     };
 
   return (
@@ -263,8 +261,6 @@ function MainPage() {
                 </div>
             </div>
         </section>
-
-        {/* This section is top items */}
 
         <section className='shop mt-4'>
             <div className='container'>

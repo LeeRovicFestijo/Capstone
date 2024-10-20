@@ -10,6 +10,9 @@ const crypto = require('crypto');
 const User = require('./models/User');
 const sequelize = require('./config/database');
 const { Op } = require('sequelize');
+const axios = require('axios');
+
+const PAYMONGO_SECRET_KEY = 'sk_test_sEx9zBemN6cU4uY4RudHyvtG';
 
 const app = express();
 const PORT = 5001;
@@ -435,6 +438,11 @@ app.post('/api/e-orders', async (req, res) => {
     const { customer_id, cart, total_amount, order_delivery, payment_mode, account_id, shipping_address } = req.body;
   
     try {
+        const paymentResult = await pool.query('UPDATE payment SET payment_status = $1 WHERE customer_id = $2', ['paid', customer_id])
+
+        if (paymentResult.rowCount === 0) {
+            return res.status(400).json({ message: 'No payment found for the customer' });
+        }
         // Insert into Orders table
         const orderResult = await pool.query(
             'INSERT INTO orders (customer_id, total_amount, order_date, order_deliver, payment_mode, account_id) VALUES ($1, $2, NOW(), $3, $4, $5) RETURNING order_id',
@@ -561,7 +569,7 @@ app.post('/api/create-checkout-session', async (req,res) => {
     res.json({id:session.id});
 });
 
-app.post('/api/forgot-password', async (req, res) => {
+app.post('/api/forgot-password-customer', async (req, res) => {
     const { email } = req.body;
   
     // Check if user exists
@@ -587,7 +595,7 @@ app.post('/api/forgot-password', async (req, res) => {
     res.send({ message: 'Password reset link sent' });
 });
 
-app.post('/api/reset-password', async (req, res) => {
+app.post('/api/reset-password-customer', async (req, res) => {
     const { password, token } = req.body;
   
     // Find user by token and check expiration
@@ -612,6 +620,115 @@ app.post('/api/reset-password', async (req, res) => {
     await user.save(); // Save the updated user
   
     res.send({ message: 'Password has been reset' });
+});
+
+const generateRandomId = (length) => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        result += characters[randomIndex];
+    }
+    return result;
+};
+
+app.post('/api/create-gcash-checkout-session', async (req, res) => {
+    const { customer_id, lineItems } = req.body;
+
+    const formattedLineItems = lineItems.map((product) => {
+        return {
+            currency: 'PHP',
+            amount: Math.round(product.unit_price * 100), 
+            name: product.item_description,
+            quantity: product.quantity,
+        };
+    });
+
+    const randomId = generateRandomId(28);
+
+    try {
+        const response = await axios.post(
+            'https://api.paymongo.com/v1/checkout_sessions',
+            {
+                data: {
+                    attributes: {
+                        send_email_receipt: false,
+                        show_line_items: true,
+                        line_items: formattedLineItems, 
+                        payment_method_types: ['gcash'],
+                        success_url: `http://localhost:3000/success?session_id=${randomId}`,
+                        cancel_url: 'http://localhost:3000/cancel',
+                    },
+                },
+            },
+            {
+                headers: {
+                    accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    Authorization: `Basic ${Buffer.from(PAYMONGO_SECRET_KEY).toString('base64')}`, 
+                },
+            }
+        );
+
+        const checkoutUrl = response.data.data.attributes.checkout_url;
+
+        if (!checkoutUrl) {
+            return res.status(500).json({ error: 'Checkout URL not found in response' });
+        }
+
+        const client = await pool.connect();
+
+        try {
+            await client.query('BEGIN');
+
+            // UPSERT query
+            const query = `
+                INSERT INTO payment (customer_id, session_id, payment_status)
+                VALUES ($1, $2, $3)
+                ON CONFLICT (customer_id) 
+                DO UPDATE SET 
+                    session_id = EXCLUDED.session_id,
+                    payment_status = EXCLUDED.payment_status;
+            `;
+            const values = [customer_id, randomId, 'pending'];
+
+            await client.query(query, values);
+            await client.query('COMMIT'); // Commit the transaction
+        } catch (error) {
+            await client.query('ROLLBACK'); // Rollback in case of error
+            console.error('Error inserting/updating payment:', error.message);
+            return res.status(500).json({ error: 'Failed to insert/update payment', details: error.message });
+        } finally {
+            client.release(); // Release the connection back to the pool
+        }
+
+        res.status(200).json({ url: checkoutUrl });
+    } catch (error) {
+        console.error('Error creating checkout session:', error.response ? error.response.data : error.message);
+        res.status(500).json({ error: 'Failed to create checkout session', details: error.response ? error.response.data : error.message });
+    }
+});
+
+app.get('/api/check-payment-status/:customer_id', async (req, res) => {
+    const { customer_id } = req.params;
+
+    try {
+        const client = await pool.connect();
+        const query = 'SELECT session_id, payment_status FROM payment WHERE customer_id = $1';
+        const result = await client.query(query, [customer_id]);
+
+        if (result.rows.length > 0) {
+            const { session_id, payment_status } = result.rows[0];
+            res.status(200).json({ session_id, payment_status });
+        } else {
+            res.status(200).json({ exists: false });
+        }
+
+        client.release();
+    } catch (error) {
+        console.error('Error checking payment status:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 // Start server

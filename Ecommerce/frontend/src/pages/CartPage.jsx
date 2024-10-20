@@ -7,7 +7,7 @@ import MainLayout from '../layout/MainLayout'
 import "../style/cart-style.css";
 
 function CartPage() {
-    const { cart, setCart, persistedCustomer, placeholderImage, checkoutDetails, setCheckoutDetails } = useEcommerce();
+    const { cart, setCart, persistedCustomer, placeholderImage, locationAddress, setLocationAddress, paymentMethod, setPaymentMethod } = useEcommerce();
     const [showPopup, setShowPopup] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(""); 
     const totalPrice = cart.reduce((price, item) => price + item.quantity * item.unit_price, 0);
@@ -17,20 +17,21 @@ function CartPage() {
     const handleBuyClick = () => {
         if (cart.length !== 0) {
             setShowPopup(true);
+            setLocationAddress('');
+            setPaymentMethod('');
         } else {
             toast.error('Put something on your cart first!', toastOptions)
         }
     };
   
     const closePopup = () => {
-      setShowPopup(false);
-      setCheckoutDetails({ location: "", paymentMethod: "" }); 
-      setSelectedPaymentMethod(""); 
+        setShowPopup(false);
+        setSelectedPaymentMethod("");
+        setLocationAddress('');
+        setPaymentMethod('');
     };
 
     const handlePaymentMode = async () => {
-        console.log(cart);
-        const { paymentMethod, location } = checkoutDetails;
         if (!persistedCustomer) {
             toast.error('Sign in first before buying!', toastOptions)
             return;
@@ -39,7 +40,7 @@ function CartPage() {
             toast.error('Choose a payment method!', toastOptions)
             return;
         }
-        if (!location) {
+        if (!locationAddress) {
             toast.error('Enter your delivery location!', toastOptions)
             return;
         }
@@ -59,10 +60,15 @@ function CartPage() {
             if (paymentMethod === 'Cash on Delivery') {
                 handleConfirmPayment();
             } else if (paymentMethod === 'GCash') {
-                handleConfirmPayment();
+                setShowPopup(false);
+                setSelectedPaymentMethod("");
+                console.log(paymentMethod);
+                makePaymentGCash();
             } else if (paymentMethod === 'PayMaya') {
                 handleConfirmPayment();
             } else if (paymentMethod === 'Card') {
+                setShowPopup(false);
+                setSelectedPaymentMethod("");
                 makePaymentCard();
             } else if (paymentMethod === 'Bank Transfer') {
                 handleConfirmPayment();
@@ -92,20 +98,31 @@ function CartPage() {
                 toast.error('Failed to create order. Please try again.', toastOptions);
             }
         }
+    };
 
-        // if (paymentMethod === 'Cash on Delivery') {
-        //     handleConfirmPayment();
-        // } else if (paymentMethod === 'GCash') {
-        //     handleConfirmPayment();
-        // } else if (paymentMethod === 'PayMaya') {
-        //     handleConfirmPayment();
-        // } else if (paymentMethod === 'Card') {
-        //     makePaymentCard();
-        //     // handleConfirmPayment();
-        // } else if (paymentMethod === 'Bank Transfer') {
-        //     handleConfirmPayment();
-        // }
-    }
+    const makePaymentGCash = async () => {
+        const body = {
+            customer_id: persistedCustomer.customer_id,
+            lineItems: cart.map(product => ({
+                quantity: product.quantity,
+                item_description: product.item_description,
+                unit_price: product.unit_price
+            })),
+        };
+    
+        try {
+            // Send a request to the backend to generate the payment link
+            const response = await axios.post('http://localhost:5001/api/create-gcash-checkout-session', body);
+    
+            // Extract the payment link URL from the backend response
+            const { url } = response.data;
+    
+            // Redirect the user to the PayMongo payment link
+            window.location.href = url;
+        } catch (error) {
+            console.error('Error initiating payment:', error);
+        }
+    };
 
     const makePaymentCard = async () => {
         const stripe = await loadStripe('pk_test_51QAOasDzyRvt3wJcIhB29xUkNErdVliAEWKpDxALWUKFuGCeZr24XKM97WCqWTCW4bIgffLLKd5SWUo7rgoAx4qL008xNlA773');
@@ -138,7 +155,6 @@ function CartPage() {
     };
   
     const handleConfirmPayment = async () => {
-        const { paymentMethod, location } = checkoutDetails;
         const finalPaymentMethod = paymentMethod === 'Cash on Delivery' ? 'Cash' : paymentMethod;
  
         const orderData = {
@@ -153,7 +169,7 @@ function CartPage() {
             order_delivery: 'yes',
             payment_mode: finalPaymentMethod,
             account_id: 1,
-            shipping_address: location
+            shipping_address: locationAddress,
         };
 
         try {
@@ -161,6 +177,8 @@ function CartPage() {
             if (response.status === 200) {
                 setCart([]); 
                 closePopup();
+                // setLocationAddress('');
+                // setPaymentMethod('');
                 toast.success('Thank you for your order!')
             } 
             
@@ -321,7 +339,7 @@ function CartPage() {
                                     key={method}
                                     className={`payment-btn ${selectedPaymentMethod === method ? "active" : ""}`} 
                                     onClick={() => {
-                                    setCheckoutDetails((prev) => ({ ...prev, paymentMethod: method }));
+                                    setPaymentMethod(method);
                                     setSelectedPaymentMethod(method); 
                                     }}
                                 >
@@ -336,8 +354,8 @@ function CartPage() {
                             <input
                                 type="text"
                                 id="location"
-                                value={checkoutDetails.location}
-                                onChange={(e) => setCheckoutDetails((prev) => ({ ...prev, location: e.target.value }))}
+                                value={locationAddress? locationAddress : ''}
+                                onChange={(e) => setLocationAddress(e.target.value)}
                                 placeholder="Enter delivery location"
                                 className="large-location-input"
                             />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from '@mui/material';
 import './customer-style.css';
 
 Modal.setAppElement('#root'); 
@@ -97,86 +97,6 @@ const CustomerModal = ({ isOpen, onClose, onSave, editMode, customerToEdit }) =>
     };
 
     return (
-        // <Modal 
-        //     isOpen={isOpen} 
-        //     onRequestClose={onClose}
-        //     className="modal-content"
-        //     overlayClassName="modal-overlay"
-        // >
-        //     <div className='add-customer-form'>
-        //         <h2 className='text-center mb-4'>{editMode ? 'Edit Customer' : 'Add Customer'}</h2>
-                
-        //         <div className='form-group mb-3'>
-        //             <label>Full Name</label>
-        //             <input
-        //                 type="text"
-        //                 name="customer_name"
-        //                 className="form-control"
-        //                 value={customerData.customer_name}
-        //                 onChange={handleChange}
-        //                 placeholder="Enter Full Name"
-        //             />
-        //             {errors.customer_name && <div className="text-danger">{errors.customer_name}</div>}
-        //         </div>
-
-        //         <div className='form-group mb-3'>
-        //             <label>Contact Number</label>
-        //             <input
-        //                 type="text"
-        //                 name="customer_number"
-        //                 className="form-control"
-        //                 value={customerData.customer_number}
-        //                 onChange={handleChange}
-        //                 placeholder="Enter Contact Number"
-        //             />
-        //             {errors.customer_number && <div className="text-danger">{errors.customer_number}</div>}
-        //         </div>
-
-        //         <div className='form-group mb-3'>
-        //             <label>Email Address</label>
-        //             <input
-        //                 type="email"
-        //                 name="customer_email"
-        //                 className="form-control"
-        //                 value={customerData.customer_email}
-        //                 onChange={handleChange}
-        //                 placeholder="Enter Email Address"
-        //             />
-        //             {errors.customer_email && <div className="text-danger">{errors.customer_email}</div>}
-        //         </div>
-
-        //         <div className='form-group mb-3'>
-        //             <label>Address</label>
-        //             <input
-        //                 type="text"
-        //                 name="customer_address"
-        //                 className="form-control"
-        //                 value={customerData.customer_address}
-        //                 onChange={handleChange}
-        //                 placeholder="Enter Address"
-        //             />
-        //             {errors.address && <div className="text-danger">{errors.address}</div>}
-        //         </div>
-
-        //         <div className='form-group mb-3'>
-        //             <label>Date</label>
-        //             <input
-        //                 type="text"
-        //                 name="customer_date"
-        //                 className="form-control"
-        //                 value={customerData.customer_date}
-        //                 readOnly
-        //             />
-        //         </div>
-
-        //         <div className="d-flex justify-content-end">
-        //             <button className="btn btn-primary me-2" onClick={handleSave}>
-        //                 {editMode ? 'Update' : 'Done'}
-        //             </button>
-        //             <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
-        //         </div>
-        //     </div>
-        // </Modal>
         <Dialog open={isOpen} onClose={onClose}>
             <DialogTitle>{editMode ? 'Edit Customer' : 'Add Customer'}</DialogTitle>
             <DialogContent>

@@ -22,7 +22,7 @@ function ResetPasswordPage() {
     }
 
     try {
-      const response = await axios.post('http://localhost:5001/api/reset-password', { password, token });
+      const response = await axios.post('http://localhost:5001/api/reset-password-customer', { password, token });
       if (response.status === 200) {
         setSuccessMessage('Password reset successful! You can now log in.');
         setTimeout(() => {
