@@ -535,7 +535,7 @@ app.get('/api/transaction-report', async (req, res) => {
              o.order_deliver, o.account_id, o.payment_mode, c.customer_name  
       FROM orders o 
       LEFT JOIN customer c ON o.customer_id = c.customer_id
-      LEFT JOIN shipment s ON o.order_id = s.order_id  -- Join with shipment to check shipping status
+      LEFT JOIN shipment s ON o.order_id = s.order_id 
       WHERE (s.shipping_status IS NULL OR s.shipping_status != 'Cancelled')`;
 
     if (year && year !== 'All Year') {

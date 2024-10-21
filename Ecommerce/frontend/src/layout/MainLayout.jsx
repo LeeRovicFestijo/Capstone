@@ -26,6 +26,7 @@ function MainLayout({children}) {
         customer_address: persistedCustomer?.customer_address || '',
         customer_number: persistedCustomer?.customer_number || '',
         customer_profile: persistedCustomer?.customer_profile || null,
+        customer_preview_profile: null,
     });
     const [customerPassword, setCustomerPassword] = useState({
         old_password: '',
@@ -118,6 +119,7 @@ function MainLayout({children}) {
             customer_address: persistedCustomer.customer_address,
             customer_number: persistedCustomer.customer_number,
             customer_profile: persistedCustomer.customer_profile,
+            customer_preview_profile: null,
         });
         setOpenProfileDetailsModal(true);
     };
@@ -166,9 +168,17 @@ function MainLayout({children}) {
         const { name, value } = e.target;
         setCustomerPassword({ ...customerPassword, [name]: value });
     };
-    
-    const handleProfileChange = (e) => {
-        setCustomerDetails({ ...customerDetails, customer_profile: e.target.files[0] });
+
+    const handleProfileChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const imageUrl = URL.createObjectURL(file); 
+            setCustomerDetails((prevDetails) => ({
+                ...prevDetails,
+                customer_profile: file,
+                customer_preview_profile: imageUrl,
+            }));
+        }
     };
 
     const handleSaveChanges = async () => {
@@ -407,7 +417,7 @@ function MainLayout({children}) {
             <DialogContent>
                 <div style={{ textAlign: 'center' }}>
                 {customerDetails.customer_profile ? (
-                    <img src={customerDetails.customer_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+                    <img src={customerDetails.customer_preview_profile ? customerDetails.customer_preview_profile : customerDetails.customer_profile} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
                 ) : (
                     <i className="bi bi-person-circle" style={{ fontSize: '100px', color: 'gray' }} />
                 )}

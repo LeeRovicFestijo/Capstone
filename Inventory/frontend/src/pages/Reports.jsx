@@ -20,6 +20,8 @@ const Reports = () => {
     const [showInventoryTable, setShowInventoryTable] = useState(false);
     const [showCustomerTable, setShowCustomerTable] = useState(false);
     const [showOrdersTable, setShowOrdersTable] = useState(false);
+    const [rowsPerPage] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const fetchInventoryReport = async () => {
         try {
@@ -82,7 +84,6 @@ const Reports = () => {
     }, []);
 
     const handleFilterClick = () => {
-        console.log(inventoryPerformance);
         fetchCustomers();
         fetchOrders();
         fetchPerformanceData();
@@ -196,6 +197,19 @@ const Reports = () => {
         order_deliver: orders.order_deliver,
         payment_mode: orders.payment_mode,
     }));
+
+    const indexOfLastItem = currentPage * rowsPerPage;
+    const indexOfFirstItem = indexOfLastItem - rowsPerPage; 
+    const currentItems = orderData.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(orderData.length / rowsPerPage);
+  
+    const handleNextPage = () => {
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    };
+  
+    const handlePrevPage = () => {
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
+    };
 
     return (
         <MainLayout>
@@ -407,7 +421,7 @@ const Reports = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {orderData.map((order) => (
+                                        {currentItems.map((order) => (
                                         <TableRow 
                                             key={order.order_id} 
                                             style={{cursor:'pointer'}}
@@ -423,6 +437,25 @@ const Reports = () => {
                                     </TableBody>
                                 </Table>
                             </Paper>
+                            <div className="pagination d-flex flex-column flex-sm-row justify-content-between align-items-center">
+                                <button
+                                    className="pagination-btn mb-2 mb-sm-0"
+                                    onClick={handlePrevPage}
+                                    disabled={currentPage === 1}
+                                >
+                                    Previous
+                                </button>
+                                <div className="pagination-info mb-2 mb-sm-0">
+                                    Page {currentPage} of {totalPages}
+                                </div>
+                                <button
+                                    className="pagination-btn"
+                                    onClick={handleNextPage}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    Next
+                                </button>
+                            </div>
                         </div>
                     )}
 

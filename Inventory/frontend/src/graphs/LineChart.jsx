@@ -57,10 +57,10 @@ const LineChart =() => {
         xScale={{ type: 'point' }}
         yScale={{
             type: 'linear',
-            min: 'auto',
+            min: 0,
             max: 'auto',
             stacked: true,
-            reverse: false
+            reverse: false,
         }}
         yFormat=" >-.2f"
         curve="monotoneX"
@@ -77,7 +77,7 @@ const LineChart =() => {
             truncateTickAt: 10
         }}
         axisLeft={{
-            tickSize: 5,
+            tickSize: 3,
             tickPadding: 5,
             tickRotation: 0,
             legend: undefined,

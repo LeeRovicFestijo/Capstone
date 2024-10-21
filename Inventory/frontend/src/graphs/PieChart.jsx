@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'; 
 import axios from 'axios';
 import { ResponsivePie } from '@nivo/pie';
-import { scaleLinear } from 'd3-scale';
 
 const PieChart = () => {
     const [paymentModeSales, setPaymentModeSales] = useState([]);
@@ -30,10 +29,6 @@ const PieChart = () => {
         return <div>No sales data available for this month.</div>;
     }
 
-    const colorScale = scaleLinear()
-        .domain([0, paymentModeSales.length - 1]) 
-        .range(['#f2e0a2', '#ddbb68']); 
-
 
   return (
     <ResponsivePie
@@ -44,7 +39,7 @@ const PieChart = () => {
         padAngle={1}
         cornerRadius={3}
         activeOuterRadiusOffset={8}
-        colors={['#DDBB68', '#B0974D', '#9A8640', '#C7A95B']}
+        colors={['#DDBB68', '#B0974D', '#9A8640', '#af974d', '#C7A95B']}
         colorBy="index"
         borderWidth={3}
         borderColor={{
