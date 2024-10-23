@@ -78,6 +78,7 @@ const LineChart =() => {
         }}
         axisLeft={{
             tickSize: 3,
+            tickValues: 5,
             tickPadding: 5,
             tickRotation: 0,
             legend: undefined,

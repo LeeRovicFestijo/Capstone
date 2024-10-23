@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from 'axios';
 import { useEcommerce } from "../Api/EcommerceApi";
 import { toast, Flip } from 'react-toastify';
-import {loadStripe} from '@stripe/stripe-js';
 import MainLayout from '../layout/MainLayout'
 import "../style/cart-style.css";
 
@@ -61,10 +60,6 @@ function CartPage() {
                 setShowPopup(false);
                 setSelectedPaymentMethod("");
                 makePaymentGCash();
-            } else if (paymentMethod === 'Card') {
-                setShowPopup(false);
-                setSelectedPaymentMethod("");
-                makePaymentCard();
             }
 
         } catch (error) {
@@ -112,36 +107,6 @@ function CartPage() {
             window.location.href = url;
         } catch (error) {
             console.error('Error initiating payment:', error);
-        }
-    };
-
-    const makePaymentCard = async () => {
-        const stripe = await loadStripe('pk_test_51QAOasDzyRvt3wJcIhB29xUkNErdVliAEWKpDxALWUKFuGCeZr24XKM97WCqWTCW4bIgffLLKd5SWUo7rgoAx4qL008xNlA773');
-    
-        // Create a body object containing the products in the cart
-        const body = {
-            products: cart
-        };
-    
-        // Define headers for the request
-        const headers = {
-            "Content-Type": "application/json"
-        };
-    
-        try {
-            const response = await axios.post('http://localhost:5001/api/create-checkout-session', body, { headers: headers });
-
-            const session = response.data;
-
-            const result = await stripe.redirectToCheckout({
-                sessionId: session.id
-            });
-
-            if (result.error) {
-                console.error(result.error);
-            }
-        } catch (error) {
-            console.error('Error creating checkout session:', error);
         }
     };
 
@@ -292,7 +257,7 @@ function CartPage() {
                         <div className="payment-methods mt-3">
                             <h3>Payment Method</h3>
                             <div className="payment-buttons">
-                                {["GCash", "Card"].map((method) => (
+                                {["GCash"].map((method) => (
                                 <button
                                     key={method}
                                     className={`payment-btn ${selectedPaymentMethod === method ? "active" : ""}`} 

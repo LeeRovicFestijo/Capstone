@@ -10,9 +10,9 @@ const PieChart = () => {
           const response = await axios.get('http://localhost:5001/api/sales-by-payment-mode');
           
           const transformedData = response.data.map(item => ({
-            id: item.payment_mode,  // Assuming your API returns a field named `payment_method`
+            id: item.payment_mode,  
             label: item.payment_mode,
-            value: item.total_sales  // Assuming your API returns a field named `total_sales`
+            value: item.total_sales 
         }));
         
         setPaymentModeSales(transformedData); 

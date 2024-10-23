@@ -76,19 +76,18 @@ function LoginPage() {
                 />
                 </div>
                 <div className="form-group mb-3 d-flex justify-content-between">
-                <div className="form-check">
-                    <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="remember"
-                    checked={robotChecked}
-                    onChange={() => setRobotChecked(!robotChecked)}
-                    />
-                    <label className="form-check-label" htmlFor="remember">
-                    I'm not a robot
-                    </label>
-                </div>
-                <a href="/forgot-password">Forgot password?</a>
+                  <div className="form-check">
+                      <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="remember"
+                      checked={robotChecked}
+                      onChange={() => setRobotChecked(!robotChecked)}
+                      />
+                      <label className="form-check-label" htmlFor="remember">
+                      I'm not a robot
+                      </label>
+                  </div>
                 </div>
                 {errorMessage && (
                 <small className="text-danger d-block mb-3">

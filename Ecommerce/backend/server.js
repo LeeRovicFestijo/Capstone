@@ -4,7 +4,6 @@ const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const multer = require('multer');
-const stripe = require('stripe')('sk_test_51QAOasDzyRvt3wJc5uwT06oFxBlteFkUika7Mh6GbDu1ESVZAwhisQQHbbeJwNXKADJ9vRjXs2fD6UuDuEETxjaj00jJaEs0Nq');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const User = require('./models/User');
@@ -12,7 +11,7 @@ const sequelize = require('./config/database');
 const { Op } = require('sequelize');
 const axios = require('axios');
 
-const PAYMONGO_SECRET_KEY = 'sk_test_sEx9zBemN6cU4uY4RudHyvtG';
+const PAYMONGO_SECRET_KEY = process.env.PAYMONGO_SECRET_KEY;
 
 const app = express();
 const PORT = 5001;
@@ -42,11 +41,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // PostgreSQL connection pool
 const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'sigbuilder',
-    password: '12345678',
-    port: 5433,
+    user: process.env.DATABASE_USER,
+    host: process.env.DATABASE_HOST,
+    database: process.env.DATABASE_NAME,
+    password: process.env.DATABASE_PASSWORD,
+    port: process.env.DATABASE_PORT,
 });
 
 const storage = multer.memoryStorage();
@@ -538,35 +537,6 @@ app.get('/api/order-details-customer', async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Error fetching order details', error: error.message });
     }
-});
-
-app.post('/api/create-checkout-session', async (req,res) => {
-    const { products } = req.body;
-
-    const lineItems = products.map((product) => {
-        const quantity = Number.isInteger(product.quantity) ? product.quantity : 1; 
-
-        return {
-            price_data: {
-                currency: 'php',
-                product_data: {
-                    name: product.item_description,
-                },
-                unit_amount: Math.round(product.unit_price * 100),
-            },
-            quantity: quantity 
-        };
-    });
-
-    const session = await stripe.checkout.sessions.create({
-        payment_method_types:['card'],
-        line_items: lineItems,
-        mode:'payment',
-        success_url:`http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: 'http://localhost:3000/cancel',
-    });
-
-    res.json({id:session.id});
 });
 
 app.post('/api/forgot-password-customer', async (req, res) => {

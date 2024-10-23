@@ -132,7 +132,7 @@ function SignupPage() {
               >
                 Sign Up
               </button>
-              <p>Already have an account? <span><a href="/">Login</a></span></p>
+              <p>Already have an account? <span><a href="/login">Login</a></span></p>
             </form>
           </div>
         </div>

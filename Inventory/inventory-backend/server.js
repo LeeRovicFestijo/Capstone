@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
+require('dotenv').config();
 
 const app = express();
 app.use(express.json());
@@ -32,12 +33,12 @@ app.use(cors({ origin: 'http://localhost:3000' })); // Allow requests from React
 //  });
 
 const pool = new Pool({
-   user: 'postgres',
-      host: 'localhost',
-   database: 'sigbuilder',
-   password: '12345678',
-   port: 5433,
- });
+  user: process.env.DATABASE_USER,
+  host: process.env.DATABASE_HOST,
+  database: process.env.DATABASE_NAME,
+  password: process.env.DATABASE_PASSWORD,
+  port: process.env.DATABASE_PORT,
+});
 
 app.use(bodyParser.json());
 
@@ -712,17 +713,28 @@ app.get('/api/active-shipments-dashboard', async (req, res) => {
 app.get('/api/sales-data', async (req, res) => {
   try {
     const result = await pool.query(`
+      WITH months AS (
+          SELECT 
+              TO_CHAR(date_trunc('month', generate_series), 'Month') AS sales_month,
+              EXTRACT(MONTH FROM generate_series) AS month_number
+          FROM generate_series(
+              date_trunc('year', NOW()),
+              date_trunc('month', NOW()),
+              INTERVAL '1 month'
+          )
+      )
       SELECT 
-          TO_CHAR(DATE_TRUNC('month', o.order_date), 'Month') AS sales_month,
-          SUM(t.order_quantity * i.unit_price) AS total_sales
-      FROM transactions t
-      JOIN inventory i ON t.item_id = i.item_id
-      JOIN orders o ON o.order_id = t.order_id
-      LEFT JOIN shipment s ON s.order_id = o.order_id 
-      WHERE o.order_date >= NOW() - INTERVAL '1 year'
-        AND (s.shipping_status IS NULL OR s.shipping_status != 'Cancelled')  
-      GROUP BY sales_month
-      ORDER BY MIN(o.order_date);
+          m.sales_month,
+          m.month_number,
+          COALESCE(SUM(t.order_quantity * i.unit_price), 0) AS total_sales
+      FROM months m
+      LEFT JOIN orders o ON EXTRACT(MONTH FROM o.order_date) = m.month_number
+      LEFT JOIN transactions t ON o.order_id = t.order_id
+      LEFT JOIN inventory i ON t.item_id = i.item_id
+      LEFT JOIN shipment s ON s.order_id = o.order_id AND (s.shipping_status IS NULL OR s.shipping_status != 'Cancelled')
+      WHERE o.order_date >= DATE_TRUNC('year', NOW())
+      GROUP BY m.sales_month, m.month_number
+      ORDER BY m.month_number;
     `);
 
     const formattedData = [
