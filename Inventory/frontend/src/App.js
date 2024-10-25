@@ -1,13 +1,12 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';  // Import Router components
-import InventoryTable from './pages/InventoryTable';  // Your InventoryTable component
-import Dashboard from './pages/Dashboard';  // Assuming Dashboard.jsx is in /pages directory
-import Reports from './pages/Reports';  // Reports page
-import Shipment from './pages/Shipment';  // Shipment page
-import Accounts from './pages/Accounts';  // Accounts page
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; 
+import InventoryTable from './pages/InventoryTable';  
+import Dashboard from './pages/Dashboard'; 
+import Reports from './pages/Reports';  
+import Shipment from './pages/Shipment'; 
+import Accounts from './pages/Accounts';  
 import LoginPage from './pages/LoginPage';
 import { InventoryProvider } from './api/InventoryProvider';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 function App() {
     return (
@@ -20,7 +19,6 @@ function App() {
                     <Route path="/reports" element={<Reports />} /> 
                     <Route path="/shipment" element={<Shipment />} /> 
                     <Route path="/accounts" element={<Accounts />} />
-                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 </Routes>
             </Router>
         </InventoryProvider>
