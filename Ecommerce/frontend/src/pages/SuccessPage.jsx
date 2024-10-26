@@ -34,7 +34,7 @@ function SuccessPage() {
     };
 
     try {
-        const response = await axios.post('http://localhost:5001/api/e-orders', orderData);
+        const response = await axios.post('https://ecommerceserver.sigbuilders.app/api/e-orders', orderData);
         if (response.status === 200) {
             sessionStorage.setItem('paymentSuccess', 'true');
             setCart([]);
@@ -50,7 +50,7 @@ function SuccessPage() {
       const fetchPaymentStatus = async () => {
           const customer_id = persistedCustomer.customer_id;
           try {
-              const response = await axios.get(`http://localhost:5001/api/check-payment-status/${customer_id}`);
+              const response = await axios.get(`https://ecommerceserver.sigbuilders.app/api/check-payment-status/${customer_id}`);
               if (sessionId === response.data.session_id && response.data.payment_status === 'pending') {
                   handleConfirmPayment(); // Call to confirm payment
               } else {

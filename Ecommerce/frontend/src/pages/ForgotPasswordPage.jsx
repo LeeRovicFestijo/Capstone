@@ -16,7 +16,7 @@ function ForgotPasswordPage() {
 
     if (email !== '') {
       try {
-        const response = await axios.post('http://localhost:5001/api/forgot-password-customer', { email });
+        const response = await axios.post('https://ecommerceserver.sigbuilders.app/api/forgot-password-customer', { email });
         
         if (response.status === 200) {
           setSuccessMessage('Password reset email sent! Please check your inbox.');

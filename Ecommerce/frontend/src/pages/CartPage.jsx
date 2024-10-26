@@ -53,7 +53,7 @@ function CartPage() {
                     unit_price: item.unit_price,
                 })),
             }
-            const response = await axios.post('http://localhost:5001/api/check-stock', cartData);
+            const response = await axios.post('https://ecommerceserver.sigbuilders.app/api/check-stock', cartData);
         
             // Proceed with payment if stock is sufficient
             if (paymentMethod === 'GCash') {
@@ -100,7 +100,7 @@ function CartPage() {
         };
     
         try {
-            const response = await axios.post('http://localhost:5001/api/create-gcash-checkout-session', body);
+            const response = await axios.post('https://ecommerceserver.sigbuilders.app/api/create-gcash-checkout-session', body);
 
             const { url } = response.data;
 

@@ -46,6 +46,9 @@ const pool = new Pool({
     database: process.env.DATABASE_NAME,
     password: process.env.DATABASE_PASSWORD,
     port: process.env.DATABASE_PORT,
+    ssl: {
+        rejectUnauthorized: false,
+      },
 });
 
 const storage = multer.memoryStorage();

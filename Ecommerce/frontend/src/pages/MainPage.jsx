@@ -57,7 +57,7 @@ function MainPage() {
 
     const fetchNewArrivals = async () => {
         try {
-        const result = await axios.get('http://localhost:5001/api/new-arrivals'); 
+        const result = await axios.get('https://ecommerceserver.sigbuilders.app/api/new-arrivals'); 
         setNewArrivals(result.data);
         } catch (error) {
         console.error('Error fetching products:', error);
@@ -66,7 +66,7 @@ function MainPage() {
 
     const fetcTopItems = async () => {
         try {
-        const result = await axios.get('http://localhost:5001/api/top-items-ecommerce'); 
+        const result = await axios.get('https://ecommerceserver.sigbuilders.app/api/top-items-ecommerce'); 
         setTopItems(result.data);
         } catch (error) {
         console.error('Error fetching products:', error);
@@ -75,7 +75,7 @@ function MainPage() {
 
     const fetchShopItems = async () => {
         try {
-        const result = await axios.get('http://localhost:5001/api/shop-items'); 
+        const result = await axios.get('https://ecommerceserver.sigbuilders.app/api/shop-items'); 
         setShopItems(result.data);
         setDisplayedItems(result.data.slice(0, itemsToShow));
         } catch (error) {

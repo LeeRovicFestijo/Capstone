@@ -5,6 +5,7 @@ import { usePOS } from '../api/POSProvider';
 import '../components/customer-style.css'; 
 import CustomerModal from '../components/CustomerModal';
 import MainLayout from '../layout/MainLayout';
+import Pagination from '@mui/material/Pagination';
 
 function CustomerPage() {
   const { selectedCustomer, setSelectedCustomer, isCustomerAdded, setIsCustomerAdded, selectedCustomerLocal, setSelectedCustomerLocal } = usePOS();
@@ -15,10 +16,12 @@ function CustomerPage() {
   const [isEditMode, setEditMode] = useState(false);
   const [customerToEdit, setCustomerToEdit] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchCustomers = async () => {
     try {
-      const result = await axios.get('http://localhost:5001/api/customer');
+      const result = await axios.get('https://posserver.sigbuilders.app/api/customer');
       setRecentCustomers(result.data);
     } catch (error) {
       console.error('Error fetching customers:', error);
@@ -27,11 +30,7 @@ function CustomerPage() {
 
   const handleSelectCustomer = (customer) => {
     setSelectedCustomerLocal(customer);
-    if (selectedCustomer && selectedCustomer.customer_id === customer.customer_id) {
-      setIsCustomerAdded(true);
-    } else {
-      setIsCustomerAdded(false);
-    }
+    setIsCustomerAdded(selectedCustomer && selectedCustomer.customer_id === customer.customer_id);
   };
 
   const handleRemoveCustomer = () => {
@@ -41,7 +40,7 @@ function CustomerPage() {
   };
 
   const handleAddCustomer = () => {
-    setSelectedCustomer(selectedCustomerLocal)
+    setSelectedCustomer(selectedCustomerLocal);
     if (selectedCustomerLocal) {
       setIsCustomerAdded(true);
       navigate('/pos');
@@ -53,45 +52,39 @@ function CustomerPage() {
   };
 
   const handleOpenEditModal = (selectedCustomerLocal) => {
-      setEditMode(true);
-      setCustomerToEdit(selectedCustomerLocal);
-      setCustomerModalOpen(true);
+    setEditMode(true);
+    setCustomerToEdit(selectedCustomerLocal);
+    setCustomerModalOpen(true);
   };
 
   const handleOpenAddModal = () => {
-      setEditMode(false);
-      setCustomerToEdit(null);
-      setCustomerModalOpen(true);
+    setEditMode(false);
+    setCustomerToEdit(null);
+    setCustomerModalOpen(true);
   };
 
   const handleSaveCustomer = async (customer) => {
     try {
       let newCustomer;
-
       if (customer.customer_id) {
-        const response = await axios.put(`http://localhost:5001/api/customer/${customer.customer_id}`, customer);
+        const response = await axios.put(`https://posserver.sigbuilders.app/api/customer/${customer.customer_id}`, customer);
         newCustomer = response.data;
-        console.log(newCustomer);
       } else {
-        const response = await axios.post('http://localhost:5001/api/add-customer', customer);
+        const response = await axios.post('https://posserver.sigbuilders.app/api/add-customer', customer);
         newCustomer = response.data; 
-        console.log(newCustomer); 
       }
 
       setRecentCustomers((prevCustomers) => {
         if (customer.customer_id) {
-            return prevCustomers.map((c) =>
-                c.customer_id === customer.customer_id ? customer : c
-            );
+          return prevCustomers.map((c) => (c.customer_id === customer.customer_id ? customer : c));
         } else {
-            return [customer, ...prevCustomers];
+          return [newCustomer, ...prevCustomers];
         }
       });
 
       setSelectedCustomer(newCustomer);
       setIsCustomerAdded(true);
       navigate('/pos');
-
     } catch (error) {
       console.error('Error saving customer:', error);
       alert('Failed to save customer');
@@ -102,12 +95,18 @@ function CustomerPage() {
     setSearchTerm(e.target.value);
   };
 
+  // Filter and sort customers based on the search term
   const filteredCustomers = recentCustomers
     .filter((customer) =>
       customer.customer_name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => new Date(b.customer_date) - new Date(a.customer_date));
-  
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredCustomers.slice(indexOfFirstItem, indexOfLastItem);
 
   useEffect(() => {
     fetchCustomers();
@@ -123,6 +122,9 @@ function CustomerPage() {
     }
   }, [location.state?.newCustomer]);
 
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page); 
+  };
 
   return (
     <>
@@ -160,8 +162,8 @@ function CustomerPage() {
                       <h2>{selectedCustomerLocal.customer_name}</h2>
                       <h2 className="customer-id">#{selectedCustomerLocal.customer_id}</h2>
                     </div>
-                    <p style={{ marginBottom: '3px' }}><i class="bi bi-envelope"/> {selectedCustomerLocal.customer_email}</p>
-                    <p style={{ marginTop: '0' }}><i class="bi bi-telephone"/> {selectedCustomerLocal.customer_number}</p>
+                    <p style={{ marginBottom: '3px' }}><i className="bi bi-envelope"/> {selectedCustomerLocal.customer_email}</p>
+                    <p style={{ marginTop: '0' }}><i className="bi bi-telephone"/> {selectedCustomerLocal.customer_number}</p>
                     <div className="customer-actions">
                       {isCustomerAdded ? (
                         <button className="remove-btn" onClick={handleRemoveCustomer}>Remove</button>
@@ -181,7 +183,7 @@ function CustomerPage() {
             <hr />
             <h3>Recent Customers</h3>
             <div className={selectedCustomerLocal ? 'recent-customers-scrollable' : 'recent-customers-scrollable-selected'}>
-              {filteredCustomers.map((customer, index) => {
+              {currentItems.map((customer, index) => {
                 // Convert the customer date to a readable format
                 const formattedDate = new Date(customer.customer_date).toLocaleDateString('en-GB', {
                   year: 'numeric',
@@ -191,7 +193,7 @@ function CustomerPage() {
 
                 return (
                   <div 
-                    key={index} 
+                    key={customer.customer_id} // Use a unique key for each customer
                     className="recent-customer-item"
                     onClick={() => handleSelectCustomer(customer)}
                     style={{
@@ -203,11 +205,20 @@ function CustomerPage() {
                       <p className="customer-name">{customer.customer_name}</p>
                       <p className="customer-email">{customer.customer_email}</p>
                     </div>
-                    <p className="customer-date">{formattedDate}</p> {/* Use the formatted date here */}
+                    <p className="customer-date">{formattedDate}</p>
                   </div>
                 );
               })}
             </div>
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              variant="outlined"
+              shape="rounded"
+              color="primary"
+              sx={{ display: 'flex', justifyContent: 'center', marginTop: 2 }} // Center the pagination
+            />
           </div>
         </div>
       </MainLayout>

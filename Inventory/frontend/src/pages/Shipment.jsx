@@ -26,7 +26,7 @@ const Shipment = () => {
     const fetchShipmentOrders = async () => {
         setIsLoading(true);
         try {
-            const result = await axios.get('http://localhost:5001/api/shipment-order'); 
+            const result = await axios.get('https://adminserver.sigbuilders.app/api/shipment-order'); 
             setShipmentOrder(result.data);
         } catch (error) {
             console.error('Error fetching orders:', error);
@@ -104,7 +104,7 @@ const Shipment = () => {
         setAnchorElStatus(null); // Close the status menu
     
         // Make an API call to update the status in the backend
-        axios.put(`http://localhost:5001/api/shipment-order/${selectedShipment}`, { shipping_status: status })
+        axios.put(`https://adminserver.sigbuilders.app/api/shipment-order/${selectedShipment}`, { shipping_status: status })
         .then(response => {
             console.log('Status updated:', response);
             fetchShipmentOrders(); 
@@ -136,7 +136,7 @@ const Shipment = () => {
     const handleShipmentOrder = async (order_id) => {
         setIsLoading(true);
         try {
-            const result = await axios.get('http://localhost:5001/api/shipment-details', {params: {order_id}}); 
+            const result = await axios.get('https://adminserver.sigbuilders.app/api/shipment-details', {params: {order_id}}); 
             setShipmentDetails(result.data);
             setIsModalOpen(true);
         } catch (error) {

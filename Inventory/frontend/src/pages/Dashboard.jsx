@@ -24,7 +24,7 @@ const Dashboard = () => {
     const isMobile = useMediaQuery('(max-width: 768px)'); 
     const fetchTotalSales = async () => {
         try {
-            const response = await axios.get('http://localhost:5001/api/total-sales-dashboard');
+            const response = await axios.get('https://adminserver.sigbuilders.app/api/total-sales-dashboard');
             if (response.status === 200) {
                 setTotalSales(response.data);
             }
@@ -35,7 +35,7 @@ const Dashboard = () => {
 
     const fetchOrderToShip = async () => {
         try {
-            const response = await axios.get('http://localhost:5001/api/active-shipments-dashboard');
+            const response = await axios.get('https://adminserver.sigbuilders.app/api/active-shipments-dashboard');
             if (response.status === 200) {
                 setOrderToShip(response.data);
             }
@@ -46,7 +46,7 @@ const Dashboard = () => {
 
     const fetchTotalCustomer = async () => {
         try {
-            const response = await axios.get('http://localhost:5001/api/total-customer-dashboard');
+            const response = await axios.get('https://adminserver.sigbuilders.app/api/total-customer-dashboard');
             if (response.status === 200) {
                 setTotalCustomer(response.data);
             }
@@ -57,7 +57,7 @@ const Dashboard = () => {
 
     const fetchRecentOrders = async () => {
         try {
-            const response = await axios.get('http://localhost:5001/api/recent-orders-dashboard');
+            const response = await axios.get('https://adminserver.sigbuilders.app/api/recent-orders-dashboard');
             if (response.status === 200) {
                 setRecentOrders(response.data);
             }

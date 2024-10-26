@@ -7,7 +7,7 @@ const LineChart =() => {
 
     const fetchSalesData = async () => {
         try {
-            const response = await axios.get('http://localhost:5001/api/sales-data');
+            const response = await axios.get('https://adminserver.sigbuilders.app/api/sales-data');
             setSalesData(response.data);
         } catch (error) {
             console.error('Error fetching sales data:', error);

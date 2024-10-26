@@ -7,7 +7,7 @@ const BarChart = () => {
 
     const fetchTopItems = async () => {
         try {
-            const topResponse = await axios.get('http://localhost:5001/api/top-items-dashboard');
+            const topResponse = await axios.get('https://adminserver.sigbuilders.app/api/top-items-dashboard');
             if (topResponse.status === 200) {
                 setTopItems(topResponse.data);
             }

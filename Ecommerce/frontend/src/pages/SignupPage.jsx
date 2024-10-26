@@ -24,7 +24,7 @@ function SignupPage() {
         setErrorMessage('Please provide a proper email address!');
       } else {
         try {
-          const response = await axios.post('http://localhost:5001/api/signup', {
+          const response = await axios.post('https://ecommerceserver.sigbuilders.app/api/signup', {
             fullName,
             address,
             number,

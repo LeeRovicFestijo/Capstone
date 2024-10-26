@@ -19,18 +19,7 @@ const upload = multer({
   }
 });
 
-app.use(cors({ origin: 'http://localhost:3000' })); // Allow requests from React
-
-
-
-// PostgreSQL connection configuration
-//  const pool = new Pool({
-//      user: 'postgres',
-//      host: 'localhost',
-//      database: 'sigbuilder',
-//      password: '$Andrei1515',
-//      port: 5432, 
-//  });
+app.use(cors({ origin: 'http://localhost:3000' })); 
 
 const pool = new Pool({
   user: process.env.DATABASE_USER,
@@ -43,7 +32,7 @@ const pool = new Pool({
 app.use(bodyParser.json());
 
 app.post('/api/login-admin', async (req, res) => {
-  const { email, password } = req.body; // Change id to username
+  const { email, password } = req.body; 
 
   try {
     // Query PostgreSQL for employee accounts
@@ -949,8 +938,7 @@ app.get('/api/restock-dashboard', async (req, res) => {
 });
 
 // Start the server
-// const port = 5000;
-const port = 5001;
+const port = process.env.PORT || 5001;
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`Server running on port ${port}`);
 });

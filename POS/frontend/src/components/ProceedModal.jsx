@@ -50,7 +50,7 @@ const ProceedModal = ({ isOpen, onClose, cart, fetchProducts, totalAmount, custo
         console.log(orderData);
 
         try {
-            const response = await axios.post('http://localhost:5001/api/orders', orderData);
+            const response = await axios.post('https://posserver.sigbuilders.app/api/orders', orderData);
             if (response.status === 200) {
                 handlePrint(); // Print the receipt after successful order creation
                 payment();

@@ -21,7 +21,7 @@ function LoginPage() {
 
     if (isFormValid) {
       try {
-        const response = await axios.post('http://localhost:5001/api/login', {
+        const response = await axios.post('https://ecommerceserver.sigbuilders.app/api/login', {
           email, 
           password,
         });

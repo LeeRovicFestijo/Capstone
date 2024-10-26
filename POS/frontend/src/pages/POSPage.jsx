@@ -38,7 +38,7 @@ function POSPage() {
     const fetchProducts = async () => {
         setIsLoading(true);
         try {
-            const result = await axios.get('http://localhost:5001/api/products'); 
+            const result = await axios.get('https://posserver.sigbuilders.app/api/products'); 
             setProduct(result.data);
         } catch (error) {
             console.error('Error fetching products:', error);

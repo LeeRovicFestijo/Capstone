@@ -18,7 +18,7 @@ function OrderHistoryPage() {
 
   useEffect(() => {
     // Fetch order history from the backend
-    axios.get('http://localhost:5001/api/order-history-customer', { params: { customer_id } })
+    axios.get('https://ecommerceserver.sigbuilders.app/api/order-history-customer', { params: { customer_id } })
       .then((response) => {
         setOrderHistory(response.data);
         setLoading(false);
@@ -31,7 +31,7 @@ function OrderHistoryPage() {
 
   const handleOrderDetails = async (order_id) => {
     try {
-      const result = await axios.get('http://localhost:5001/api/order-details-customer', { params: { order_id } });
+      const result = await axios.get('https://ecommerceserver.sigbuilders.app/api/order-details-customer', { params: { order_id } });
       setOrderDetails(result.data);
       setIsModalOpen(true);
     } catch (error) {

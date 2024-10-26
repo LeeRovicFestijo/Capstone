@@ -36,7 +36,7 @@ function MainLayout({children}) {
 
     const fetchSearchItems = async () => {
         try {
-        const result = await axios.get('http://localhost:5001/api/search-items'); 
+        const result = await axios.get('https://ecommerceserver.sigbuilders.app/api/search-items'); 
         setSearchItems(result.data);
         } catch (error) {
         console.error('Error fetching products:', error);
@@ -50,7 +50,7 @@ function MainLayout({children}) {
     const fetchCustomer = async () => {
         const customer_id = persistedCustomer?.customer_id;
         try {
-            const response = await axios.get(`http://localhost:5001/api/customer_profile?customer_id=${customer_id}`);
+            const response = await axios.get(`https://ecommerceserver.sigbuilders.app/api/customer_profile?customer_id=${customer_id}`);
             if (response.status === 200) {
                 setPersistedCustomer(response.data);
                 return response.data;
@@ -209,7 +209,7 @@ function MainLayout({children}) {
                 formDataToSend.append('customer_profile', customerDetails.customer_profile);
             }
 
-            const response = await axios.post('http://localhost:5001/api/update-customer-account', formDataToSend, {
+            const response = await axios.post('https://ecommerceserver.sigbuilders.app/api/update-customer-account', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -254,7 +254,7 @@ function MainLayout({children}) {
             formDataToSend.append('new_password', new_password);
             formDataToSend.append('confirm_password', confirm_password);
 
-            const response = await axios.post('http://localhost:5001/api/change-admin-password', formDataToSend, {
+            const response = await axios.post('https://ecommerceserver.sigbuilders.app/api/change-admin-password', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

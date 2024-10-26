@@ -53,7 +53,7 @@ function MainLayout({children}) {
     const fetchAdmin = async () => {
         const account_id = persistedAdmin?.account_id;
         try {
-            const response = await axios.get(`http://localhost:5001/api/admin_profile?account_id=${account_id}`);
+            const response = await axios.get(`https://adminserver.sigbuilders.app/api/admin_profile?account_id=${account_id}`);
             if (response.status === 200) {
                 setPersistedAdmin(response.data);
                 return response.data;
@@ -151,7 +151,7 @@ function MainLayout({children}) {
                 formDataToSend.append('account_profile', adminDetails.account_profile);
             }
   
-            const response = await axios.post('http://localhost:5001/api/update-admin-account', formDataToSend, {
+            const response = await axios.post('https://adminserver.sigbuilders.app/api/update-admin-account', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -195,7 +195,7 @@ function MainLayout({children}) {
             formDataToSend.append('new_password', new_password);
             formDataToSend.append('confirm_password', confirm_password);
 
-            const response = await axios.post('http://localhost:5001/api/change-admin-password', formDataToSend, {
+            const response = await axios.post('https://adminserver.sigbuilders.app/api/change-admin-password', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

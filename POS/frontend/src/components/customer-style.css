@@ -82,7 +82,7 @@
 
 .recent-customers-scrollable {
   overflow-y: auto;
-  max-height: calc(100vh - 577px);
+  max-height: calc(100vh - 632px);
   overflow-x: hidden;
 
   ::-webkit-scrollbar {
@@ -110,7 +110,7 @@
 
 .recent-customers-scrollable-selected {
   overflow-y: auto;
-  max-height: calc(100vh - 422px);
+  max-height: calc(100vh - 472px);
   overflow-x: auto;
 
   ::-webkit-scrollbar {

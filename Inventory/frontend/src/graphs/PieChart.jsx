@@ -7,7 +7,7 @@ const PieChart = () => {
 
     const fetchPaymentSales = async () => {
         try {
-          const response = await axios.get('http://localhost:5001/api/sales-by-payment-mode');
+          const response = await axios.get('https://adminserver.sigbuilders.app/api/sales-by-payment-mode');
           
           const transformedData = response.data.map(item => ({
             id: item.payment_mode,  

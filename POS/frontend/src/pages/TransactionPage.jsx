@@ -36,7 +36,7 @@ function TransactionPage() {
   const fetchOrders = async () => {
     setIsLoading(true);
     try {
-      const result = await axios.get('http://localhost:5001/api/transaction'); 
+      const result = await axios.get('https://posserver.sigbuilders.app/api/transaction'); 
       setOrder(result.data);
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -81,7 +81,7 @@ function TransactionPage() {
   const handleOrderDetails = async (order_id) => {
     setIsLoading(true);
     try {
-      const result = await axios.get('http://localhost:5001/api/order-details', {params: {order_id}}); 
+      const result = await axios.get('https://posserver.sigbuilders.app/api/order-details', {params: {order_id}}); 
       setOrderDetails(result.data);
       setIsModalOpen(true);
     } catch (error) {

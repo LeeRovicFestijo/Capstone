@@ -20,7 +20,7 @@ function LoginPage() {
 
     if (isFormValid) {
       try {
-        const response = await axios.post('http://localhost:5001/api/login-admin', {
+        const response = await axios.post('https://adminserver.sigbuilders.app/api/login-admin', {
           email, 
           password,
         });

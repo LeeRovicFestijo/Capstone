@@ -21,7 +21,7 @@ function LoginPage() {
 
     if (isFormValid) {
       try {
-        const response = await axios.post('http://localhost:5001/api/login-pos', {
+        const response = await axios.post('https://posserver.sigbuilders.app/api/login-pos', {
           email, 
           password,
         });

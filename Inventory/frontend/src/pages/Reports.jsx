@@ -21,11 +21,14 @@ const Reports = () => {
     const [showCustomerTable, setShowCustomerTable] = useState(false);
     const [showOrdersTable, setShowOrdersTable] = useState(false);
     const [rowsPerPage] = useState(10);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPerformancePage, setCurrentPerformancePage] = useState(1);
+    const [currentInventoryPage, setCurrentInventoryPage] = useState(1);
+    const [currentCustomerPage, setCurrentCustomerPage] = useState(1);
+    const [currentOrderPage, setCurrentOrderPage] = useState(1);
 
     const fetchInventoryReport = async () => {
         try {
-            const result = await axios.get('http://localhost:5001/api/inventory');
+            const result = await axios.get('https://adminserver.sigbuilders.app/api/inventory');
             setInventoryReport(result.data);
         } catch (error) {
             console.error('Error fetching inventory:', error);
@@ -34,7 +37,7 @@ const Reports = () => {
 
     const fetchCustomers = async () => {
         try {
-            const result = await axios.get('http://localhost:5001/api/customer-report', {
+            const result = await axios.get('https://adminserver.sigbuilders.app/api/customer-report', {
                 params: {
                     year: selectedYear === 'All Year' ? null : selectedYear,
                     month: selectedMonth === 'All Month' ? null : selectedMonth,
@@ -48,7 +51,7 @@ const Reports = () => {
     
     const fetchOrders = async () => {
         try {
-            const result = await axios.get('http://localhost:5001/api/transaction-report', {
+            const result = await axios.get('https://adminserver.sigbuilders.app/api/transaction-report', {
                 params: {
                     year: selectedYear === 'All Year' ? null : selectedYear,
                     month: selectedMonth === 'All Month' ? null : selectedMonth,
@@ -62,7 +65,7 @@ const Reports = () => {
 
     const fetchPerformanceData = async () => {
         try {
-          const response = await axios.get('http://localhost:5001/api/inventory-performance', {
+          const response = await axios.get('https://adminserver.sigbuilders.app/api/inventory-performance', {
             params: {
               year: selectedYear === 'All Year' ? null : selectedYear,
               month: selectedMonth === 'All Month' ? null : selectedMonth,
@@ -134,7 +137,7 @@ const Reports = () => {
 
     const handleOrderDetails = async (order_id) => {
         try {
-          const result = await axios.get('http://localhost:5001/api/order-details-report', {params: {order_id}}); 
+          const result = await axios.get('https://adminserver.sigbuilders.app/api/order-details-report', {params: {order_id}}); 
           setOrderDetails(result.data);
           setIsModalOpen(true);
         } catch (error) {
@@ -198,17 +201,56 @@ const Reports = () => {
         payment_mode: orders.payment_mode,
     }));
 
-    const indexOfLastItem = currentPage * rowsPerPage;
-    const indexOfFirstItem = indexOfLastItem - rowsPerPage; 
-    const currentItems = orderData.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(orderData.length / rowsPerPage);
+    const indexOfLastPerformance = currentPerformancePage * rowsPerPage;
+    const indexOfFirstPerformance = indexOfLastPerformance - rowsPerPage; 
+    const currentPerformance = inventoryPerformance.slice(indexOfFirstPerformance, indexOfLastPerformance);
+    const totalPerformancePages = Math.ceil(inventoryPerformance.length / rowsPerPage);
   
-    const handleNextPage = () => {
-        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    const handleNextPerformancePage = () => {
+        if (currentPerformancePage < totalPerformancePages) setCurrentPerformancePage(currentPerformancePage + 1);
     };
   
-    const handlePrevPage = () => {
-        if (currentPage > 1) setCurrentPage(currentPage - 1);
+    const handlePrevPerformancePage = () => {
+        if (currentPerformancePage > 1) setCurrentPerformancePage(currentPerformancePage - 1);
+    };
+
+    const indexOfLastInventory = currentInventoryPage * rowsPerPage;
+    const indexOfFirstInventory = indexOfLastInventory - rowsPerPage; 
+    const currentInventory = inventoryReport.slice(indexOfFirstInventory, indexOfLastInventory);
+    const totalInventoryPages = Math.ceil(inventoryReport.length / rowsPerPage);
+  
+    const handleNextInventoryPage = () => {
+        if (currentInventoryPage < totalInventoryPages) setCurrentInventoryPage(currentInventoryPage + 1);
+    };
+  
+    const handlePrevInventoryPage = () => {
+        if (currentInventoryPage > 1) setCurrentInventoryPage(currentInventoryPage - 1);
+    };
+
+    const indexOfLastCustomer = currentCustomerPage * rowsPerPage;
+    const indexOfFirstCustomer = indexOfLastCustomer - rowsPerPage; 
+    const currentCustomers = customerData.slice(indexOfFirstCustomer, indexOfLastCustomer);
+    const totalCustomerPages = Math.ceil(customerData.length / rowsPerPage);
+  
+    const handleNextCustomerPage = () => {
+        if (currentCustomerPage < totalCustomerPages) setCurrentCustomerPage(currentCustomerPage + 1);
+    };
+  
+    const handlePrevCustomerPage = () => {
+        if (currentCustomerPage > 1) setCurrentCustomerPage(currentCustomerPage - 1);
+    };
+
+    const indexOfLastItem = currentOrderPage * rowsPerPage;
+    const indexOfFirstItem = indexOfLastItem - rowsPerPage; 
+    const currentOrders = orderData.slice(indexOfFirstItem, indexOfLastItem);
+    const totalOrderPages = Math.ceil(orderData.length / rowsPerPage);
+  
+    const handleNextOrderPage = () => {
+        if (currentOrderPage < totalOrderPages) setCurrentOrderPage(currentOrderPage + 1);
+    };
+  
+    const handlePrevOrderPage = () => {
+        if (currentOrderPage > 1) setCurrentOrderPage(currentOrderPage - 1);
     };
 
     return (
@@ -296,7 +338,7 @@ const Reports = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {inventoryPerformance.map((inventory) => (
+                                        {currentPerformance.map((inventory) => (
                                         <TableRow 
                                             key={inventory.item_id} 
                                         >
@@ -308,6 +350,25 @@ const Reports = () => {
                                     </TableBody>
                                 </Table>
                             </Paper>
+                            <div className="pagination d-flex flex-column flex-sm-row justify-content-between align-items-center">
+                                <button
+                                    className="pagination-btn mb-2 mb-sm-0"
+                                    onClick={handlePrevPerformancePage}
+                                    disabled={currentInventoryPage === 1}
+                                >
+                                    Previous
+                                </button>
+                                <div className="pagination-info mb-2 mb-sm-0">
+                                    Page {currentInventoryPage} of {totalInventoryPages}
+                                </div>
+                                <button
+                                    className="pagination-btn"
+                                    onClick={handleNextPerformancePage}
+                                    disabled={currentPerformancePage === totalPerformancePages}
+                                >
+                                    Next
+                                </button>
+                            </div>
                         </div>
                     )}
 
@@ -337,7 +398,7 @@ const Reports = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {inventoryReport.map((inventory) => (
+                                        {currentInventory.map((inventory) => (
                                         <TableRow 
                                             key={inventory.item_id} 
                                         >
@@ -350,6 +411,25 @@ const Reports = () => {
                                     </TableBody>
                                 </Table>
                             </Paper>
+                            <div className="pagination d-flex flex-column flex-sm-row justify-content-between align-items-center">
+                                <button
+                                    className="pagination-btn mb-2 mb-sm-0"
+                                    onClick={handlePrevInventoryPage}
+                                    disabled={currentInventoryPage === 1}
+                                >
+                                    Previous
+                                </button>
+                                <div className="pagination-info mb-2 mb-sm-0">
+                                    Page {currentInventoryPage} of {totalInventoryPages}
+                                </div>
+                                <button
+                                    className="pagination-btn"
+                                    onClick={handleNextInventoryPage}
+                                    disabled={currentInventoryPage === totalInventoryPages}
+                                >
+                                    Next
+                                </button>
+                            </div>
                         </div>
                     )}
 
@@ -378,7 +458,7 @@ const Reports = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {customerData.map((customer) => (
+                                        {currentCustomers.map((customer) => (
                                         <TableRow 
                                             key={customer.customer_id} 
                                         >
@@ -391,6 +471,25 @@ const Reports = () => {
                                     </TableBody>
                                 </Table>
                             </Paper>
+                            <div className="pagination d-flex flex-column flex-sm-row justify-content-between align-items-center">
+                                <button
+                                    className="pagination-btn mb-2 mb-sm-0"
+                                    onClick={handlePrevCustomerPage}
+                                    disabled={currentCustomerPage === 1}
+                                >
+                                    Previous
+                                </button>
+                                <div className="pagination-info mb-2 mb-sm-0">
+                                    Page {currentCustomerPage} of {totalCustomerPages}
+                                </div>
+                                <button
+                                    className="pagination-btn"
+                                    onClick={handleNextCustomerPage}
+                                    disabled={currentCustomerPage === totalCustomerPages}
+                                >
+                                    Next
+                                </button>
+                            </div>
                         </div>
                     )}
 
@@ -421,7 +520,7 @@ const Reports = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {currentItems.map((order) => (
+                                        {currentOrders.map((order) => (
                                         <TableRow 
                                             key={order.order_id} 
                                             style={{cursor:'pointer'}}
@@ -440,18 +539,18 @@ const Reports = () => {
                             <div className="pagination d-flex flex-column flex-sm-row justify-content-between align-items-center">
                                 <button
                                     className="pagination-btn mb-2 mb-sm-0"
-                                    onClick={handlePrevPage}
-                                    disabled={currentPage === 1}
+                                    onClick={handlePrevOrderPage}
+                                    disabled={currentOrderPage === 1}
                                 >
                                     Previous
                                 </button>
                                 <div className="pagination-info mb-2 mb-sm-0">
-                                    Page {currentPage} of {totalPages}
+                                    Page {currentOrderPage} of {totalOrderPages}
                                 </div>
                                 <button
                                     className="pagination-btn"
-                                    onClick={handleNextPage}
-                                    disabled={currentPage === totalPages}
+                                    onClick={handleNextOrderPage}
+                                    disabled={currentOrderPage === totalOrderPages}
                                 >
                                     Next
                                 </button>

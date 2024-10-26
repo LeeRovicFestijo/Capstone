@@ -34,7 +34,7 @@ function MainLayout({children}) {
     const fetchUser = async () => {
       const account_id = persistedUser?.account_id;
       try {
-          const response = await axios.get(`http://localhost:5001/api/user_profile?account_id=${account_id}`);
+          const response = await axios.get(`https://posserver.sigbuilders.app/api/user_profile?account_id=${account_id}`);
           if (response.status === 200) {
               setPersistedUser(response.data);
               return response.data;
@@ -162,7 +162,7 @@ function MainLayout({children}) {
             formDataToSend.append('new_password', new_password);
             formDataToSend.append('confirm_password', confirm_password);
 
-            const response = await axios.post('http://localhost:5001/api/change-user-password', formDataToSend, {
+            const response = await axios.post('https://posserver.sigbuilders.app/api/change-user-password', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -204,7 +204,7 @@ function MainLayout({children}) {
               formDataToSend.append('account_profile', userDetails.account_profile);
           }
 
-          const response = await axios.post('http://localhost:5001/api/update-user-account', formDataToSend, {
+          const response = await axios.post('https://posserver.sigbuilders.app/api/update-user-account', formDataToSend, {
               headers: {
                   'Content-Type': 'multipart/form-data'
               }

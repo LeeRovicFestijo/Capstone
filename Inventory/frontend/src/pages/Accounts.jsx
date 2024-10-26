@@ -29,7 +29,7 @@ const Accounts = () => {
   const fetchAccounts = async () => {
     setIsLoading(true);
     try {
-      const result = await axios.get('http://localhost:5001/api/accounts'); 
+      const result = await axios.get('https://adminserver.sigbuilders.app/api/accounts'); 
       setAccounts(result.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -41,7 +41,7 @@ const Accounts = () => {
   const fetchEmployees = async () => {
     setIsLoading(true);
     try {
-      const result = await axios.get('http://localhost:5001/api/employees'); 
+      const result = await axios.get('https://adminserver.sigbuilders.app/api/employees'); 
       setEmployees(result.data);
     } catch (error) {
       console.error('Error fetching employees:', error);
@@ -181,7 +181,7 @@ const Accounts = () => {
 
         // Update existing account
         try {
-          const response = await axios.put(`http://localhost:5001/api/accounts/${editItemId}`, formData);
+          const response = await axios.put(`https://adminserver.sigbuilders.app/api/accounts/${editItemId}`, formData);
           if (response.status === 200) {
             fetchAccounts();
             fetchEmployees();
@@ -217,7 +217,7 @@ const Accounts = () => {
         }
 
         try {
-          const response = await axios.post('http://localhost:5001/api/add_account', {
+          const response = await axios.post('https://adminserver.sigbuilders.app/api/add_account', {
             account_username, account_email, account_password, account_confirmPassword, account_role, account_status
           });
           if (response.status === 201) {
@@ -259,7 +259,7 @@ const Accounts = () => {
 
         // Update existing employee
         try {
-          const response = await axios.put(`http://localhost:5001/api/employees/${editItemId}`, formData);
+          const response = await axios.put(`https://adminserver.sigbuilders.app/api/employees/${editItemId}`, formData);
           if (response.status === 200) {
             fetchEmployees();
             fetchAccounts();
@@ -286,7 +286,7 @@ const Accounts = () => {
 
         // Add new employee
         try {
-          const response = await axios.post('http://localhost:5001/api/add_employee', formData);
+          const response = await axios.post('https://adminserver.sigbuilders.app/api/add_employee', formData);
           if (response.status === 201) {
             fetchEmployees();
             handleCloseModal();

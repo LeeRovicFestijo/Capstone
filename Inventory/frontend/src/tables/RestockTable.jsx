@@ -10,7 +10,7 @@ const RestockTable = () => {
     const fetchRestockData = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5001/api/restock-dashboard');
+            const response = await axios.get('https://adminserver.sigbuilders.app/api/restock-dashboard');
             if (response.status === 200) {
                 setRestockData(response.data);
             }

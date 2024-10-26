@@ -3,7 +3,7 @@ import '../components/InventoryTable.css';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { Table, TableBody, TableCell, TableHead, TableRow, Paper, Menu, MenuItem } from '@mui/material';
 import { Modal, Button } from 'react-bootstrap';
 import { debounce } from 'lodash';
@@ -22,11 +22,7 @@ const InventoryTable = () => {
     const [filteredData, setFilteredData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [selectedItems, setSelectedItems] = useState([]);
-    const [itemToDelete, setItemToDelete] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null); 
-    const [deleteMode, setDeleteMode] = useState('');
     const [totalItems, setTotalItems] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
@@ -34,7 +30,7 @@ const InventoryTable = () => {
     const fetchInventory = async () => {
         setIsLoading(true);
         try {
-            const result = await axios.get('http://localhost:5001/api/inventory');
+            const result = await axios.get('https://adminserver.sigbuilders.app/api/inventory');
             setInventoryData(result.data);
             setFilteredData(result.data);
             setTotalItems(result.data.length);
@@ -139,7 +135,7 @@ const InventoryTable = () => {
             unit_measurement: formData.unitMeasurement,
         };
 
-        const requestUrl = editId ? `http://localhost:5001/api/inventory/${editId}` : 'http://localhost:5001/api/inventory';
+        const requestUrl = editId ? `https://adminserver.sigbuilders.app/api/inventory/${editId}` : 'https://adminserver.sigbuilders.app/api/inventory';
         const method = editId ? 'PUT' : 'POST';
 
         const formDataToSubmit = new FormData();
@@ -175,69 +171,6 @@ const InventoryTable = () => {
         });
         setEditId(inventory.item_id);
         setShowModal(true);
-    };
-
-    const handleDeleteInventory = async (id) => {
-        try {
-            await fetch(`http://localhost:5001/api/inventory/${id}`, { method: 'DELETE' });
-            fetchInventory();
-            setItemToDelete(null);
-            toast.success('Item deleted successfully!', toastOptions)
-        } catch (err) {
-            console.error('Error deleting inventory:', err);
-        }
-    };
-
-    const handleDeleteSelected = async () => {
-        const deletePromises = selectedItems.map(id =>
-            fetch(`http://localhost:5001/api/inventory/${id}`, { method: 'DELETE' })
-                .then(() => id)
-                .catch(err => {
-                    console.error(`Error deleting inventory with id ${id}:`, err);
-                    return null;
-                })
-        );
-
-        const deletedIds = await Promise.all(deletePromises);
-        fetchInventory();
-        setSelectedItems([]);
-        toast.success('Selected Items deleted successfully!', toastOptions)
-    };
-
-    const confirmDeleteItem = (id) => {
-        setItemToDelete(id);
-        setDeleteMode('single');
-        setShowDeleteModal(true);
-    };
-
-    const confirmDeleteSelected = () => {
-        setDeleteMode('multiple');
-        setShowDeleteModal(true);
-    };
-
-    const handleConfirmDelete = () => {
-        if (deleteMode === 'single' && itemToDelete) {
-            handleDeleteInventory(itemToDelete);
-        } else if (deleteMode === 'multiple') {
-            handleDeleteSelected();
-        }
-        setShowDeleteModal(false);
-    };
-
-    const handleSelectItem = (id) => {
-        setSelectedItems(prevSelectedItems =>
-            prevSelectedItems.includes(id)
-                ? prevSelectedItems.filter(item => item !== id)
-                : [...prevSelectedItems, id]
-        );
-    };
-
-    const handleSelectAll = () => {
-        if (selectedItems.length === filteredData.length) {
-            setSelectedItems([]);
-        } else {
-            setSelectedItems(filteredData.map(item => item.item_id));
-        }
     };
 
     const resetForm = () => {
@@ -297,12 +230,6 @@ const InventoryTable = () => {
                                 <FontAwesomeIcon icon={faPlus} className="me-2" />
                                 Add Inventory
                             </button>
-                            {selectedItems.length > 0 && (
-                                <button className="btn btn-danger mx-2" onClick={confirmDeleteSelected}>
-                                    <FontAwesomeIcon icon={faTrash} className="me-2" />
-                                    Delete Selected
-                                </button>
-                            )}
                         </div>
                         <button className='btn btn-success ms-auto mt-2 mt-sm-0' onClick={handleOpenClick}>
                             <i className='bi bi-funnel'/> Filter
@@ -313,13 +240,6 @@ const InventoryTable = () => {
                         <Table>
                         <TableHead>
                             <TableRow>
-                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>
-                            <input
-                                type="checkbox"
-                                checked={selectedItems.length === filteredData.length && filteredData.length > 0}
-                                onChange={handleSelectAll}
-                            />
-                            </TableCell>
                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Item Description</TableCell>
                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Unit Price</TableCell>
                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Quality Stocks</TableCell>
@@ -334,13 +254,6 @@ const InventoryTable = () => {
                                 key={inventory.item_id} 
                                 style={{cursor:'pointer'}} 
                             >
-                                <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedItems.includes(inventory.item_id)}
-                                        onChange={() => handleSelectItem(inventory.item_id)}
-                                    />
-                                </TableCell>
                                 <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.item_description}</TableCell>
                                 <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.unit_price}</TableCell>
                                 <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.quality_stocks}</TableCell>
@@ -355,9 +268,6 @@ const InventoryTable = () => {
                                 <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>
                                     <button className="edit-btn mx-1" onClick={() => handleEditInventory(inventory)}>
                                         <FontAwesomeIcon icon={faEdit} />
-                                    </button>
-                                    <button className="delete-btn mx-1" onClick={() => confirmDeleteItem(inventory.item_id)}>
-                                        <FontAwesomeIcon icon={faTrash} />
                                     </button>
                                 </TableCell>
                             </TableRow>
@@ -456,23 +366,6 @@ const InventoryTable = () => {
                             </Button>
                             <Button variant="success" onClick={handleAddInventory}>
                                 {editId ? 'Update Inventory' : 'Add Inventory'}
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
-
-                    <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Confirm Delete</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            Are you sure you want to delete {deleteMode === 'single' ? 'this item' : 'the selected items'}?
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                                Cancel
-                            </Button>
-                            <Button variant="danger" onClick={handleConfirmDelete}>
-                                Confirm
                             </Button>
                         </Modal.Footer>
                     </Modal>
