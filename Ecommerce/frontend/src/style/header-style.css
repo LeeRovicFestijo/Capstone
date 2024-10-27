@@ -33,7 +33,7 @@
   font-size: 1.6rem;
   color: white;
   @media (max-width: 768px) {
-      font-size: 1.3rem; /* Smaller size for mobile devices */
+      font-size: 1.5rem; /* Smaller size for mobile devices */
   }
 }
 
@@ -41,7 +41,7 @@
   font-size: 1rem;
   color: white;
   @media (max-width: 768px) {
-      font-size: 0.7rem; /* Smaller size for mobile devices */
+      font-size: 0.9rem; /* Smaller size for mobile devices */
   }
 }
 
@@ -117,6 +117,14 @@
     font-size: 0.8rem; /* Smaller font for count */
 }
 
+.autocomplete {
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    margin-top: 8px;
+    border-radius: 5px;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
     .header-container {
@@ -135,15 +143,14 @@
     
     .search-box {
         margin: auto;
-        width: 80%;
+        width: 90%;
+        height: 40%;
+    }
+
+    .autocomplete {
+        margin-bottom: 15px;
+        margin-top: 5px;
     }
 }
 
-.autocomplete {
-  margin-left: 10px;
-  margin-right: 10px;
-  margin-bottom: 5px;
-  margin-top: 8px;
-  border-radius: 40px;
-}
 

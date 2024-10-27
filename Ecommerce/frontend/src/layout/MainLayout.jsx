@@ -325,6 +325,21 @@ function MainLayout({children}) {
                         sx={{
                             width: '100%', 
                             backgroundColor: 'white',
+                            '& .MuiInputBase-root': {
+                                height: {
+                                    xs: '40px', 
+                                    sm: '48px', 
+                                    md: '56px',
+                                },
+                                padding: '0 8px', 
+                            },
+                            '& .MuiOutlinedInput-root': {
+                                minHeight: {
+                                    xs: '40px',
+                                    sm: '48px',
+                                    md: '56px',
+                                },
+                            },
                             '& .MuiAutocomplete-inputRoot': {
                               '& .MuiOutlinedInput-notchedOutline': {
                                 borderColor: 'white', 
@@ -345,6 +360,11 @@ function MainLayout({children}) {
                             },
                             '& .MuiAutocomplete-popupIndicator': {
                                 display: 'none',
+                            },
+                            height: {
+                                xs: '40px',
+                                sm: '48px',
+                                md: '56px', 
                             },
                         }}
                     />
@@ -585,7 +605,6 @@ function MainLayout({children}) {
                 <h2>About Us</h2>
                 <ul>
                     <li>Careers</li>
-                    <li>Our Stores</li>
                     <li>Terms & Conditions</li>
                     <li>Privacy Policy</li>
                 </ul>
@@ -595,9 +614,7 @@ function MainLayout({children}) {
                 <h2>Customer Care</h2> 
                 <ul>
                     <li>Help Center</li>
-                    <li>How to Buy</li>
                     <li>Track Your Order</li>
-                    <li>Corporate & Bulk Purchasing</li>
                     <li>Returns & Refunds</li>
                 </ul>
                 </div>

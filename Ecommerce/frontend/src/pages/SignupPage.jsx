@@ -52,9 +52,8 @@ function SignupPage() {
       <div className="d-flex justify-content-center align-items-center" style={{ height: '91vh' }}>
         <div className="row w-100 mx-2">
           <div className="col-md-6 text-white d-flex justify-content-center align-items-center flex-column p-4" style={{backgroundColor: '#1B305B'}}>
-            <h1 className="mb-4">SIG BUILDERS</h1>
-            <h2 className="mb-4">CONSTRUCTION SUPPLY</h2>
-            <p>&copy; All rights reserved 2001.</p>
+            <h2 className="mb-2" style={{fontWeight: '600'}}>SIG BUILDERS</h2>
+            <h2 className="mb-4" style={{fontWeight: '600', textAlign: 'center'}}>CONSTRUCTION SUPPLY</h2>
           </div>
           <div className="col-md-6 bg-light p-4 d-flex flex-column justify-content-center">
             <h1 className="mb-4">Sign Up</h1>

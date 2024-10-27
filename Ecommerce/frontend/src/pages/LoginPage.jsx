@@ -89,7 +89,6 @@ function LoginPage() {
                     I'm not a robot
                   </label>
                 </div>
-                <a href="/forgot-password">Forgot password?</a>
               </div>
               {errorMessage && (
                 <small className="text-danger d-block mb-3">

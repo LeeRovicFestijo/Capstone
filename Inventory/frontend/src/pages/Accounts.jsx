@@ -284,7 +284,6 @@ const Accounts = () => {
           return; // Prevent submission
         }
 
-        // Add new employee
         try {
           const response = await axios.post('https://adminserver.sigbuilders.app/api/add_employee', formData);
           if (response.status === 201) {
