@@ -342,8 +342,8 @@ app.post('/api/orders', async (req, res) => {
       // If order is for delivery, add to Shipment table
       if (order_delivery === 'yes') {
           await pool.query(
-              'INSERT INTO shipment (order_id, shipping_address, shipping_status) VALUES ($1, $2, $3)',
-              [order_id, shipping_address, 'Pending']
+              'INSERT INTO shipment (order_id, shipping_address, shipping_status, payment_status) VALUES ($1, $2, $3, $4)',
+              [order_id, shipping_address, 'Pending', 'Paid']
           );
       }
 
