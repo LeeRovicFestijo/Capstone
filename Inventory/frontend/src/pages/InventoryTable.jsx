@@ -148,14 +148,12 @@ const InventoryTable = () => {
             formDataToSubmit.append('item_image', formFile);
         }
 
-        console.log(formDataToSubmit);
 
         fetch(requestUrl, {
             method: method,
             body: formDataToSubmit,
         })
             .then(response => {
-                console.log('Inventory updated:', response);
                 fetchInventory();
             })
             toast.success('Inventory saved successfully!', toastOptions)

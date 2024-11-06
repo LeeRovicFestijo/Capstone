@@ -459,6 +459,48 @@ app.put('/api/shipment-order/:id', async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+app.put('/api/shipment-payment-status/:id', async (req, res) => {
+  const order_id = req.params.id; 
+  const { payment_status } = req.body; 
+
+  try {
+    const result = await pool.query(
+      'UPDATE shipment SET payment_status = $1 WHERE order_id = $2 RETURNING *',
+      [payment_status, order_id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.status(200).json(result.rows[0]); // Send back the updated order
+  } catch (error) {
+    console.error('Error updating order:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.put('/api/shipment-payment-mode/:id', async (req, res) => {
+  const order_id = req.params.id; 
+  const { payment_mode } = req.body; 
+
+  try {
+    const result = await pool.query(
+      'UPDATE shipment SET payment_mode = $1 WHERE order_id = $2 RETURNING *',
+      [payment_mode, order_id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.status(200).json(result.rows[0]); // Send back the updated order
+  } catch (error) {
+    console.error('Error updating order:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
   
 app.get('/api/shipment-details', async (req, res) => {
     const { order_id } = req.query;
@@ -665,7 +707,7 @@ app.get('/api/total-sales-dashboard', async (req, res) => {
           JOIN orders o ON o.order_id = t.order_id
           LEFT JOIN shipment s ON s.order_id = o.order_id
           WHERE o.order_date >= DATE_TRUNC('year', CURRENT_DATE)
-            AND (s.shipping_status != 'Cancelled' OR s.shipping_status IS NULL);
+            AND ((s.shipping_status != 'Cancelled' AND s.payment_status = 'Paid') OR s.shipping_status IS NULL);
       `);
       const totalSales = result.rows[0]?.total_sales || 0;
       res.status(200).json({ total_sales: totalSales });
@@ -720,7 +762,7 @@ app.get('/api/sales-data', async (req, res) => {
       LEFT JOIN orders o ON EXTRACT(MONTH FROM o.order_date) = m.month_number
       LEFT JOIN transactions t ON o.order_id = t.order_id
       LEFT JOIN inventory i ON t.item_id = i.item_id
-      LEFT JOIN shipment s ON s.order_id = o.order_id AND (s.shipping_status IS NULL OR s.shipping_status != 'Cancelled')
+      LEFT JOIN shipment s ON s.order_id = o.order_id AND (s.shipping_status IS NULL OR (s.shipping_status != 'Cancelled' AND s.payment_status = 'Paid'))
       WHERE o.order_date >= DATE_TRUNC('year', NOW())
       GROUP BY m.sales_month, m.month_number
       ORDER BY m.month_number;
@@ -758,7 +800,7 @@ app.get('/api/top-items-dashboard', async (req, res) => {
           WHERE 
               o.order_date >= DATE_TRUNC('month', CURRENT_DATE) 
               AND o.order_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month' 
-              AND (s.shipping_status != 'Cancelled' OR s.shipping_status IS NULL) 
+              AND ((s.shipping_status != 'Cancelled' AND s.payment_status = 'Paid') OR s.shipping_status IS NULL) 
           GROUP BY i.item_id
           ORDER BY total_sales DESC
           LIMIT 5;
@@ -780,7 +822,7 @@ app.get('/api/sales-by-payment-mode', async (req, res) => {
         JOIN transactions t ON o.order_id = t.order_id
         JOIN inventory i ON t.item_id = i.item_id
         LEFT JOIN shipment s ON s.order_id = o.order_id  
-        WHERE (s.shipping_status != 'Cancelled' OR s.shipping_status IS NULL)  
+        WHERE ((s.shipping_status != 'Cancelled' AND s.payment_status = 'Paid') OR s.shipping_status IS NULL)  
         GROUP BY o.payment_mode;
     `);
 

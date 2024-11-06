@@ -72,7 +72,8 @@ function OrderHistoryPage() {
                   <TableRow>
                     <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Order ID</TableCell>
                     <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Date</TableCell>
-                    <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Status</TableCell>
+                    <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Delivery Status</TableCell>
+                    <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Payment Status</TableCell>
                     <TableCell align="right" style={{ fontFamily: 'Poppins, sans-serif' }}>Total Amount</TableCell>
                   </TableRow>
                 </TableHead>
@@ -82,6 +83,7 @@ function OrderHistoryPage() {
                       <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.order_id}</TableCell>
                       <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{new Date(order.order_date).toLocaleDateString()}</TableCell>
                       <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.shipping_status}</TableCell>
+                      <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.payment_status}</TableCell>
                       <TableCell align="right" style={{ fontFamily: 'Poppins, sans-serif' }}>₱{order.total_amount}</TableCell>
                     </TableRow>
                   ))}

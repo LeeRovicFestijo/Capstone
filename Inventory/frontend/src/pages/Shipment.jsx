@@ -20,6 +20,8 @@ const Shipment = () => {
     const [selectedStatus, setSelectedStatus] = useState("");
     const [anchorEl, setAnchorEl] = useState(null); 
     const [anchorElStatus, setAnchorElStatus] = useState(null);
+    const [anchorElPaymentStatus, setAnchorElPaymentStatus] = useState(null);
+    const [anchorElPaymentMode, setAnchorElPaymentMode] = useState(null);
     const [selectedPayment, setSelectedPayment] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -79,9 +81,21 @@ const Shipment = () => {
         setSelectedShipment(shipment);
     }
 
+    const handlePaymentStatusClick = (event, shipment) => {
+      event.stopPropagation();
+      setAnchorElPaymentStatus(event.currentTarget);
+      setSelectedShipment(shipment);
+    }
+
+    const handlePaymentModeClick = (event, shipment) => {
+      event.stopPropagation();
+      setAnchorElPaymentMode(event.currentTarget);
+      setSelectedShipment(shipment);
+    }
+
     // Handle sort option click
     const handleSortOptionClick = (option) => {
-      if (["Cash", "GCash", "PayMaya", "Card"].includes(option)) {
+      if (["Cash", "GCash", "PayMaya", "Card", "Bank Transfer"].includes(option)) {
           setSelectedPayment(option); 
       } else if (["Pending", "Out For Delivery", "Delivered", "Cancelled"].includes(option)){
           setSelectedStatus(option);
@@ -92,31 +106,84 @@ const Shipment = () => {
     };
 
     const handleStatusChange = (status) => {
-    if (selectedShipment) { // Ensure selectedShipment is defined
-        const updatedShipmentOrders = shipmentOrders.map((shipment) => {
-        if (shipment.order_id === selectedShipment) {
-            return { ...shipment, shipping_status: status }; // Update status
-        }
-        return shipment;
-        });
-    
-        setShipmentOrder(updatedShipmentOrders); // Update state
-        setAnchorElStatus(null); // Close the status menu
-    
-        // Make an API call to update the status in the backend
-        axios.put(`https://adminserver.sigbuilders.app/api/shipment-order/${selectedShipment}`, { shipping_status: status })
-        .then(response => {
-            console.log('Status updated:', response);
-            fetchShipmentOrders(); 
-        })
-        .catch(error => {
-            console.error('Error updating status:', error);
-        });
-    }
+      if (selectedShipment) { // Ensure selectedShipment is defined
+          const updatedShipmentOrders = shipmentOrders.map((shipment) => {
+          if (shipment.order_id === selectedShipment) {
+              return { ...shipment, shipping_status: status }; // Update status
+          }
+          return shipment;
+          });
+      
+          setShipmentOrder(updatedShipmentOrders); // Update state
+          setAnchorElStatus(null); // Close the status menu
+      
+          // Make an API call to update the status in the backend
+          axios.put(`https://adminserver.sigbuilders.app/api/shipment-order/${selectedShipment}`, { shipping_status: status })
+          .then(response => {
+              fetchShipmentOrders(); 
+          })
+          .catch(error => {
+              console.error('Error updating status:', error);
+          });
+      }
+    };
+
+    const handlePaymentStatusChange = (status) => {
+      if (selectedShipment) { // Ensure selectedShipment is defined
+          const updatedShipmentOrders = shipmentOrders.map((shipment) => {
+          if (shipment.order_id === selectedShipment) {
+              return { ...shipment, shipping_status: status }; // Update status
+          }
+          return shipment;
+          });
+      
+          setShipmentOrder(updatedShipmentOrders); // Update state
+          setAnchorElPaymentStatus(null); // Close the status menu
+      
+          // Make an API call to update the status in the backend
+          axios.put(`https://adminserver.sigbuilders.app/api/shipment-payment-status/${selectedShipment}`, { payment_status: status })
+          .then(response => {
+              fetchShipmentOrders(); 
+          })
+          .catch(error => {
+              console.error('Error updating status:', error);
+          });
+      }
+    };
+
+    const handlePaymentModeChange = (status) => {
+      if (selectedShipment) { // Ensure selectedShipment is defined
+          const updatedShipmentOrders = shipmentOrders.map((shipment) => {
+          if (shipment.order_id === selectedShipment) {
+              return { ...shipment, shipping_status: status }; // Update status
+          }
+          return shipment;
+          });
+      
+          setShipmentOrder(updatedShipmentOrders); // Update state
+          setAnchorElPaymentMode(null); // Close the status menu
+      
+          // Make an API call to update the status in the backend
+          axios.put(`https://adminserver.sigbuilders.app/api/shipment-payment-mode/${selectedShipment}`, { payment_mode: status })
+          .then(response => {
+              fetchShipmentOrders(); 
+          })
+          .catch(error => {
+              console.error('Error updating status:', error);
+          });
+      }
     };
     
     const handleCloseStatus = () => {
         setAnchorElStatus(null);
+    }
+
+    const handleClosePaymentStatus = () => {
+      setAnchorElPaymentStatus(null);
+    }
+
+    const handleClosePaymentMode = () => {
+      setAnchorElPaymentMode(null);
     }
 
     const handleCloseDropdown = () => {
@@ -201,7 +268,8 @@ const Shipment = () => {
                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Date</TableCell>
                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Total Amount</TableCell>
                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Shipping Address</TableCell>
-                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Payment</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Payment Mode</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Payment Status</TableCell>
                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Shipping Status</TableCell>
                           </TableRow>
                         </TableHead>
@@ -214,8 +282,43 @@ const Shipment = () => {
                               <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{shipment.total_amount}</TableCell>
                               <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{shipment.shipping_address}</TableCell>
                               <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>
-                                <Button variant="outlined" style={{ borderColor: getButtonColorPayment(shipment.payment_mode) }}>
+                                <Button 
+                                  variant="outlined" 
+                                  style={{ borderColor: getButtonColorPayment(shipment.payment_mode) }}
+                                  disabled={shipment.payment_mode !== 'N/A'}
+                                  onClick={(event) => handlePaymentModeClick(event, shipment.order_id)}
+                                  sx={{
+                                    '&.Mui-disabled': {
+                                      color: shipment.payment_mode === 'Cash' ? '#20c997' : 
+                                             shipment.payment_mode === 'GCash' ? '#2471ce' :
+                                             shipment.payment_mode === 'PayMaya' ? '#28a745' :
+                                             shipment.payment_mode === 'Card' ? '#4a44d6' :
+                                             shipment.payment_mode === 'Bank Transfer' ? '#ddbb68' : 'gray',
+                                      borderColor: shipment.payment_mode === 'Cash' ? '#20c997' : 
+                                                   shipment.payment_mode === 'GCash' ? '#2471ce' :
+                                                   shipment.payment_mode === 'PayMaya' ? '#28a745' :
+                                                   shipment.payment_mode === 'Card' ? '#4a44d6' :
+                                                   shipment.payment_mode === 'Bank Transfer' ? '#ddbb68' : 'gray',
+                                    }
+                                  }}
+                                >
                                   {shipment.payment_mode}
+                                </Button>
+                              </TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>
+                                <Button 
+                                  variant="outlined" 
+                                  color={getButtonColorPaymentStatus(shipment.payment_status)} 
+                                  onClick={(event) => handlePaymentStatusClick(event, shipment.order_id)}
+                                  disabled={shipment.payment_status === 'Paid'}
+                                  sx={{
+                                    '&.Mui-disabled': {
+                                      color: shipment.payment_status === 'Paid' ? 'green' : undefined,
+                                      borderColor: shipment.payment_status === 'Paid' ? 'green' : undefined
+                                    }
+                                  }}
+                                >
+                                  {shipment.payment_status}
                                 </Button>
                               </TableCell>
                               <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -227,9 +330,9 @@ const Shipment = () => {
                                   sx={{
                                     '&.Mui-disabled': {
                                       color: shipment.shipping_status === 'Delivered' ? 'green' : 
-                                             shipment.shipping_status === 'Cancelled' ? 'red' : 'gray', // Set color based on status
+                                             shipment.shipping_status === 'Cancelled' ? 'red' : 'gray', 
                                       borderColor: shipment.shipping_status === 'Delivered' ? 'green' : 
-                                                   shipment.shipping_status === 'Cancelled' ? 'red' : 'gray', // Set border color too
+                                                   shipment.shipping_status === 'Cancelled' ? 'red' : 'gray', 
                                     }
                                   }}
                                 >
@@ -288,7 +391,9 @@ const Shipment = () => {
               <MenuItem onClick={() => handleSortOptionClick("GCash")}>GCash</MenuItem>
               <MenuItem onClick={() => handleSortOptionClick("PayMaya")}>PayMaya</MenuItem>
               <MenuItem onClick={() => handleSortOptionClick("Card")}>Card</MenuItem>
+              <MenuItem onClick={() => handleSortOptionClick("Bank Transfer")}>Bank Transfer</MenuItem>
             </Menu>
+
             <Menu
               anchorEl={anchorElStatus}
               open={Boolean(anchorElStatus)}
@@ -307,6 +412,42 @@ const Shipment = () => {
               <MenuItem onClick={() => handleStatusChange("Delivered")}>Delivered</MenuItem>
               <MenuItem onClick={() => handleStatusChange("Cancelled")}>Cancelled</MenuItem>
             </Menu>
+
+            <Menu
+              anchorEl={anchorElPaymentStatus}
+              open={Boolean(anchorElPaymentStatus)}
+              onClose={handleClosePaymentStatus}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+            >
+              <MenuItem onClick={() => handlePaymentStatusChange("Paid")}>Paid</MenuItem>
+            </Menu>
+
+            <Menu
+              anchorEl={anchorElPaymentMode}
+              open={Boolean(anchorElPaymentMode)}
+              onClose={handleClosePaymentMode}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+            >
+              <MenuItem onClick={() => handlePaymentModeChange("GCash")}>GCash</MenuItem>
+              <MenuItem onClick={() => handlePaymentModeChange("PayMaya")}>PayMaya</MenuItem>
+              <MenuItem onClick={() => handlePaymentModeChange("Bank Transfer")}>Bank Transfer</MenuItem>
+              <MenuItem onClick={() => handlePaymentModeChange("Card")}>Card</MenuItem>
+            </Menu>
+
             <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}>
               <DialogTitle>Order Details</DialogTitle>
               <DialogContent>
@@ -355,9 +496,20 @@ function getButtonColorPayment(status) {
         'GCash': '#2471ce',
         'PayMaya': '#28a745',
         'Card': '#4a44d6',
+        'N/A' : '#888',
     };
 
     return paymentColors[status] || 'default';
+}
+
+function getButtonColorPaymentStatus(status) {
+  const paymentStatusColors = {
+      'Pending': 'warning',
+      'Paid': 'success',
+      'Refund': 'error',
+  };
+
+  return paymentStatusColors[status] || 'default';
 }
 
 function getButtonColorStatus(status) {

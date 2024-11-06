@@ -47,8 +47,6 @@ const ProceedModal = ({ isOpen, onClose, cart, fetchProducts, totalAmount, custo
             shipping_address: shippingAddress
         };
 
-        console.log(orderData);
-
         try {
             const response = await axios.post('https://posserver.sigbuilders.app/api/orders', orderData);
             if (response.status === 200) {

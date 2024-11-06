@@ -64,18 +64,6 @@ function MainLayout({children}) {
         fetchCustomer();
     }, []);
 
-    useEffect(() => {
-        if (persistedCustomer) {
-            setCustomerDetails({
-                customer_name: persistedCustomer.customer_name,
-                customer_email: persistedCustomer.customer_email,
-                customer_address: persistedCustomer.customer_address,
-                customer_number: persistedCustomer.customer_number,
-                customer_profile: persistedCustomer.customer_profile,
-            });
-        }
-    }, [persistedCustomer]);
-
     const addProduct = async (product) => {
         let findProductInCart = cart.find(i => i.item_id === product.item_id);
 
@@ -97,11 +85,9 @@ function MainLayout({children}) {
                 quantity: 1,
                 totalAmount: parseFloat(product.unit_price),
             };
-            console.log(addingProduct);
             setCart([...cart, addingProduct]);
             toast.success(`Added ${product.item_description} to cart`, toastOptions);
         }
-        console.log(cart);
     };
 
     const handleOpenProfileModal = () => {
@@ -185,7 +171,6 @@ function MainLayout({children}) {
         const { customer_name, customer_email, customer_address, customer_number } = customerDetails;
         const customer_id = persistedCustomer.customer_id;
         const errors = [];
-        console.log(customer_id);
 
         if (!customer_name || !customer_email || !customer_address || !customer_number) {
             errors.push("All fields are required.");
@@ -219,13 +204,15 @@ function MainLayout({children}) {
                 toast.success('Account updated successfully!', toastOptions);
                 handleCloseProfileDetailsModal();
                 handleCloseMenu();
+                fetchCustomer();
             }
 
             if (response.status === 401) {
-                toast.error('Old password is incorrect.', toastOptions);
+                toast.error('There is an error changing account details.', toastOptions);
             }
         } catch (error) {
             console.error('Error updating account:', error);
+            toast.error('There is an error changing account details.', toastOptions);
         }
     };
 
@@ -254,7 +241,7 @@ function MainLayout({children}) {
             formDataToSend.append('new_password', new_password);
             formDataToSend.append('confirm_password', confirm_password);
 
-            const response = await axios.post('https://ecommerceserver.sigbuilders.app/api/change-admin-password', formDataToSend, {
+            const response = await axios.post('https://ecommerceserver.sigbuilders.app/api/change-customer-password', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -267,6 +254,7 @@ function MainLayout({children}) {
             }
         } catch (error) {
             console.error('Error changing password:', error);
+            toast.error('Wrong old password!', toastOptions);
         }
     };
 
@@ -595,7 +583,7 @@ function MainLayout({children}) {
                 <div className="box">
                 <h1>Contact Us</h1>
                 <ul>
-                    <li>Location: Poblacion 1, Sta. Teresita, Batangas</li>
+                    <li>Location: Poblacion 2, Sta. Teresita, Batangas</li>
                     <li>Email: simcetxen@yahoo.com</li>
                     <li>Phone: 09192161595 / 09175942377</li>
                 </ul>

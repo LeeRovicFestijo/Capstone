@@ -354,12 +354,12 @@ const Reports = () => {
                                 <button
                                     className="pagination-btn mb-2 mb-sm-0"
                                     onClick={handlePrevPerformancePage}
-                                    disabled={currentInventoryPage === 1}
+                                    disabled={currentPerformancePage === 1}
                                 >
                                     Previous
                                 </button>
                                 <div className="pagination-info mb-2 mb-sm-0">
-                                    Page {currentInventoryPage} of {totalInventoryPages}
+                                    Page {currentPerformancePage} of {totalPerformancePages}
                                 </div>
                                 <button
                                     className="pagination-btn"

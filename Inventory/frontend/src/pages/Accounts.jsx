@@ -134,7 +134,6 @@ const Accounts = () => {
   };
 
   const handleOpenModal = (type, item = null) => {
-    console.log(currentItems);
     setModalType(type);
     if (item) {
       setFormData(item);

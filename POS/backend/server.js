@@ -101,8 +101,8 @@ app.post('/api/update-user-account', upload.single('account_profile'), async (re
               [account_email, employee_id]
           );
 
-          if (existingEmailCheck.rows.length === 0) {
-            
+          if (existingEmailCheck.rows.length !== 0) {
+            res.status(403).json('Email already exist!')
           }
 
           const employeeUpdateResult = await pool.query(

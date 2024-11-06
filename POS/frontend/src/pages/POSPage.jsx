@@ -69,7 +69,6 @@ function POSPage() {
                 quantity: 1,
                 totalAmount: parseFloat(product.unit_price),
             };
-            console.log(addingProduct);
             setCart([...cart, addingProduct]);
             toast.success(`Added ${product.item_description} to cart`, toastOptions);
         }
@@ -84,7 +83,6 @@ function POSPage() {
         const newCart = cart.map(cartItem => {
             if (cartItem.item_id === productId) {
                 const newTotalAmount = cartItem.unit_price * newQuantity;
-                console.log(`Updated Total Amount: ${newTotalAmount}`);
                 return {
                     ...cartItem,
                     quantity: newQuantity,
@@ -145,22 +143,13 @@ function POSPage() {
         }
     }, [cart]);
 
-    useEffect(() => {
-        if (selectedCustomer) {
-            console.log('Selected customer:3', selectedCustomer);
-        }
-    }, [selectedCustomer]);
-
     const handleRemoveCustomer = () => {
-        console.log(selectedCustomer);
         if (selectedCustomer) {
             if (selectedCustomer.customer_id === selectedCustomerLocal.customer_id) {
-                console.log(selectedCustomer)
                 navigate('/customers', { state: { newCustomer: selectedCustomer } });
                 setSelectedCustomer(null);
                 setIsCustomerAdded(false);
             } else {
-                console.log(selectedCustomer)
                 navigate('/customers', { state: { newCustomer: selectedCustomer } });
                 setSelectedCustomer(null);
                 setIsCustomerAdded(true);

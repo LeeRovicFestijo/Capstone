@@ -8,6 +8,7 @@ import "../style/cart-style.css";
 function CartPage() {
     const { cart, setCart, persistedCustomer, placeholderImage, locationAddress, setLocationAddress, paymentMethod, setPaymentMethod } = useEcommerce();
     const [showPopup, setShowPopup] = useState(false);
+    const [showPaymentPopup, setShowPaymentPopup] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(""); 
     const totalPrice = cart.reduce((price, item) => price + item.quantity * item.unit_price, 0);
     const shippingCost = 98;
@@ -28,6 +29,14 @@ function CartPage() {
         setSelectedPaymentMethod("");
         setLocationAddress('');
         setPaymentMethod('');
+    };
+
+    const closePaymentPopup = () => {
+        setShowPaymentPopup(false);
+        setSelectedPaymentMethod("");
+        setLocationAddress('');
+        setPaymentMethod('');
+        toast.success('Thank you for your purchase!', toastOptions);
     };
 
     const handlePaymentMode = async () => {
@@ -60,6 +69,10 @@ function CartPage() {
                 setShowPopup(false);
                 setSelectedPaymentMethod("");
                 makePaymentGCash();
+            } else if (paymentMethod === 'CallToPay') {
+                setShowPopup(false);
+                setSelectedPaymentMethod("");
+                handleConfirmPayment();
             }
 
         } catch (error) {
@@ -89,6 +102,37 @@ function CartPage() {
         }
     };
 
+    const handleConfirmPayment = async () => {
+    
+        const orderData = {
+            customer_id: persistedCustomer.customer_id,
+            cart: cart.map(item => ({
+                item_id: item.item_id,
+                item_description: item.item_description,
+                order_quantity: item.quantity,
+                unit_price: item.unit_price,
+            })),
+            total_amount: totalPrice,
+            order_delivery: 'yes',
+            payment_mode: 'N/A',
+            account_id: 1,
+            shipping_address: locationAddress,
+            payment_status: 'Pending',
+        };
+    
+        try {
+            const response = await axios.post('https://ecommerceserver.sigbuilders.app/api/e-orders', orderData);
+            if (response.status === 200) {
+                setCart([]);
+                setLocationAddress('');
+                setPaymentMethod('');
+                setShowPaymentPopup(true);
+            } 
+        } catch (error) {
+          alert('Failed to create order. Please try again.');
+        }
+    }; 
+
     const makePaymentGCash = async () => {
         const body = {
             customer_id: persistedCustomer.customer_id,
@@ -98,7 +142,7 @@ function CartPage() {
                 unit_price: product.unit_price
             })),
         };
-    
+        // https://ecommerceserver.sigbuilders.app
         try {
             const response = await axios.post('https://ecommerceserver.sigbuilders.app/api/create-gcash-checkout-session', body);
 
@@ -257,7 +301,7 @@ function CartPage() {
                         <div className="payment-methods mt-3">
                             <h3>Payment Method</h3>
                             <div className="payment-buttons">
-                                {["GCash"].map((method) => (
+                                {["CallToPay", "GCash"].map((method) => (
                                 <button
                                     key={method}
                                     className={`payment-btn ${selectedPaymentMethod === method ? "active" : ""}`} 
@@ -287,6 +331,29 @@ function CartPage() {
                         <div className="button-container">
                             <button className="confirm-payment" onClick={handlePaymentMode}>
                                 Confirm Payment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showPaymentPopup && (
+                <div className="popup-overlay">
+                    <div className="popup-inner">
+                        <div className="popup-container" style={{ position: 'relative' }}>
+                            <h2>Call To Pay</h2>
+                        </div>
+                        <div className="cart-summary mt-2">
+                            <h3>Choose either of these numbers to pay</h3>
+                            <div className="summary-item">
+                                <h5>09192161595</h5>
+                                <h5>09175942377</h5>
+                            </div>
+                        </div>
+
+                        <div className="button-container-close">
+                            <button className="close-number" onClick={closePaymentPopup}>
+                                Close
                             </button>
                         </div>
                     </div>

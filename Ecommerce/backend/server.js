@@ -437,7 +437,7 @@ app.post('/api/check-stock', async (req, res) => {
 
 
 app.post('/api/e-orders', async (req, res) => {
-    const { customer_id, cart, total_amount, order_delivery, payment_mode, account_id, shipping_address } = req.body;
+    const { customer_id, cart, total_amount, order_delivery, payment_mode, account_id, shipping_address, payment_status } = req.body;
   
     try {
         const paymentResult = await pool.query('UPDATE payment SET payment_status = $1 WHERE customer_id = $2', ['paid', customer_id])
@@ -471,8 +471,8 @@ app.post('/api/e-orders', async (req, res) => {
         // If order is for delivery, add to Shipment table
         if (order_delivery === 'yes') {
             await pool.query(
-                'INSERT INTO shipment (order_id, shipping_address, shipping_status) VALUES ($1, $2, $3)',
-                [order_id, shipping_address, 'Pending']
+                'INSERT INTO shipment (order_id, shipping_address, shipping_status, payment_status) VALUES ($1, $2, $3, $4)',
+                [order_id, shipping_address, 'Pending', payment_status]
             );
         }
   
@@ -492,7 +492,8 @@ app.get('/api/order-history-customer', async (req, res) => {
             o.order_id, 
             o.order_date, 
             o.total_amount, 
-            s.shipping_status
+            s.shipping_status,
+            s.payment_status
             FROM 
             orders o
             JOIN 
@@ -629,8 +630,8 @@ app.post('/api/create-gcash-checkout-session', async (req, res) => {
                         show_line_items: true,
                         line_items: formattedLineItems, 
                         payment_method_types: ['gcash'],
-                        success_url: `http://localhost:3000/success?session_id=${randomId}`,
-                        cancel_url: 'http://localhost:3000/cancel',
+                        success_url: `https://website.sigbuilders.app/success?session_id=${randomId}`,
+                        cancel_url: 'https://website.sigbuilders.app/cancel',
                     },
                 },
             },
@@ -694,7 +695,7 @@ app.get('/api/check-payment-status/:customer_id', async (req, res) => {
             const { session_id, payment_status } = result.rows[0];
             res.status(200).json({ session_id, payment_status });
         } else {
-            res.status(200).json({ exists: false });
+            res.status(200).json({ exists: false });1
         }
 
         client.release();

@@ -31,6 +31,7 @@ function SuccessPage() {
         payment_mode: paymentMethod,
         account_id: 1,
         shipping_address: locationAddress,
+        payment_status: 'Paid',
     };
 
     try {

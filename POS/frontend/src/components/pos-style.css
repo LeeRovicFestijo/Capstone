@@ -28,7 +28,7 @@
 
 .scrollable-container-order {
     overflow-y: auto;
-    max-height: calc(100vh - 330px);
+    max-height: calc(100vh - 390px);
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
