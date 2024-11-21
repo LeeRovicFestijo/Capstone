@@ -19,7 +19,7 @@ const upload = multer({
   }
 });
 
-app.use(cors({ origin: 'http://localhost:3000' })); 
+app.use(cors()); 
 
 const pool = new Pool({
   user: process.env.DATABASE_USER,
@@ -393,6 +393,7 @@ app.get('/api/shipment-order', async (req, res) => {
             o.payment_mode,
             sh.shipping_address,
             sh.shipping_status,
+            sh.payment_status
             c.customer_id,
             c.customer_name
         FROM 
@@ -410,7 +411,9 @@ app.get('/api/shipment-order', async (req, res) => {
             sh.shipping_address, 
             sh.shipping_status, 
             c.customer_id, 
-            c.customer_name;
+            c.customer_name
+        ORDER BY 
+            sh.order_id DESC;
       `;
         const result = await pool.query(query);
         res.status(200).json(result.rows);
@@ -490,7 +493,7 @@ app.put('/api/shipment-payment-mode/:id', async (req, res) => {
 
   try {
     const result = await pool.query(
-      'UPDATE shipment SET payment_mode = $1 WHERE order_id = $2 RETURNING *',
+      'UPDATE orders SET payment_mode = $1 WHERE order_id = $2 RETURNING *',
       [payment_mode, order_id]
     );
 

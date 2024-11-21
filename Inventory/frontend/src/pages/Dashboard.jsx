@@ -97,7 +97,18 @@ const Dashboard = () => {
                         <StatBox
                             title="Total Sales"
                             subtitle={totalSales.total_sales ? totalSales.total_sales : '0'}
-                            icon={<PointOfSaleIcon sx={{ fontSize: '3rem', color: '#ddbb68' }} />}
+                            icon={
+                                <PointOfSaleIcon
+                                    sx={{
+                                        fontSize: {
+                                            xs: '3rem',      // For mobile screens (max-width: 600px)
+                                            sm: '2.5rem',    // For tablets (max-width: 960px)
+                                            md: '3rem'       // For desktops (default)
+                                        },
+                                        color: '#ddbb68'
+                                    }}
+                                />
+                            }
                         />
                     </Box>
 
@@ -116,7 +127,18 @@ const Dashboard = () => {
                         <StatBox
                             title="Total Customers"
                             subtitle={totalCustomer.totalCustomers ? totalCustomer.totalCustomers : '0'}
-                            icon={<GroupsIcon sx={{ fontSize: '3rem', color: '#ddbb68' }} />}
+                            icon={
+                                <GroupsIcon
+                                    sx={{
+                                        fontSize: {
+                                            xs: '3rem',      // For mobile screens (max-width: 600px)
+                                            sm: '2.5rem',    // For tablets (max-width: 960px)
+                                            md: '3rem'       // For desktops (default)
+                                        },
+                                        color: '#ddbb68'
+                                    }}
+                                />
+                            }
                         />
                     </Box>
 
@@ -135,7 +157,18 @@ const Dashboard = () => {
                         <StatBox
                             title="Orders to Ship"
                             subtitle={orderToShip.activeShipments ? orderToShip.activeShipments : '0'}
-                            icon={<LocalShippingIcon sx={{ fontSize: '3rem', color: '#ddbb68' }} />}
+                            icon={
+                                <LocalShippingIcon
+                                    sx={{
+                                        fontSize: {
+                                            xs: '3rem',      // For mobile screens (max-width: 600px)
+                                            sm: '2.5rem',    // For tablets (max-width: 960px)
+                                            md: '3rem'       // For desktops (default)
+                                        },
+                                        color: '#ddbb68'
+                                    }}
+                                />
+                            }
                         />
                     </Box>
 
@@ -154,7 +187,18 @@ const Dashboard = () => {
                         <StatBox
                             title="Restock Items"
                             subtitle={restockData.length ? restockData.length : '0'}
-                            icon={<ReportProblemIcon sx={{ fontSize: '3rem', color: '#ddbb68' }} />}
+                            icon={
+                                <ReportProblemIcon
+                                    sx={{
+                                        fontSize: {
+                                            xs: '3rem',      // For mobile screens (max-width: 600px)
+                                            sm: '2.5rem',    // For tablets (max-width: 960px)
+                                            md: '3rem'       // For desktops (default)
+                                        },
+                                        color: '#ddbb68'
+                                    }}
+                                />
+                            }
                         />
                     </Box>
 

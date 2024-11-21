@@ -117,14 +117,15 @@
     transition: margin-left 0.3s ease;
 }
 
+
 @media (max-width: 768px) {
     .header-container {
         padding: 0.5rem;
     }
 
     .sidebar {
-        width: 50px; 
-        /* overflow: hidden; */
+        width: 0px; 
+        padding: 0px;
     }
 
     .content {

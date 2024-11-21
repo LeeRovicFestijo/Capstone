@@ -34,44 +34,53 @@ const RestockTable = () => {
     }
 
     return (
-        <TableContainer component={Paper}>
+        <TableContainer
+            component={Paper}
+            sx={{
+                backgroundColor: '#143024', // Green background for the table
+                borderRadius: '8px',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                overflow: 'auto',
+            }}
+        >
             <Table>
+                {/* Table Header */}
                 <TableHead>
                     <TableRow>
-                        <TableCell>
-                            <Typography variant="h7" fontWeight="600">Item Description</Typography>
-                        </TableCell>
-                        <TableCell>
-                            <Typography variant="h7" fontWeight="600">Quality Stocks</Typography>
-                        </TableCell>
-                        <TableCell>
-                            <Typography variant="h7" fontWeight="600">Reorder Point</Typography>
-                        </TableCell>
-                        <TableCell>
-                            <Typography variant="h7" fontWeight="600">Recommended Order Stocks</Typography>
-                        </TableCell>
-                        <TableCell>
-                            <Typography variant="h7" fontWeight="600">ABC Classification</Typography>
-                        </TableCell>
+                        {['Item Description', 'Quality Stocks', 'Reorder Point', 'Recommended Order Stocks', 'ABC Classification'].map((header) => (
+                            <TableCell
+                                key={header}
+                                sx={{
+                                    color: '#ddbb68', // Header color
+                                    fontWeight: '600',
+                                    backgroundColor: '#143024',
+                                    borderBottom: '2px solid #ddbb68',
+                                }}
+                            >
+                                <Typography variant="h7">{header}</Typography>
+                            </TableCell>
+                        ))}
                     </TableRow>
                 </TableHead>
+
+                {/* Table Body */}
                 <TableBody>
                     {restockData.map((stock) => (
                         <TableRow key={stock.item_id}>
                             <TableCell>
-                                <Typography variant="body1">{stock.item_description}</Typography>
+                                <Typography variant="body1" sx={{ color: 'white' }}>{stock.item_description}</Typography>
                             </TableCell>
                             <TableCell>
-                                <Typography variant="body1">{stock.quality_stocks}</Typography>
+                                <Typography variant="body1" sx={{ color: 'white' }}>{stock.quality_stocks}</Typography>
                             </TableCell>
                             <TableCell>
-                                <Typography variant="body1">{stock.reorder_point}</Typography>
+                                <Typography variant="body1" sx={{ color: 'white' }}>{stock.reorder_point}</Typography>
                             </TableCell>
                             <TableCell>
-                                <Typography variant="body1">{stock.eoq}</Typography>
+                                <Typography variant="body1" sx={{ color: 'white' }}>{stock.eoq}</Typography>
                             </TableCell>
                             <TableCell>
-                                <Typography variant="body1">{stock.abc_classification}</Typography>
+                                <Typography variant="body1" sx={{ color: 'white' }}>{stock.abc_classification}</Typography>
                             </TableCell>
                         </TableRow>
                     ))}

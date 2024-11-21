@@ -7,6 +7,7 @@ import "../style/login-signup-style.css";
 function LoginPage() {
   const [email, setEmail] = useState(''); 
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [robotChecked, setRobotChecked] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -48,7 +49,7 @@ function LoginPage() {
         <div className="row w-100 mx-2">
           <div className="col-md-6 text-white d-flex justify-content-center align-items-center flex-column p-4" style={{backgroundColor: '#1B305B'}}>
             <h2 className="mb-2" style={{fontWeight: '600'}}>SIG BUILDERS</h2>
-            <h2 className="mb-4" style={{fontWeight: '600', textAlign: 'center'}}>CONSTRUCTION SUPPLY</h2>
+            <h2 className="mb-4" style={{fontWeight: '600', textAlign: 'center'}}>AND CONSTRUCTION SUPPLY INC.</h2>
           </div>
           <div className="col-md-6 bg-light p-4 d-flex flex-column justify-content-center">
             <h1 className="mb-4">WELCOME!</h1>
@@ -67,14 +68,23 @@ function LoginPage() {
               </div>
               <div className="form-group mb-3">
                 <label htmlFor="password">Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                />
+                <div className="input-group">
+                  <input
+                    type={showPassword ? "text" : "password"} // Toggle input type
+                    className="form-control"
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={() => setShowPassword(!showPassword)} // Toggle visibility
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
               </div>
               <div className="form-group mb-3 d-flex justify-content-between">
                 <div className="form-check">

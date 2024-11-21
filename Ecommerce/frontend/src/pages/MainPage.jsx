@@ -183,10 +183,9 @@ function MainPage() {
                 </div>
                 <div className='content product'>
                     <Swiper
-                        modules={[Autoplay, Navigation, Pagination]} 
+                        modules={[Navigation, Pagination]} 
                         spaceBetween={30}
                         slidesPerView={1}
-                        autoplay={{ delay: 3000, disableOnInteraction: false }} 
                         pagination={{ clickable: true }}
                         navigation={false}
                         className="swiper-container"
@@ -227,10 +226,9 @@ function MainPage() {
                 </div>
                 <div className='content product'>
                     <Swiper
-                        modules={[Autoplay, Navigation, Pagination]} 
+                        modules={[Navigation, Pagination]} 
                         spaceBetween={30}
                         slidesPerView={1}
-                        autoplay={{ delay: 3000, disableOnInteraction: false }} 
                         pagination={{ clickable: true }}
                         navigation={false}
                         className="swiper-container"

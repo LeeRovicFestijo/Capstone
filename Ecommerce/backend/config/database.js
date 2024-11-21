@@ -3,13 +3,15 @@ const { PostgresDialect } = require('@sequelize/postgres');
 
 const sequelize = new Sequelize({
   dialect: PostgresDialect,
-  database: 'sigbuilder',
-  user: 'postgres',
-  password: '12345678',
-  host: 'localhost',
-  port: 5433,
-  ssl: false,
+  user: process.env.DATABASE_USER,
+  host: process.env.DATABASE_HOST,
+  database: process.env.DATABASE_NAME,
+  password: process.env.DATABASE_PASSWORD,
+  port: process.env.DATABASE_PORT,
   clientMinMessages: 'notice',
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 module.exports = sequelize;

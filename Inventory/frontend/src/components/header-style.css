@@ -113,7 +113,7 @@
 }
 
 .sidebar {
-    height: calc(100vh - 12vh);
+    /* height: calc(100vh - 12vh); */
     display: flex;
     width: 290px;
     background-color: rgb(20, 48, 36);
@@ -129,6 +129,7 @@
 
     .sidebar {
         width: 0%;
+        padding: 0px;
     }
 }
 
