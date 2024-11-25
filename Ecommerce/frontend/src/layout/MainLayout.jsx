@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom"; 
-import { Autocomplete, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Button, Menu, MenuItem } from '@mui/material';
+import { Autocomplete, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Button, Menu, MenuItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { ToastContainer, toast, Flip } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,6 +18,7 @@ function MainLayout({children}) {
     const [openProfileModal, setOpenProfileModal] = useState(false);
     const [openProfileDetailsModal, setOpenProfileDetailsModal] = useState(false);
     const [openChangePasswordModal, setOpenChangePasswordModal] = useState(false);
+    const [isFAQOpen, setIsFAQOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const navigate = useNavigate();
     const [customerDetails, setCustomerDetails] = useState({
@@ -143,6 +144,14 @@ function MainLayout({children}) {
     const handleSignIn = () => {
         setAnchorEl(null);
         navigate('/login');
+    };
+
+    const handleOpenFAQ = () => {
+        setIsFAQOpen(true);
+    };
+
+    const handleCloseFAQ = () => {
+        setIsFAQOpen(false);
     };
 
     const handleInputChange = (e) => {
@@ -601,18 +610,43 @@ function MainLayout({children}) {
                 <div className="box">
                 <h2>Customer Care</h2> 
                 <ul>
+                    <li 
+                        onClick={handleOpenFAQ}
+                        className="clickable" 
+                        role="button" 
+                        tabIndex={0}
+                    > 
+                        FAQ
+                    </li>
                     <li>Help Center</li>
                     <li>Track Your Order</li>
                     <li>Returns & Refunds</li>
                 </ul>
                 </div>
-
                 <div className="box">
                 <h2>SIG BUILDERS</h2> 
                 <p>"SIG BUILDER is your one-stop shop for all construction supplies, offering high-quality materials and tools to bring your building projects to life."</p>
                 </div>
             </div>
         </footer>
+        <Dialog open={isFAQOpen} onClose={handleCloseFAQ}>
+            <DialogTitle>Frequently Ask Questions</DialogTitle>
+            <DialogContent>
+            <Typography variant="h6" gutterBottom>
+                Covered Delivery Locations
+            </Typography>
+                <ul>
+                    <li>Alitagtag</li>
+                    <li>San Luis</li>
+                    <li>San Nicolas</li>
+                    <li>Taal</li>
+                    <li>Santa Teresita</li>
+                </ul>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleCloseFAQ} color="primary">Close</Button>
+            </DialogActions>
+        </Dialog>
         </main>
     </div>
   )

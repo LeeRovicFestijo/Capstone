@@ -47,7 +47,7 @@ const RestockTable = () => {
                 {/* Table Header */}
                 <TableHead>
                     <TableRow>
-                        {['Item Description', 'Quality Stocks', 'Reorder Point', 'Recommended Order Stocks', 'ABC Classification'].map((header) => (
+                        {['Item Description', 'Quality Stocks', 'Reorder Point', 'Recommended Order Stocks', 'ABC Category'].map((header) => (
                             <TableCell
                                 key={header}
                                 sx={{

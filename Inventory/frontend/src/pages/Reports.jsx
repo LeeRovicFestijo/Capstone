@@ -14,6 +14,7 @@ const Reports = () => {
     const [inventoryPerformance, setInventoryPerformance] = useState([]);
     const [orderData, setOrderData] = useState([]);
     const [orderDetails, setOrderDetails] = useState([]);
+    const [years, setYears] = useState([]);
     const [selectedYear, setSelectedYear] = useState('All Year');
     const [selectedMonth, setSelectedMonth] = useState('All Month');
     const [showPerformanceTable, setShowPerformanceTable] = useState(true);
@@ -79,7 +80,18 @@ const Reports = () => {
         }
     };
 
+    const fetchYears = async () => {
+        try {
+          const response = await axios.get("https://adminserver.sigbuilders.app/api/getYears"); 
+          const data = response.data; 
+          setYears(data.years); 
+        } catch (error) {
+          console.error("Error fetching years:", error);
+        }
+    };
+
     useEffect(() => {
+        fetchYears();
         fetchPerformanceData();
         fetchCustomers();
         fetchOrders();
@@ -267,9 +279,11 @@ const Reports = () => {
                                 
                                 <select className="form-control mb-2 mb-md-0 mr-md-2 w-100 w-md-auto" value={selectedYear} onChange={handleYearChange}>
                                 <option value="All Year">All Year</option>
-                                <option value="2023">2023</option>
-                                <option value="2024">2024</option>
-                                <option value="2025">2025</option>
+                                {years.map((year) => (
+                                <option key={year} value={year}>
+                                    {year}
+                                </option>
+                                ))}
                                 </select>
 
                                 <select className="form-control mb-2 mb-md-0 mr-md-2 w-100 w-md-auto" value={selectedMonth} onChange={handleMonthChange}>

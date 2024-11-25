@@ -69,7 +69,11 @@ function CartPage() {
                 setShowPopup(false);
                 setSelectedPaymentMethod("");
                 makePaymentGCash();
-            } else if (paymentMethod === 'CallToPay') {
+            } else if (paymentMethod === 'Call To Pay') {
+                setShowPopup(false);
+                setSelectedPaymentMethod("");
+                handleConfirmPayment();
+            } else if (paymentMethod === 'Cash On Delivery') {
                 setShowPopup(false);
                 setSelectedPaymentMethod("");
                 handleConfirmPayment();
@@ -114,7 +118,7 @@ function CartPage() {
             })),
             total_amount: totalPrice,
             order_delivery: 'yes',
-            payment_mode: 'N/A',
+            payment_mode: 'Cash',
             account_id: 1,
             shipping_address: locationAddress,
             payment_status: 'Pending',
@@ -126,7 +130,8 @@ function CartPage() {
                 setCart([]);
                 setLocationAddress('');
                 setPaymentMethod('');
-                setShowPaymentPopup(true);
+                setSelectedPaymentMethod("");
+                toast.success('Thank you for your purchase!', toastOptions);
             } 
         } catch (error) {
           alert('Failed to create order. Please try again.');
@@ -301,7 +306,7 @@ function CartPage() {
                         <div className="payment-methods mt-3">
                             <h3>Payment Method</h3>
                             <div className="payment-buttons">
-                                {["CallToPay", "GCash"].map((method) => (
+                                {["Cash On Delivery", "GCash"].map((method) => (
                                 <button
                                     key={method}
                                     className={`payment-btn ${selectedPaymentMethod === method ? "active" : ""}`} 

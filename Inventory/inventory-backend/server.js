@@ -301,7 +301,7 @@ app.put('/api/accounts/:id', async (req, res) => {
   
     try {
       const accountResult = await pool.query(
-        'UPDATE employee_account SET account_username = $1, account_role = $2, account_status = $3, account_email = $4 WHERE account_id = $7 RETURNING *',
+        'UPDATE employee_account SET account_username = $1, account_role = $2, account_status = $3, account_email = $4 WHERE account_id = $5 RETURNING *',
         [account_username, account_role, account_status, account_email, id]
       );
       if (accountResult.rowCount === 0) {
@@ -535,6 +535,17 @@ app.get('/api/shipment-details', async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Error fetching order details', error: error.message });
     }
+});
+
+app.get("/api/getYears", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT DISTINCT EXTRACT(YEAR FROM order_date) AS year FROM orders");
+    const years = result.rows.map((row) => row.year);
+    res.json({ years });
+  } catch (error) {
+    console.error("Error fetching years:", error);
+    res.status(500).json({ error: "Failed to fetch years" });
+  }
 });
 
 app.get('/api/customer-report', async (req, res) => {
