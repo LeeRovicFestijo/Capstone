@@ -7,7 +7,7 @@ const BarChart = () => {
 
     const fetchTopItems = async () => {
         try {
-            const topResponse = await axios.get('https://adminserver.sigbuilders.app/api/top-items-dashboard');
+            const topResponse = await axios.get('https://adminserver.sigbuilders.app/api/top-items-dashboard'); 
             if (topResponse.status === 200) {
                 setTopItems(topResponse.data);
             }
@@ -121,7 +121,7 @@ const BarChart = () => {
             legend: undefined,
             legendPosition: 'middle',
             legendOffset: 32,
-            truncateTickAt: 10
+            truncateTickAt: 15
         }}
         axisLeft={{
             tickSize: 5,

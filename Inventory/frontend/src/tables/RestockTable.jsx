@@ -71,13 +71,13 @@ const RestockTable = () => {
                                 <Typography variant="body1" sx={{ color: 'white' }}>{stock.item_description}</Typography>
                             </TableCell>
                             <TableCell>
-                                <Typography variant="body1" sx={{ color: 'white' }}>{stock.quality_stocks}</Typography>
+                                <Typography variant="body1" sx={{ color: 'white' }}>{parseFloat(stock.quality_stocks).toLocaleString()}</Typography>
                             </TableCell>
                             <TableCell>
-                                <Typography variant="body1" sx={{ color: 'white' }}>{stock.reorder_point}</Typography>
+                                <Typography variant="body1" sx={{ color: 'white' }}>{parseFloat(stock.reorder_point).toLocaleString()}</Typography>
                             </TableCell>
                             <TableCell>
-                                <Typography variant="body1" sx={{ color: 'white' }}>{stock.eoq}</Typography>
+                                <Typography variant="body1" sx={{ color: 'white' }}>{parseFloat(stock.eoq).toLocaleString()}</Typography>
                             </TableCell>
                             <TableCell>
                                 <Typography variant="body1" sx={{ color: 'white' }}>{stock.abc_classification}</Typography>

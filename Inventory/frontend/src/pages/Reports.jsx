@@ -6,15 +6,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartLine, faBoxes, faUsers, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from '../layout/MainLayout';
 import { CSVLink } from 'react-csv';
+import { useInventory } from '../api/InventoryProvider';
 
 const Reports = () => {
+    const { years, setYears } = useInventory();
     const [inventoryReport, setInventoryReport] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [customerData, setCustomerData] = useState([]);
     const [inventoryPerformance, setInventoryPerformance] = useState([]);
     const [orderData, setOrderData] = useState([]);
     const [orderDetails, setOrderDetails] = useState([]);
-    const [years, setYears] = useState([]);
     const [selectedYear, setSelectedYear] = useState('All Year');
     const [selectedMonth, setSelectedMonth] = useState('All Month');
     const [showPerformanceTable, setShowPerformanceTable] = useState(true);
@@ -203,6 +204,7 @@ const Reports = () => {
         { label: "Order Date", key: "order_date" },
         { label: "Order Deliver", key: "order_deliver" },
         { label: "Payment Method", key: "payment_mode" },
+        { label: "Total Amount", key: "total_amount" },
     ];
 
     const csvDataOrders = orderData.map(orders => ({
@@ -211,6 +213,7 @@ const Reports = () => {
         order_date: orders.order_date,
         order_deliver: orders.order_deliver,
         payment_mode: orders.payment_mode,
+        total_amount: orders.total_amount,
     }));
 
     const indexOfLastPerformance = currentPerformancePage * rowsPerPage;
@@ -357,8 +360,8 @@ const Reports = () => {
                                             key={inventory.item_id} 
                                         >
                                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.item_description}</TableCell>
-                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.total_sales}</TableCell>
-                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{inventory.total_items_sold}</TableCell>
+                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{parseFloat(inventory.total_sales).toLocaleString()}</TableCell>
+                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{parseFloat(inventory.total_items_sold).toLocaleString()}</TableCell>
                                         </TableRow>
                                         ))}
                                     </TableBody>
@@ -531,6 +534,7 @@ const Reports = () => {
                                         <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Order Date</TableCell>
                                         <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Order Deliver</TableCell>
                                         <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Payment Method</TableCell>
+                                        <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Total Amount</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -545,6 +549,7 @@ const Reports = () => {
                                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{formatDate(order.order_date)}</TableCell>
                                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.order_deliver}</TableCell>
                                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.payment_mode}</TableCell>
+                                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{parseFloat(order.total_amount).toLocaleString()}</TableCell>
                                         </TableRow>
                                         ))}
                                     </TableBody>

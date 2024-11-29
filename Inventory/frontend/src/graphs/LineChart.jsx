@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ResponsiveLine } from '@nivo/line';
 
-const LineChart =() => {
+const LineChart =({ filterYear }) => {
     const [salesData, setSalesData] = useState([]);
 
     const fetchSalesData = async () => {
         try {
-            const response = await axios.get('https://adminserver.sigbuilders.app/api/sales-data');
+          const response = await axios.get('https://adminserver.sigbuilders.app/api/sales-data', {
+            params: { year: filterYear }
+          });
             setSalesData(response.data);
         } catch (error) {
             console.error('Error fetching sales data:', error);
@@ -15,8 +17,8 @@ const LineChart =() => {
     };
 
     useEffect(() => {
-        fetchSalesData();
-    }, []);
+      fetchSalesData();
+    }, [filterYear]); 
 
     if (salesData.length === 0) {
         return <div>No sales data available.</div>;

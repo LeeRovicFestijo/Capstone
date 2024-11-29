@@ -96,14 +96,13 @@ const ProceedModal = ({ isOpen, onClose, cart, fetchProducts, totalAmount, custo
                 </div>
                 
                 <div className="form-group">
-                    <label>To Ship:</label>
                     <Select
                         value={shippingMethod}
                         onChange={(e) => setShippingMethod(e.target.value)}
                         fullWidth
                     >
-                        <MenuItem value="OnSite">No</MenuItem>
-                        <MenuItem value="Ship">Yes</MenuItem>
+                        <MenuItem value="OnSite">Pickup</MenuItem>
+                        <MenuItem value="Ship">Deliver</MenuItem>
                     </Select>
                 </div>
                 

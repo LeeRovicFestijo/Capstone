@@ -15,13 +15,21 @@ function CartPage() {
     const finalPrice = totalPrice + shippingCost; 
   
     const handleBuyClick = () => {
-        if (cart.length !== 0) {
-            setShowPopup(true);
-            setLocationAddress('');
-            setPaymentMethod('');
-        } else {
-            toast.error('Put something on your cart first!', toastOptions)
+        const invalidItem = cart.find(item => Number.isNaN(item.quantity) || item.quantity === 0);
+    
+        if (invalidItem) {
+            toast.error('One of your products does not have a valid quantity!', toastOptions);
+            return;
         }
+
+        if (cart.length === 0) {
+            toast.error('Put something in your cart first!', toastOptions);
+            return; 
+        }
+    
+        setShowPopup(true);
+        setLocationAddress('');
+        setPaymentMethod('');
     };
   
     const closePopup = () => {
@@ -236,7 +244,14 @@ function CartPage() {
                                     >
                                         <i className="fa-solid fa-minus"></i>
                                     </button>
-                                    <span className="item-qty">{item.quantity}</span>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        className="form-control text-center"
+                                        style={{ width: '90px', MozAppearance: 'textfield', WebkitAppearance: 'none', margin: 0 }}
+                                        value={item.quantity}
+                                        onChange={(e) => updateQuantity(item.item_id, parseInt(e.target.value))}
+                                    />
                                     <button 
                                         className="qty-btn"
                                         onClick={() => {
@@ -276,57 +291,66 @@ function CartPage() {
                 <div className="popup-overlay">
                     <div className="popup-inner">
                         <div className="popup-container" style={{ position: 'relative' }}>
-                            <button className="close-popup" onClick={closePopup} style={{ position: 'absolute', right: '10px' }}>
+                            <button
+                                className="close-popup"
+                                onClick={closePopup}
+                                style={{ position: 'absolute', right: '10px' }}
+                            >
                                 <i className="bi bi-x-circle"></i>
                             </button>
                             <h2>Checkout</h2>
                         </div>
                         <div className="cart-summary mt-2">
-                        <h3>Order Summary</h3>
-                        {cart.map((item) => (
-                            <div key={item.item_id} className="summary-item">
-                            <p>{item.item_description} - ₱{item.unit_price} x {item.quantity}</p>
-                            <p>₱{(item.totalAmount).toFixed(2)}</p>
+                            <h3>Order Summary</h3>
+                            {cart.map((item) => (
+                                <div key={item.item_id} className="summary-item">
+                                    <p>{item.item_description} - ₱{item.unit_price} x {item.quantity}</p>
+                                    <p>₱{item.totalAmount.toFixed(2)}</p>
+                                </div>
+                            ))}
+                            <div className="summary-item">
+                                <p><strong>Total Payment:</strong></p>
+                                <p><strong>₱{totalPrice.toFixed(2)}</strong></p>
                             </div>
-                        ))}
-                        <div className="summary-item">
-                            <p>Merchandise Subtotal:</p>
-                            <p>₱{totalPrice.toFixed(2)}</p>
-                        </div>
-                        <div className="summary-item">
-                            <p>Shipping Total:</p>
-                            <p>₱{shippingCost.toFixed(2)}</p>
-                        </div>
-                        <div className="summary-item total">
-                            <p>Total Payment:</p>
-                            <p>₱{finalPrice.toFixed(2)}</p>
-                        </div>
                         </div>
 
                         <div className="payment-methods mt-3">
-                            <h3>Payment Method</h3>
+                            <h4>Payment Method</h4>
                             <div className="payment-buttons">
                                 {["Cash On Delivery", "GCash"].map((method) => (
-                                <button
-                                    key={method}
-                                    className={`payment-btn ${selectedPaymentMethod === method ? "active" : ""}`} 
-                                    onClick={() => {
-                                    setPaymentMethod(method);
-                                    setSelectedPaymentMethod(method); 
-                                    }}
-                                >
-                                    {method}
-                                </button>
+                                    <button
+                                        key={method}
+                                        className={`payment-btn ${selectedPaymentMethod === method ? "active" : ""}`}
+                                        onClick={() => {
+                                            setPaymentMethod(method);
+                                            setSelectedPaymentMethod(method);
+                                        }}
+                                    >
+                                        {method}
+                                    </button>
                                 ))}
                             </div>
                         </div>
 
                         <div className="location-field">
-                            <label htmlFor="location">Delivery Location:</label>
+                            <h4 htmlFor="location" className="mt-3">Delivery Location:</h4>
+                            <div className="shipping-note">
+                                <p><strong>Shipping Information (Underload):</strong></p>
+                                <ul style={{ listStyleType: "none", padding: 0, margin: 0 }}> 
+                                    <li>Shipping fees vary depending on the delivery location.</li>
+                                    <li>
+                                        <strong>Within Santa Teresita:</strong> ₱150 - ₱200
+                                    </li>
+                                    <li>
+                                        <strong>Outside Santa Teresita:</strong> ₱200 - ₱400
+                                    </li>
+                                    <li>Shipping fees are paid upon delivery.</li>
+                                </ul>
+                            </div>
                             <input
                                 type="text"
                                 id="location"
-                                value={locationAddress? locationAddress : ''}
+                                value={locationAddress || ''}
                                 onChange={(e) => setLocationAddress(e.target.value)}
                                 placeholder="Enter delivery location"
                                 className="large-location-input"

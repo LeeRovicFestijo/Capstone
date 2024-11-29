@@ -11,21 +11,29 @@ const StatBox = ({ title, subtitle, icon }) => {
             h4: {
                 fontWeight: 'bold',
                 color: 'white',
+                fontSize: '1.8rem',
+                '@media (max-width: 1280px)': {
+                    fontSize: '1rem', 
+                },
                 '@media (max-width: 1366px)': {
-                    fontSize: '1.5rem', // Smaller font on tablets
+                    fontSize: '1.2rem', // Smaller font on tablets
                 },
                 '@media (max-width: 1024px)': {
                     fontSize: '1rem', // Smaller font on tablets
                 },
                 '@media (max-width: 768px)': {
-                    fontSize: '1.5rem', // Smaller font on mobile
+                    fontSize: '1.4rem', // Smaller font on mobile
                 },
             },
             h5: {
                 fontWeight: '400',
                 color: '#ddbb68',
+                fontSize: '1.5rem',
+                '@media (max-width: 1280px)': {
+                    fontSize: '1rem', 
+                },
                 '@media (max-width: 1366px)': {
-                    fontSize: '1.2rem', // Smaller font on tablets
+                    fontSize: '1rem', // Smaller font on tablets
                 },
                 '@media (max-width: 1024px)': {
                     fontSize: '0.8rem', // Smaller font on tablets

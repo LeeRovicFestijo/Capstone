@@ -171,7 +171,7 @@ function TransactionPage() {
                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Customer Name</TableCell>
                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Date</TableCell>
                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Total Amount</TableCell>
-                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Ship</TableCell>
+                            <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Order Type</TableCell>
                             <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>Payment</TableCell>
                           </TableRow>
                         </TableHead>
@@ -181,8 +181,8 @@ function TransactionPage() {
                               <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.order_id}</TableCell>
                               <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.customer_name}</TableCell>
                               <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{formatDate(order.order_date)}</TableCell>
-                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.total_amount}</TableCell>
-                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.order_deliver}</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{parseFloat(order.total_amount).toLocaleString()}</TableCell>
+                              <TableCell style={{ fontFamily: 'Poppins, sans-serif' }}>{order.order_deliver === 'yes' ? 'Pickup' : 'Deliver'}</TableCell>
                               <TableCell>
                                 <Button 
                                   variant="outlined" 
