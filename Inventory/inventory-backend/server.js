@@ -870,140 +870,6 @@ app.get('/api/recent-orders-dashboard', async (req, res) => {
   }
 });
 
-// app.get('/api/restock-dashboard', async (req, res) => {
-//   try {
-
-//     const query = ` 
-//       -- Place the complete SQL query here
-//       WITH OrderToSale AS (
-//     SELECT 
-//         t.item_id,
-//         o.order_id,
-//         o.order_date
-//     FROM 
-//         orders o
-//     LEFT JOIN 
-//         transactions t ON o.order_id = t.order_id
-// ),
-// InventoryValues AS (
-//     SELECT 
-//         i.item_id,
-//         i.item_description,
-//         i.quality_stocks, -- Current stock levels
-//         COALESCE(SUM(t.order_quantity), 0) AS total_quantity_sold, -- Total quantity sold for each item
-//         i.unit_price,
-//         (i.unit_price * COALESCE(SUM(t.order_quantity), 0)) AS total_value, -- Total value of sales
-//         7 AS lead_time, -- Lead time is fixed at 7 days
-//         4000 AS ordering_cost
-//     FROM 
-//         inventory i
-//     LEFT JOIN 
-//         transactions t ON i.item_id = t.item_id
-//     LEFT JOIN 
-//         orders o ON t.order_id = o.order_id
-//     WHERE 
-//         o.order_date >= CURRENT_DATE - INTERVAL '1 year'
-//     GROUP BY 
-//         i.item_id, i.unit_price, i.quality_stocks
-// ),
-// EOQAnalysis AS (
-//     SELECT
-//         item_id,
-//         item_description,
-//         quality_stocks, -- Current stock levels
-//         total_quantity_sold,
-//         FLOOR(SQRT((2 * total_quantity_sold * ordering_cost) / 25000)) AS eoq, -- EOQ calculation rounded to nearest integer
-//         (total_quantity_sold / 365) * lead_time AS lead_time_demand, -- Demand during the fixed 7-day lead time
-//         25 AS safety_stock, -- Fixed safety stock value
-//         ((total_quantity_sold / 365) * lead_time) + 25 AS reorder_point -- ROP = lead time demand + safety stock
-//     FROM 
-//         InventoryValues
-// ),
-// RankedInventory AS (
-//     SELECT
-//         i.item_id,
-//         i.item_description,
-//         i.unit_price,
-//         COALESCE(SUM(t.order_quantity), 0) AS total_quantity_sold,  -- Handle unsold items
-//         COALESCE((i.unit_price * SUM(t.order_quantity)), 0) AS total_value -- Handle unsold items
-//     FROM 
-//         inventory i
-//     LEFT JOIN 
-//         transactions t ON i.item_id = t.item_id
-//     LEFT JOIN 
-//         orders o ON t.order_id = o.order_id
-//     WHERE 
-//         o.order_date >= CURRENT_DATE - INTERVAL '1 year' OR o.order_date IS NULL -- Include items with no orders
-//     GROUP BY 
-//         i.item_id, i.unit_price
-// ),
-// RankedInventoryWithTotal AS (
-//     SELECT
-//         *,
-//         RANK() OVER (ORDER BY total_value DESC) AS rank_value,
-//         SUM(total_value) OVER () AS total_inventory_value -- Total value of all items
-//     FROM
-//         RankedInventory
-// ),
-// ABCClassification AS (
-//     SELECT
-//         item_id,
-//         item_description,
-//         unit_price,
-//         total_quantity_sold,
-//         total_value,
-//         total_value / total_inventory_value * 100 AS value_percentage,
-//         CASE
-//             WHEN total_value / total_inventory_value * 100 >= 80 THEN 'A'
-//             WHEN total_value / total_inventory_value * 100 >= 15 THEN 'B'
-//             ELSE 'C'
-//         END AS abc_classification
-//     FROM
-//         RankedInventoryWithTotal
-// ),
-// RestockItems AS (
-//     SELECT
-//         e.item_id,
-//         e.item_description,
-//         e.quality_stocks,
-//         e.reorder_point,
-//         e.eoq,
-//         a.abc_classification,
-//         CASE
-//             WHEN e.quality_stocks < e.reorder_point THEN 'Yes'
-//             ELSE 'No'
-//         END AS needs_restock
-//     FROM
-//         EOQAnalysis e
-//     LEFT JOIN 
-//         ABCClassification a ON e.item_id = a.item_id
-// )
-// SELECT
-//     item_id,
-//     item_description,
-//     quality_stocks,
-//     reorder_point,
-//     eoq,
-//     abc_classification,
-//     needs_restock
-// FROM
-//     RestockItems
-// WHERE 
-//     needs_restock = 'Yes'
-// ORDER BY
-//     abc_classification, reorder_point DESC;
-//       `;
-//       const result = await pool.query(query);
-
-//       res.status(200).json(result.rows);
-//   } catch (error) {
-//       console.error('Error fetching inventory data:', error);
-//       res.status(500).json({ message: 'Error fetching inventory data' });
-//   }
-// });
-
-// Start the server
-
 app.get('/api/restock-dashboard', async (req, res) => {
   try {
     const query = `
@@ -1034,7 +900,7 @@ app.get('/api/restock-dashboard', async (req, res) => {
         LEFT JOIN 
             orders o ON t.order_id = o.order_id
         WHERE 
-            o.order_date >= CURRENT_DATE - INTERVAL '1 year'
+            o.order_date >= DATE_TRUNC('year', CURRENT_DATE)
         GROUP BY 
             i.item_id, i.unit_price, i.quality_stocks
       ),
@@ -1065,7 +931,7 @@ app.get('/api/restock-dashboard', async (req, res) => {
         LEFT JOIN 
             orders o ON t.order_id = o.order_id
         WHERE 
-            o.order_date >= CURRENT_DATE - INTERVAL '1 year' OR o.order_date IS NULL -- Include items with no orders
+            o.order_date >= DATE_TRUNC('year', CURRENT_DATE) OR o.order_date IS NULL -- Include items with no orders
         GROUP BY 
             i.item_id, i.unit_price
       ),
