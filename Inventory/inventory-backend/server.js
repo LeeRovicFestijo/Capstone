@@ -539,7 +539,7 @@ app.get('/api/shipment-details', async (req, res) => {
 
 app.get("/api/getYears", async (req, res) => {
   try {
-    const result = await pool.query("SELECT DISTINCT EXTRACT(YEAR FROM order_date) AS year FROM orders ORDER BY year DESC");
+    const result = await pool.query("SELECT DISTINCT EXTRACT(YEAR FROM order_date) AS year FROM orders ORDER BY year");
     const years = result.rows.map((row) => row.year);
     res.json({ years });
   } catch (error) {
