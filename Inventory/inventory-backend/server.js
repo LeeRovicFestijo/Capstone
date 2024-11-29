@@ -393,7 +393,7 @@ app.get('/api/shipment-order', async (req, res) => {
             o.payment_mode,
             sh.shipping_address,
             sh.shipping_status,
-            sh.payment_status
+            sh.payment_status,
             c.customer_id,
             c.customer_name
         FROM 
