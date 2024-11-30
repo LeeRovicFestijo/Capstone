@@ -55,7 +55,7 @@ const LineChart =({ filterYear }) => {
               },
             },
         }}
-        margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
+        margin={{ top: 50, right: 40, bottom: 50, left: 60 }}
         xScale={{ type: 'point' }}
         yScale={{
             type: 'linear',

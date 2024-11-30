@@ -48,7 +48,7 @@ const Dashboard = () => {
                 params: { year: currentYear } 
             });
             if (response.status === 200) {
-                setTotalSales(response.data);
+                setTotalSales(response.data); 
             }
         } catch (error) {
             console.error(error.message);
@@ -260,11 +260,18 @@ const Dashboard = () => {
                             justifyContent="space-between"
                             alignItems="center"
                         >
-                            <Typography variant="h5" fontWeight="600" color="#ddbb68">
+                            <Typography 
+                                variant="h5" 
+                                fontWeight="600" 
+                                color="#ddbb68"
+                                sx={{
+                                    fontSize: isMobile ? '16px' : '20px',
+                                }}
+                            >
                                 Monthly Sales
                             </Typography>
                             <Box display="flex" alignItems="center" sx={{ ml: 'auto' }}>
-                                <Typography variant="body1" color="#ddbb68" sx={{ mr: 2 }}>
+                                <Typography variant="body1" color="#ddbb68">
                                     Compare
                                 </Typography>
                                 <Switch
@@ -280,12 +287,21 @@ const Dashboard = () => {
                                     }}
                                 />
                             </Box>
-                            <FormControl sx={{ minWidth: '5vw' }}>
+                            <FormControl 
+                                sx={{
+                                    minWidth: isMobile ? '3vw' : '5vw', 
+                                    '.MuiSelect-root': {
+                                        fontSize: isMobile ? '12px' : '16px',
+                                    },
+                                }}
+                            >
                                 <Select
                                     labelId="year-select-label"
                                     value={currentYear}
                                     onChange={(e) => setCurrentYear(e.target.value)}
                                     sx={{
+                                        fontSize: isMobile ? '0.8rem' : '16px', // Smaller font size for mobile
+                                        minWidth: isMobile ? '80px' : '100px', // Adjust width dynamically
                                         color: '#ddbb68', 
                                         '.MuiOutlinedInput-notchedOutline': {
                                             borderColor: '#ddbb68', 
@@ -328,15 +344,31 @@ const Dashboard = () => {
                                 justifyContent="space-between"
                                 alignItems="center"
                             >
-                                <Typography variant="h5" fontWeight="600" color="#ddbb68">
+                                <Typography 
+                                    variant="h5" 
+                                    fontWeight="600" 
+                                    color="#ddbb68"
+                                    sx={{
+                                        fontSize: isMobile ? '16px' : '20px',
+                                    }}
+                                >
                                     Monthly Sales
                                 </Typography>
-                                <FormControl sx={{ minWidth: '5vw' }}>
+                                <FormControl 
+                                    sx={{
+                                        minWidth: isMobile ? '3vw' : '5vw', 
+                                        '.MuiSelect-root': {
+                                            fontSize: isMobile ? '12px' : '16px',
+                                        },
+                                    }}
+                                >
                                     <Select
                                         labelId="year-select-label"
                                         value={compareYear ? compareYear : years[years.length - 2]}
                                         onChange={(e) => setCompareYear(e.target.value)}
                                         sx={{
+                                            fontSize: isMobile ? '0.8rem' : '16px', // Smaller font size for mobile
+                                            minWidth: isMobile ? '80px' : '100px',
                                             color: '#ddbb68', 
                                             '.MuiOutlinedInput-notchedOutline': {
                                                 borderColor: '#ddbb68', 
