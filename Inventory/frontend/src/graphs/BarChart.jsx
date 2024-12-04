@@ -2,23 +2,25 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ResponsiveBar } from '@nivo/bar';
 
-const BarChart = () => {
+const BarChart = ( {month, limit, year} ) => {
     const [topItems, setTopItems] = useState([]);
 
     const fetchTopItems = async () => {
         try {
-            const topResponse = await axios.get('https://adminserver.sigbuilders.app/api/top-items-dashboard'); 
-            if (topResponse.status === 200) {
-                setTopItems(topResponse.data);
+            const response = await axios.get('https://adminserver.sigbuilders.app/api/top-items-dashboard', {
+                params: { month, year, limit },
+            });
+            if (response.status === 200) {
+                setTopItems(response.data);
             }
         } catch (error) {
-            console.error(error.message)
+            console.error(error.message);
         }
     };
 
     useEffect(() => {
         fetchTopItems();
-    }, []);
+    }, [month, limit, year]);
 
     const chartData = topItems.map(item => ({
         item_description: item.item_description, 

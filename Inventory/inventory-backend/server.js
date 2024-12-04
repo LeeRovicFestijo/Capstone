@@ -814,7 +814,14 @@ app.get('/api/sales-data', async (req, res) => {
 
 app.get('/api/top-items-dashboard', async (req, res) => {
   try {
-      const result = await pool.query(`
+      const { month, year, limit } = req.query;
+
+      if (!month || !year) {
+          return res.status(400).json({ message: 'Month and year are required' });
+      }
+
+      const result = await pool.query(
+          `
           SELECT 
               i.item_id, 
               i.item_description,
@@ -824,13 +831,16 @@ app.get('/api/top-items-dashboard', async (req, res) => {
           JOIN orders o ON o.order_id = t.order_id
           LEFT JOIN shipment s ON s.order_id = o.order_id 
           WHERE 
-              o.order_date >= DATE_TRUNC('month', CURRENT_DATE) 
-              AND o.order_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month' 
+              EXTRACT(MONTH FROM o.order_date) = $1 
+              AND EXTRACT(YEAR FROM o.order_date) = $2
               AND ((s.shipping_status != 'Cancelled' AND s.payment_status = 'Paid') OR s.shipping_status IS NULL) 
           GROUP BY i.item_id
           ORDER BY total_sales DESC
-          LIMIT 5;
-      `);
+          LIMIT $3;
+          `,
+          [month, year, limit || 5] 
+      );
+
       res.status(200).json(result.rows);
   } catch (error) {
       console.error('Error fetching top items:', error);

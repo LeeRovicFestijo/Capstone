@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '../layout/MainLayout';
 import axios from 'axios';
 import { Box, Typography, useMediaQuery, FormControl, Select, MenuItem, Switch } from '@mui/material';
@@ -20,6 +21,9 @@ const Dashboard = () => {
     const [totalCustomer, setTotalCustomer] = useState([]);
     const [orderToShip, setOrderToShip] = useState([]);
     const [recentOrders, setRecentOrders] = useState([]);
+    const navigate = useNavigate();
+    const [month, setMonth] = useState(new Date().getMonth() + 1);
+    const [limit, setLimit] = useState(5);
     const { restockData, inventoryData, setInventoryData, years, setYears } = useInventory();
 
     const [compareYear, setCompareYear] = useState(
@@ -194,7 +198,9 @@ const Dashboard = () => {
                             backgroundColor: '#143024',
                             padding: '16px',
                             borderRadius: '8px',
+                            cursor: 'pointer',
                         }}
+                        onClick={() => navigate('/shipment')}
                     >
                         <StatBox
                             title="Orders to Ship"
@@ -224,7 +230,9 @@ const Dashboard = () => {
                             backgroundColor: '#143024',
                             padding: '16px',
                             borderRadius: '8px',
+                            cursor: 'pointer',
                         }}
+                        onClick={() => navigate('/inventory')}
                     >
                         <StatBox
                             title="Total Products"
@@ -324,7 +332,7 @@ const Dashboard = () => {
                             </FormControl>
                         </Box>
                         <Box height="250px" ml="0px">
-                            <LineChart filterYear={currentYear} />
+                            <LineChart filterYear={currentYear} mobile={isMobile} />
                         </Box>
                     </Box>
 
@@ -391,7 +399,7 @@ const Dashboard = () => {
                                 </FormControl>
                             </Box>
                             <Box height="250px" ml="0px">
-                                <LineChart filterYear={compareYear ? compareYear : years[years.length - 2]} />
+                                <LineChart filterYear={compareYear ? compareYear : years[years.length - 2]} mobile={isMobile} />
                             </Box>
                         </Box>
                     )}
@@ -447,18 +455,78 @@ const Dashboard = () => {
                         }}
                     >
                         <Box
-                            mt="25px"
-                            p="0 30px"
+                            mt="5px"
+                            p="0 20px"
                             display="flex"
                             justifyContent="space-between"
                             alignItems="center"
                         >
-                            <Typography variant="h5" fontWeight="600" color="#ddbb68">
+                            <Typography 
+                                variant="h5" 
+                                fontWeight="600" 
+                                color="#ddbb68"
+                                sx={{
+                                    fontSize: isMobile ? '16px' : '20px',
+                                }}
+                            >
                                 Monthly Top Items
                             </Typography>
+                            <Box display="flex" alignItems="center" sx={{ ml: 'auto' }}>
+                                <Select
+                                    value={month}
+                                    onChange={(e) => setMonth(e.target.value)}
+                                    sx={{  
+                                        fontSize: isMobile ? '0.8rem' : '16px', // Smaller font size for mobile
+                                        minWidth: isMobile ? '80px' : '100px', // Adjust width dynamically
+                                        color: '#ddbb68', 
+                                        '.MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#ddbb68', 
+                                        },
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#ddbb68', 
+                                        },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#ddbb68',
+                                        },
+                                        '.MuiSvgIcon-root': {
+                                            color: '#ddbb68', 
+                                        },
+                                    }}
+                                >
+                                    {[...Array(12).keys()].map(m => (
+                                        <MenuItem key={m + 1} value={m + 1}>
+                                            {new Date(0, m).toLocaleString('default', { month: 'long' })}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                                <Select
+                                    value={limit}
+                                    onChange={(e) => setLimit(e.target.value)}
+                                    sx={{  
+                                        fontSize: isMobile ? '0.8rem' : '16px', // Smaller font size for mobile
+                                        minWidth: isMobile ? '80px' : '100px', // Adjust width dynamically
+                                        color: '#ddbb68', 
+                                        '.MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#ddbb68', 
+                                        },
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#ddbb68', 
+                                        },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#ddbb68',
+                                        },
+                                        '.MuiSvgIcon-root': {
+                                            color: '#ddbb68', 
+                                        },
+                                    }}
+                                >
+                                    <MenuItem value={5}>Top 5</MenuItem>
+                                    <MenuItem value={10}>Top 10</MenuItem>
+                                </Select>
+                            </Box>
                         </Box>
-                        <Box height="250px" ml="-20px">
-                            <BarChart />
+                        <Box height={isMobile? "230px" : "240px"} ml="0px">
+                            <BarChart month={month} limit={limit} year={currentYear} />
                         </Box>
                     </Box>
 

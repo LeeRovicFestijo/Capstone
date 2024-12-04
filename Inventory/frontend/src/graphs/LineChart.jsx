@@ -2,8 +2,12 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ResponsiveLine } from '@nivo/line';
 
-const LineChart =({ filterYear }) => {
+const LineChart =({ filterYear, mobile }) => {
     const [salesData, setSalesData] = useState([]);
+
+    const margin = mobile
+        ? { top: 20, right: 40, bottom: 40, left: 60 } 
+        : { top: 50, right: 100, bottom: 50, left: 90 };
 
     const fetchSalesData = async () => {
         try {
@@ -18,7 +22,7 @@ const LineChart =({ filterYear }) => {
 
     useEffect(() => {
       fetchSalesData();
-    }, [filterYear]); 
+    }, [filterYear, mobile]); 
 
     if (salesData.length === 0) {
         return <div>No sales data available.</div>;
@@ -55,7 +59,7 @@ const LineChart =({ filterYear }) => {
               },
             },
         }}
-        margin={{ top: 50, right: 40, bottom: 50, left: 60 }}
+        margin={margin}
         xScale={{ type: 'point' }}
         yScale={{
             type: 'linear',
