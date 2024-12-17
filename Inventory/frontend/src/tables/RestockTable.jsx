@@ -47,7 +47,7 @@ const RestockTable = () => {
                 {/* Table Header */}
                 <TableHead>
                     <TableRow>
-                        {['Item Description', 'Quality Stocks', 'Reorder Point', 'Recommended Order Stocks', 'ABC Category'].map((header) => (
+                        {['Item Description', 'Current Stocks', 'Reorder Point', 'Recommended Order Stocks', 'ABC Category'].map((header) => (
                             <TableCell
                                 key={header}
                                 sx={{
@@ -77,7 +77,7 @@ const RestockTable = () => {
                                 <Typography variant="body1" sx={{ color: 'white' }}>{parseFloat(stock.reorder_point).toLocaleString()}</Typography>
                             </TableCell>
                             <TableCell>
-                                <Typography variant="body1" sx={{ color: 'white' }}>{parseFloat(stock.eoq).toLocaleString()}</Typography>
+                                <Typography variant="body1" sx={{ color: 'white' }}>{parseFloat(stock.reorder_point - stock["quality_stocks"] + stock.eoq).toLocaleString()}</Typography>
                             </TableCell>
                             <TableCell>
                                 <Typography variant="body1" sx={{ color: 'white' }}>{stock.abc_classification}</Typography>
